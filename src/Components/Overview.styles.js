@@ -8,19 +8,17 @@ const styles = theme => ({
         textAlign: 'center',
         padding: theme.spacing(3),
     },
-    sectionTitle: {
-        float: "left",
-        paddingRight: 25,
-    },
     categoriesTreeSection: {
         float: 'left',
         height: "100%",
         width: "100%",
+        margin: theme.spacing(1)
     },
     filtersSection: {
         float: 'center',
         height: "100%",
         width: "100%",
+        margin: theme.spacing(1)
     },
 });
 

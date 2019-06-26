@@ -29,7 +29,7 @@ class Overview extends React.Component {
     }
 
     componentDidMount() {
-        this.fetchAndSetGreetings();
+        //this.fetchAndSetGreetings();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -40,9 +40,8 @@ class Overview extends React.Component {
     }
 
     handleFiltersChange = () => {
-        console.log("Filters:");
-        this.state.filters.map((value)=>
-            console.log(value.attribute+": "+value.values));
+        console.log("Filters overview:");
+        console.log(this.state.filters);
     };
 
     render() {
@@ -54,20 +53,18 @@ class Overview extends React.Component {
                         <Grid item xs={2}>
                             <Paper className={classes.categoriesTreeSection}>
                                 <CategoriesTree
-                                    categories={this.state.categories.map(c => ({
-                                        ...c
-                                    }))}
+                                    categories={this.state.categories}
                                     //categoryChangeCallback={this.handleCategoryChange}
                                     selectedCategoryId={this.state.categoryId}
                                 />
                             </Paper>
                         </Grid>
                         <Grid item xs={8}>
-                            <Paper className={classes.filtersSection} elevation={2}>
+                            <Paper className={classes.filtersSection}>
                                 <Filters
                                     category={this.getActiveCategory()}
                                     filters={this.state.filters}
-                                    parentUpdateCallback={this.handleFiltersChange}
+                                    overviewCallback={this.handleFiltersChange}
                                 />
                             </Paper>
                         </Grid>

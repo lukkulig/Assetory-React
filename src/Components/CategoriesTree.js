@@ -7,9 +7,8 @@ import Divider from "@material-ui/core/Divider";
 
 const styles = ({
     root: {
+        width: "100%",
         float: "left",
-        padding: 15,
-        paddingRight: 30,
     },
     title: {
         float: "left",
@@ -24,7 +23,13 @@ const styles = ({
         marginLeft: 10,
         marginBottom: 10,
     },
-
+    grid:{
+        float: "left",
+    },
+    gridItem:{
+        marginLeft: 10,
+        marginRight: 10,
+    }
 });
 
 class CategoriesTree extends React.Component {
@@ -33,17 +38,17 @@ class CategoriesTree extends React.Component {
         return (
             <div className={classes.root}>
                 <div className={classes.header}>
-                    <Typography variant="h5" component="h2" className={classes.title}>
+                    <Typography className={classes.title} variant="h5" component="h2" >
                         Categories
                     </Typography>
                 </div>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
+                <Grid className={classes.grid} container spacing={2} justify="flex-start" alignItems="flex-start">
+                    <Grid className={classes.gridItem} item xs={12}>
                         <Divider className={classes.divider}/>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid className={classes.gridItem} item xs={12}>
                         <div>
-
+                            asd
                         </div>
                     </Grid>
                 </Grid>
@@ -55,6 +60,8 @@ class CategoriesTree extends React.Component {
 
 CategoriesTree.propTypes = {
     classes: PropTypes.object.isRequired,
+    categories: PropTypes.array.isRequired,
+    selectedCategoryId: PropTypes.string.isRequired,
 };
 
 export default withStyles(styles)(CategoriesTree)

@@ -44,12 +44,16 @@ class SetFilterDialog extends React.Component {
     };
 
     setFilters = () => {
-        this.setState({filters: this.state.filters.push({"attribute": this.props.attribute, "values": this.state.value})});
-        console.log("Filters dialog:");
-        this.state.filters.map((value)=>
-            console.log(value.attribute+": "+value.value));
-        this.props.parentUpdateCallback(this.state.filters);
         this.handleClose();
+        let temp = this.state.filters;
+
+        if(temp[this.props.attribute] === undefined)
+            temp[this.props.attribute] = [];
+        temp[this.props.attribute].push(this.state.value);
+        this.setState({filters: temp});
+        console.log("Filters dialog:");
+        console.log(this.state.filters);
+        this.props.filtersCallback();
     };
 
     handleChange = name => event => {
@@ -106,7 +110,7 @@ SetFilterDialog.propTypes = {
     classes: PropTypes.object.isRequired,
     attribute: PropTypes.string.isRequired,
     filters: PropTypes.array.isRequired,
-    parentUpdateCallback: PropTypes.func
+    filtersCallback: PropTypes.func
 };
 
 export default withStyles(styles)(SetFilterDialog);

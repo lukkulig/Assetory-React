@@ -9,9 +9,8 @@ import SetFilterDialog from "./SetFilterDialog";
 
 const styles = ({
     root: {
+        width: "100%",
         float: "left",
-        padding: 15,
-        paddingRight: 30,
     },
     title: {
         float: "left",
@@ -23,11 +22,15 @@ const styles = ({
         width: "100%",
     },
     divider: {
-        marginLeft: 10,
+        marginTop: 10,
         marginBottom: 10,
     },
     grid:{
         float: "left",
+    },
+    gridItem:{
+        marginLeft: 10,
+        marginRight: 10,
     },
     activeFilters: {},
 });
@@ -44,12 +47,23 @@ class Filters extends React.Component {
         this.setState({filters: this.props.filters})
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot){
+        console.log(true);
+    }
+
     handleFiltersChange = () => {
-        console.log("Filters:");
-        this.state.filters.map((value)=>
-            console.log(value.attribute+": "+value.values));
-        this.props.parentUpdateCallback(this.state.filters);
+       //this.setState({filters: this.state.filters});
+        console.log("Filters filters:");
+        console.log(this.state.filters);
+        console.log(this.hasFilters());
+        this.forceUpdate();
+        this.props.overviewCallback();
+
     };
+
+    // hasFilters(){
+    //     return this.state.filters.length || null
+    // }
 
     // handleFiltersDeleteChange = (filters) => {
     //     let array = [...this.state.filters];
@@ -63,15 +77,14 @@ class Filters extends React.Component {
 
     render() {
         const {classes, category, filters} = this.props;
-        const buttonListElements = [];
+        const setFiltersList = [];
 
-        // eslint-disable-next-line array-callback-return
-        category.attributes.map((val, i) => {
-            buttonListElements.push(
+        category.attributes.forEach((val, i) => {
+            setFiltersList.push(
                 <SetFilterDialog
                     attribute={val}
                     filters={filters}
-                    parentUpdateCallback={this.handleFiltersChange}
+                    filtersCallback={this.handleFiltersChange}
                     key={i}
                 />);
         });
@@ -79,23 +92,26 @@ class Filters extends React.Component {
         return (
             <div className={classes.root}>
                 <div className={classes.header}>
-                    <Typography variant="h5" component="h2" className={classes.title}>
+                    <Typography className={classes.title} variant="h5" component="h2">
                         Filters
                     </Typography>
                 </div>
                 <Grid className={classes.grid} container spacing={2} justify="flex-start" alignItems="flex-start">
-                    <Grid item xs={12}>
+                    <Grid className={classes.gridItem} item xs={12}>
                         <Divider className={classes.divider}/>
                     </Grid>
-                    <Grid container item xs={12} justify="flex-start">
-                        {buttonListElements}
+                    <Grid className={classes.gridItem} container item xs={12} justify="flex-start">
+                        {setFiltersList}
                     </Grid>
-                    <Grid item xs={12}>
+                    {//this.hasFilters() &&
+                    <Grid className={classes.gridItem} item xs={12}>
+                        {console.log("elo")}
                         <ActiveFilters
-                            filters={this.state.filters}
+                            filters={filters}
                             //parentUpdateCallback={this.handleFiltersDeleteChange}
                         />
                     </Grid>
+                    }
                 </Grid>
 
             </div>
@@ -107,7 +123,7 @@ Filters.propTypes = {
     classes: PropTypes.object.isRequired,
     category: PropTypes.object.isRequired,
     filters: PropTypes.array.isRequired,
-    parentUpdateCallback: PropTypes.func,
+    overviewCallback: PropTypes.func,
 };
 
 export default withStyles(styles)(Filters)
