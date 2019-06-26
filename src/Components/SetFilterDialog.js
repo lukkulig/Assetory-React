@@ -51,8 +51,6 @@ class SetFilterDialog extends React.Component {
             temp[this.props.attribute] = [];
         temp[this.props.attribute].push(this.state.value);
         this.setState({filters: temp});
-        console.log("Filters dialog:");
-        console.log(this.state.filters);
         this.props.filtersCallback();
     };
 

@@ -12,31 +12,31 @@ class Overview extends React.Component {
 
     state = {
         greetings: "",
-        categories: [{"id": "2", "name": "Software", "path": ["all", "software"], "attributes": ["Expiration date"]},
-            {"id": "1", "name": "All", "path": ["all"], "attributes": ["Owner", "Asd", "Qwe", "Asd", "Qwe", "Asd", "Qwe", "Asd", "Qwe", "Asd", "Qwe"]},
-            {"id": "3", "name": "Hardware", "path": ["all.hardware"], "attributes": ["Manufacturer"]}],
+        allCategories: [],
         categoryId: "1",
         filters: {},
     };
 
-    fetchAndSetGreetings() {
+    fetchAndSetCategories() {
         document.body.style.cursor = 'wait';
-        api.fetchString(
-            api.endpoints.getGreeting(),
+        api.fetch(
+            api.endpoints.getAllCategories(),
             (response) => {
-                this.setState({greetings: response});
+                this.setState({allCategories: response.content});
+                console.log(this.state.allCategories);
+                document.body.style.cursor = 'default';
             });
     }
 
     componentDidMount() {
-        //this.fetchAndSetGreetings();
+        this.fetchAndSetCategories();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
     }
 
     getActiveCategory() {
-        return this.state.categories.find(c => c.id === this.state.categoryId) || null
+        return this.state.allCategories.find(c => c.id === this.state.categoryId) || null
     }
 
     handleFiltersChange = () => {
@@ -53,12 +53,13 @@ class Overview extends React.Component {
                         <Grid item xs={2}>
                             <Paper className={classes.categoriesTreeSection}>
                                 <CategoriesTree
-                                    categories={this.state.categories}
+                                    categories={this.state.allCategories}
                                     //categoryChangeCallback={this.handleCategoryChange}
                                     selectedCategoryId={this.state.categoryId}
                                 />
                             </Paper>
                         </Grid>
+                        {this.getActiveCategory() &&
                         <Grid item xs={8}>
                             <Paper className={classes.filtersSection}>
                                 <Filters
@@ -68,6 +69,7 @@ class Overview extends React.Component {
                                 />
                             </Paper>
                         </Grid>
+                        }
                     </Grid>
                 </div>
             </div>

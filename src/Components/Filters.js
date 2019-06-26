@@ -55,7 +55,9 @@ class Filters extends React.Component {
         const {classes, category, filters} = this.props;
         const setFiltersList = [];
 
-        category.attributes.forEach((val, i) => {
+        const assetAttributes = ["Category","Localisation","Backup","License","Value","Owner","User"];
+
+        assetAttributes.concat(category.attributes).forEach((val, i) => {
             setFiltersList.push(
                 <SetFilterDialog
                     attribute={val}
@@ -79,12 +81,14 @@ class Filters extends React.Component {
                     <Grid className={classes.gridItem} container item xs={12} justify="flex-start">
                         {setFiltersList}
                     </Grid>
+                    {Object.keys(this.props.filters).length !== 0 &&
                     <Grid className={classes.gridItem} item xs={12}>
                         <ActiveFilters
                             filters={this.state.filters}
                             filtersCallback={this.handleFiltersChange}
                         />
                     </Grid>
+                    }
                 </Grid>
 
             </div>

@@ -15,28 +15,18 @@ export default {
                 action(response);
             });
     },
-    fetchString: (opt, action) => {
-        fetch(opt.path, {
-            method: opt.method,
-            body: opt.body,
-            headers: opt.headers,
-            credentials: 'include'
-        })
-            .then(res => res.text())
-            .then(response => {
-                action(response);
-            });
-    },
-    fetchNoContent: (opt, action) => {
-        fetch(opt.path, {
-            method: opt.method,
-            body: opt.body,
-            headers: opt.headers,
-            credentials: 'include'
-        }).then(response => {
-            action(response);
-        });
-    },
+    // fetchString: (opt, action) => {
+    //     fetch(opt.path, {
+    //         method: opt.method,
+    //         body: opt.body,
+    //         headers: opt.headers,
+    //         credentials: 'include'
+    //     })
+    //         .then(res => res.text())
+    //         .then(response => {
+    //             action(response);
+    //         });
+    // },
     fetchHandleError: (opt, action, errorCallback) => {
         fetch(opt.path, {
             method: opt.method,
@@ -51,8 +41,8 @@ export default {
             .catch(errorCallback);
     },
     endpoints: {
-        getGreeting: () => ({
-            path: url(`greeting`),
+        getAllCategories: () => ({
+            path: url(`categories`),
             method: "GET"
         }),
     }

@@ -49,10 +49,10 @@ class DeleteFilterDialog extends React.Component {
         let index = temp[this.props.filterKey].indexOf(this.props.attribute);
         if (index !== -1) {
             temp[this.props.filterKey].splice(index, 1);
-            this.setState({filters: temp});
+            if(temp[this.props.filterKey].length === 0){
+                delete temp[this.props.filterKey];
+            }
         }
-        console.log("Filters delete:");
-        console.log(this.state.filters);
         this.props.activeFiltersCallback(this.state.filters);
     };
 
