@@ -24,7 +24,7 @@ class SetFilterDialog extends React.Component {
     state = {
         open: false,
         value: "",
-        filters: [],
+        filters: {},
     };
 
     componentDidMount() {
@@ -46,7 +46,6 @@ class SetFilterDialog extends React.Component {
     setFilters = () => {
         this.handleClose();
         let temp = this.state.filters;
-
         if(temp[this.props.attribute] === undefined)
             temp[this.props.attribute] = [];
         temp[this.props.attribute].push(this.state.value);
@@ -109,7 +108,7 @@ class SetFilterDialog extends React.Component {
 SetFilterDialog.propTypes = {
     classes: PropTypes.object.isRequired,
     attribute: PropTypes.string.isRequired,
-    filters: PropTypes.array.isRequired,
+    filters: PropTypes.object.isRequired,
     filtersCallback: PropTypes.func
 };
 

@@ -16,7 +16,7 @@ class Overview extends React.Component {
             {"id": "1", "name": "All", "path": ["all"], "attributes": ["Owner", "Asd", "Qwe", "Asd", "Qwe", "Asd", "Qwe", "Asd", "Qwe", "Asd", "Qwe"]},
             {"id": "3", "name": "Hardware", "path": ["all.hardware"], "attributes": ["Manufacturer"]}],
         categoryId: "1",
-        filters: [],
+        filters: {},
     };
 
     fetchAndSetGreetings() {

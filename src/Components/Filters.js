@@ -32,7 +32,6 @@ const styles = ({
         marginLeft: 10,
         marginRight: 10,
     },
-    activeFilters: {},
 });
 
 
@@ -40,30 +39,23 @@ const styles = ({
 class Filters extends React.Component {
 
     state = {
-        filters: [],
+        filters: {},
     };
 
     componentDidMount() {
         this.setState({filters: this.props.filters})
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot){
-        console.log(true);
-    }
+    // componentDidUpdate(prevProps, prevState, snapshot){
+    //     console.log(true);
+    // }
 
     handleFiltersChange = () => {
-       //this.setState({filters: this.state.filters});
         console.log("Filters filters:");
         console.log(this.state.filters);
-        console.log(this.hasFilters());
         this.forceUpdate();
         this.props.overviewCallback();
-
     };
-
-    // hasFilters(){
-    //     return this.state.filters.length || null
-    // }
 
     // handleFiltersDeleteChange = (filters) => {
     //     let array = [...this.state.filters];
@@ -103,15 +95,12 @@ class Filters extends React.Component {
                     <Grid className={classes.gridItem} container item xs={12} justify="flex-start">
                         {setFiltersList}
                     </Grid>
-                    {//this.hasFilters() &&
                     <Grid className={classes.gridItem} item xs={12}>
-                        {console.log("elo")}
                         <ActiveFilters
-                            filters={filters}
+                            filters={this.state.filters}
                             //parentUpdateCallback={this.handleFiltersDeleteChange}
                         />
                     </Grid>
-                    }
                 </Grid>
 
             </div>
@@ -122,7 +111,7 @@ class Filters extends React.Component {
 Filters.propTypes = {
     classes: PropTypes.object.isRequired,
     category: PropTypes.object.isRequired,
-    filters: PropTypes.array.isRequired,
+    filters: PropTypes.object.isRequired,
     overviewCallback: PropTypes.func,
 };
 
