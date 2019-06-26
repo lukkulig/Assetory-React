@@ -1,7 +1,6 @@
 const host = "localhost";
-const port = 8080;
+const port = 5444;
 const url = endpoint => `http://${host}:${port}/${endpoint}`;
-let base64 = require('base-64');
 
 export default {
     fetch: (opt, action) => {
@@ -12,6 +11,18 @@ export default {
             credentials: 'include'
         })
             .then(res => res.json())
+            .then(response => {
+                action(response);
+            });
+    },
+    fetchString: (opt, action) => {
+        fetch(opt.path, {
+            method: opt.method,
+            body: opt.body,
+            headers: opt.headers,
+            credentials: 'include'
+        })
+            .then(res => res.text())
             .then(response => {
                 action(response);
             });
@@ -40,6 +51,15 @@ export default {
             .catch(errorCallback);
     },
     endpoints: {
+        getGreeting: () => ({
+            path: url(`greeting`),
+            method: "GET"
+        }),
+
+        getCategories: categoryId => ({
+            path: url(`categories`),
+            method: "GET"
+        }),
 
     }
 }
