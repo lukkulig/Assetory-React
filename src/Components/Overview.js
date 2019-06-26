@@ -13,9 +13,10 @@ class Overview extends React.Component {
     state = {
         greetings: "",
         categories: [{"id": "2", "name": "Software", "path": ["all", "software"], "attributes": ["Expiration date"]},
-            {"id": "1", "name": "All", "path": ["all"], "attributes": ["Owner"]},
+            {"id": "1", "name": "All", "path": ["all"], "attributes": ["Owner", "Asd", "Qwe", "Asd", "Qwe", "Asd", "Qwe", "Asd", "Qwe", "Asd", "Qwe"]},
             {"id": "3", "name": "Hardware", "path": ["all.hardware"], "attributes": ["Manufacturer"]}],
-        categoryId: 1,
+        categoryId: "1",
+        filters: [],
     };
 
     fetchAndSetGreetings() {
@@ -35,8 +36,14 @@ class Overview extends React.Component {
     }
 
     getActiveCategory() {
-        return this.state.categories.find(c => c.categoryId === this.state.categoryId) || null
+        return this.state.categories.find(c => c.id === this.state.categoryId) || null
     }
+
+    handleFiltersChange = () => {
+        console.log("Filters:");
+        this.state.filters.map((value)=>
+            console.log(value.attribute+": "+value.values));
+    };
 
     render() {
         const {classes} = this.props;
@@ -59,7 +66,8 @@ class Overview extends React.Component {
                             <Paper className={classes.filtersSection} elevation={2}>
                                 <Filters
                                     category={this.getActiveCategory()}
-                                    //filtersCallback={this.handleFiltersChange}
+                                    filters={this.state.filters}
+                                    parentUpdateCallback={this.handleFiltersChange}
                                 />
                             </Paper>
                         </Grid>

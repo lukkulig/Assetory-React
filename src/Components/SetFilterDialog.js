@@ -1,0 +1,112 @@
+import React from 'react';
+import * as PropTypes from "prop-types";
+import {withStyles} from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import Button from "@material-ui/core/Button";
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+
+const styles = theme => ({
+    textField: {
+        width: '100%',
+    },
+    filterButton: {
+        marginRight: theme.spacing(1),
+        marginBottom: theme.spacing(1)
+    },
+});
+
+class SetFilterDialog extends React.Component {
+
+    state = {
+        open: false,
+        value: "",
+        filters: [],
+    };
+
+    componentDidMount() {
+        this.setState({filters: this.props.filters})
+    }
+
+    handleClickOpen = () => {
+        this.setState({open: true});
+    };
+
+    handleClose = () => {
+        this.setState({open: false});
+    };
+
+    isValid = () => {
+        return true;
+    };
+
+    setFilters = () => {
+        this.setState({filters: this.state.filters.push({"attribute": this.props.attribute, "values": this.state.value})});
+        console.log("Filters dialog:");
+        this.state.filters.map((value)=>
+            console.log(value.attribute+": "+value.value));
+        this.props.parentUpdateCallback(this.state.filters);
+        this.handleClose();
+    };
+
+    handleChange = name => event => {
+        this.setState({[name]: event.target.value});
+    };
+
+    render() {
+        const {classes, attribute} = this.props;
+
+        return (
+            <div>
+                <Button className={classes.filterButton}
+                        variant="outlined"
+                        onClick={this.handleClickOpen}>
+                    {attribute}
+                </Button>
+                <Dialog
+                    open={this.state.open}
+                    onClose={this.handleClose}
+                    aria-labelledby="set-filter-form"
+                >
+                    <DialogTitle id="set-filter-form">{attribute}</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Setting filters
+                        </DialogContentText>
+
+                        <TextField
+                            id="filters"
+                            label="Filter"
+                            className={classes.textField}
+                            value={this.state.value}
+                            onChange={this.handleChange("value")}
+                            margin="normal"
+                            type="string"
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={this.handleClose} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={this.setFilters} color="primary" disabled={!this.isValid()}>
+                            Set filters
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
+        );
+    }
+
+}
+
+SetFilterDialog.propTypes = {
+    classes: PropTypes.object.isRequired,
+    attribute: PropTypes.string.isRequired,
+    filters: PropTypes.array.isRequired,
+    parentUpdateCallback: PropTypes.func
+};
+
+export default withStyles(styles)(SetFilterDialog);

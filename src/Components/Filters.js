@@ -5,6 +5,7 @@ import Typography from "@material-ui/core/Typography";
 import ActiveFilters from "./ActiveFilters";
 import Grid from "@material-ui/core/Grid";
 import Divider from "@material-ui/core/Divider";
+import SetFilterDialog from "./SetFilterDialog";
 
 const styles = ({
     root: {
@@ -25,8 +26,13 @@ const styles = ({
         marginLeft: 10,
         marginBottom: 10,
     },
+    grid:{
+        float: "left",
+    },
     activeFilters: {},
 });
+
+
 
 class Filters extends React.Component {
 
@@ -34,8 +40,42 @@ class Filters extends React.Component {
         filters: [],
     };
 
+    componentDidMount() {
+        this.setState({filters: this.props.filters})
+    }
+
+    handleFiltersChange = () => {
+        console.log("Filters:");
+        this.state.filters.map((value)=>
+            console.log(value.attribute+": "+value.values));
+        this.props.parentUpdateCallback(this.state.filters);
+    };
+
+    // handleFiltersDeleteChange = (filters) => {
+    //     let array = [...this.state.filters];
+    //     let index = array.indexOf(filters.target.value);
+    //     if (index !== -1) {
+    //         array.splice(index, 1);
+    //         this.setState({filters: array});
+    //     };
+    //     this.props.filtersChangeCallback(this.state.filters);
+    // };
+
     render() {
-        const {classes} = this.props;
+        const {classes, category, filters} = this.props;
+        const buttonListElements = [];
+
+        // eslint-disable-next-line array-callback-return
+        category.attributes.map((val, i) => {
+            buttonListElements.push(
+                <SetFilterDialog
+                    attribute={val}
+                    filters={filters}
+                    parentUpdateCallback={this.handleFiltersChange}
+                    key={i}
+                />);
+        });
+
         return (
             <div className={classes.root}>
                 <div className={classes.header}>
@@ -43,16 +83,17 @@ class Filters extends React.Component {
                         Filters
                     </Typography>
                 </div>
-                <Grid container spacing={2}>
+                <Grid className={classes.grid} container spacing={2} justify="flex-start" alignItems="flex-start">
                     <Grid item xs={12}>
                         <Divider className={classes.divider}/>
                     </Grid>
+                    <Grid container item xs={12} justify="flex-start">
+                        {buttonListElements}
+                    </Grid>
                     <Grid item xs={12}>
                         <ActiveFilters
-                            filters={this.state.filters.map(f => ({
-                                ...f
-                            }))}
-                            //filtersCallback={this.handleFiltersChange}
+                            filters={this.state.filters}
+                            //parentUpdateCallback={this.handleFiltersDeleteChange}
                         />
                     </Grid>
                 </Grid>
@@ -64,6 +105,9 @@ class Filters extends React.Component {
 
 Filters.propTypes = {
     classes: PropTypes.object.isRequired,
+    category: PropTypes.object.isRequired,
+    filters: PropTypes.array.isRequired,
+    parentUpdateCallback: PropTypes.func,
 };
 
 export default withStyles(styles)(Filters)
