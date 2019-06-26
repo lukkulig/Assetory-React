@@ -13,7 +13,7 @@ const RootRouter = () => {
           )}
       />
   );
-}
+};
 
 const InnerRouter = (props) => {
   return (

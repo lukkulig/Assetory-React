@@ -1,41 +1,76 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from "prop-types";
 import {withStyles} from '@material-ui/core/styles/index';
-import Typography from '@material-ui/core/Typography/index';
 import styles from "./Overview.styles";
 import api from "../api";
+import Filters from "./Filters";
+import Grid from "@material-ui/core/Grid";
+import CategoriesTree from "./CategoriesTree";
+import Paper from "@material-ui/core/Paper";
 
 class Overview extends React.Component {
 
     state = {
         greetings: "",
+        allCategories: [],
+        categoryId: "1",
+        filters: {},
     };
 
-    fetchAndSetGreetings() {
+    fetchAndSetCategories() {
         document.body.style.cursor = 'wait';
-        api.fetchString(
-            api.endpoints.getGreeting(),
+        api.fetch(
+            api.endpoints.getAllCategories(),
             (response) => {
-                this.setState({greetings: response});
+                this.setState({allCategories: response.content});
+                console.log(this.state.allCategories);
+                document.body.style.cursor = 'default';
             });
     }
 
     componentDidMount() {
-        this.fetchAndSetGreetings();
+        this.fetchAndSetCategories();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
     }
+
+    getActiveCategory() {
+        return this.state.allCategories.find(c => c.id === this.state.categoryId) || null
+    }
+
+    handleFiltersChange = () => {
+        console.log("Filters overview:");
+        console.log(this.state.filters);
+    };
 
     render() {
         const {classes} = this.props;
         return (
             <div className={classes.root}>
                 <div className={classes.content}>
-                    <Typography variant="h4" gutterBottom>
-                        <p>Overview</p>
-                        <p>{this.state.greetings}</p>
-                    </Typography>
+                    <Grid container spacing={2}>
+                        <Grid item xs={2}>
+                            <Paper className={classes.categoriesTreeSection}>
+                                <CategoriesTree
+                                    categories={this.state.allCategories}
+                                    //categoryChangeCallback={this.handleCategoryChange}
+                                    selectedCategoryId={this.state.categoryId}
+                                />
+                            </Paper>
+                        </Grid>
+                        {this.getActiveCategory() &&
+                        <Grid item xs={8}>
+                            <Paper className={classes.filtersSection}>
+                                <Filters
+                                    category={this.getActiveCategory()}
+                                    filters={this.state.filters}
+                                    overviewCallback={this.handleFiltersChange}
+                                />
+                            </Paper>
+                        </Grid>
+                        }
+                    </Grid>
                 </div>
             </div>
         );
