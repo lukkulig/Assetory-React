@@ -46,26 +46,10 @@ class Filters extends React.Component {
         this.setState({filters: this.props.filters})
     }
 
-    // componentDidUpdate(prevProps, prevState, snapshot){
-    //     console.log(true);
-    // }
-
     handleFiltersChange = () => {
-        console.log("Filters filters:");
-        console.log(this.state.filters);
         this.forceUpdate();
         this.props.overviewCallback();
     };
-
-    // handleFiltersDeleteChange = (filters) => {
-    //     let array = [...this.state.filters];
-    //     let index = array.indexOf(filters.target.value);
-    //     if (index !== -1) {
-    //         array.splice(index, 1);
-    //         this.setState({filters: array});
-    //     };
-    //     this.props.filtersChangeCallback(this.state.filters);
-    // };
 
     render() {
         const {classes, category, filters} = this.props;
@@ -98,7 +82,7 @@ class Filters extends React.Component {
                     <Grid className={classes.gridItem} item xs={12}>
                         <ActiveFilters
                             filters={this.state.filters}
-                            //parentUpdateCallback={this.handleFiltersDeleteChange}
+                            filtersCallback={this.handleFiltersChange}
                         />
                     </Grid>
                 </Grid>

@@ -1,13 +1,13 @@
 import React from 'react';
 import * as PropTypes from "prop-types";
 import {withStyles} from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
 import Button from "@material-ui/core/Button";
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 
 const styles = theme => ({
     textField: {
@@ -18,9 +18,12 @@ const styles = theme => ({
         marginBottom: theme.spacing(1),
         height: 30,
     },
+    test: {
+        padding: -10,
+    },
 });
 
-class SetFilterDialog extends React.Component {
+class DeleteFilterDialog extends React.Component {
 
     state = {
         open: false,
@@ -40,63 +43,48 @@ class SetFilterDialog extends React.Component {
         this.setState({open: false});
     };
 
-    isValid = () => {
-        return true;
-    };
-
-    setFilters = () => {
+    deleteFilter = () => {
         this.handleClose();
         let temp = this.state.filters;
-        if(temp[this.props.attribute] === undefined)
-            temp[this.props.attribute] = [];
-        temp[this.props.attribute].push(this.state.value);
-        this.setState({filters: temp});
-        console.log("Filters dialog:");
+        let index = temp[this.props.filterKey].indexOf(this.props.attribute);
+        if (index !== -1) {
+            temp[this.props.filterKey].splice(index, 1);
+            this.setState({filters: temp});
+        }
+        console.log("Filters delete:");
         console.log(this.state.filters);
-        this.props.filtersCallback();
-    };
-
-    handleChange = name => event => {
-        this.setState({[name]: event.target.value});
+        this.props.activeFiltersCallback(this.state.filters);
     };
 
     render() {
-        const {classes, attribute} = this.props;
+        const {classes, filterKey, attribute} = this.props;
 
         return (
             <div>
                 <Button className={classes.filterButton}
                         variant="outlined"
+                        filters={this.state.filters}
                         onClick={this.handleClickOpen}>
-                    {attribute}
+                    <p>{filterKey + " : " + attribute}</p>
+                    <HighlightOffIcon fontSize='small' className={classes.test}/>
                 </Button>
                 <Dialog
                     open={this.state.open}
                     onClose={this.handleClose}
-                    aria-labelledby="set-filter-form"
+                    aria-labelledby="delete-filter-form"
                 >
-                    <DialogTitle id="set-filter-form">{attribute}</DialogTitle>
+                    <DialogTitle id="delete-filter-form">{filterKey}</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            Setting filters
+                            Are you sure you want to delete filter "{attribute}" for {filterKey}?
                         </DialogContentText>
-
-                        <TextField
-                            id="filters"
-                            label="Filter"
-                            className={classes.textField}
-                            value={this.state.value}
-                            onChange={this.handleChange("value")}
-                            margin="normal"
-                            type="string"
-                        />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={this.handleClose} color="primary">
                             Cancel
                         </Button>
-                        <Button onClick={this.setFilters} color="primary" disabled={!this.isValid()}>
-                            Set filters
+                        <Button onClick={this.deleteFilter} color="primary">
+                            Delete filter
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -106,11 +94,12 @@ class SetFilterDialog extends React.Component {
 
 }
 
-SetFilterDialog.propTypes = {
+DeleteFilterDialog.propTypes = {
     classes: PropTypes.object.isRequired,
+    filterKey: PropTypes.string.isRequired,
     attribute: PropTypes.string.isRequired,
     filters: PropTypes.object.isRequired,
-    filtersCallback: PropTypes.func
+    activeFiltersCallback: PropTypes.func
 };
 
-export default withStyles(styles)(SetFilterDialog);
+export default withStyles(styles)(DeleteFilterDialog);

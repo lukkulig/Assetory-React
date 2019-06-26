@@ -1,9 +1,9 @@
 import React from "react";
 import * as PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core";
-import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff"
+import DeleteFilterDialog from "./DeleteFilterDialog";
+import Typography from "@material-ui/core/Typography";
 
 const styles = theme => ({
     root: {
@@ -15,11 +15,9 @@ const styles = theme => ({
         marginLeft: 10,
         marginRight: 10,
     },
-    filterButton: {
-        marginRight: theme.spacing(1),
-        marginBottom: theme.spacing(1),
-        textAlign: 'center'
-    },
+    text: {
+        marginRight: theme.spacing(1)
+    }
 });
 
 class ActiveFilters extends React.Component {
@@ -32,6 +30,10 @@ class ActiveFilters extends React.Component {
         this.setState({filters: this.props.filters});
     }
 
+    handleFiltersChange = (filters) => {
+        this.setState({filters: filters});
+        this.props.filtersCallback();
+    };
 
     render() {
         const {classes, filters} = this.props;
@@ -40,27 +42,28 @@ class ActiveFilters extends React.Component {
         let i = 0;
         for (let key in filters) {
             if (filters.hasOwnProperty(key)) {
-                filtersList.push(
-                    <Button className={classes.filterButton}
-                            variant="outlined"
-                            filters={this.state.filters}
-                            onClick={this.handleClickOpen}
-                            key={i}
-                    >
-                        <p>{key + " : " + filters[key]}</p>
-                        <HighlightOffIcon/>
-                    </Button>);
-                i++;
+                for (let attr_ind in filters[key]) {
+                    if (filters[key].hasOwnProperty(attr_ind)) {
+                        filtersList.push(
+                            <DeleteFilterDialog
+                                filterKey={key}
+                                attribute={filters[key][attr_ind]}
+                                filters={filters}
+                                activeFiltersCallback={this.handleFiltersChange}
+                                key={i}
+                            />);
+                        i++;
+                    }
+                }
             }
         }
-
         return (
 
             <div className={classes.root}>
                 <Grid className={classes.grid} container item xs={12} justify="flex-start">
-                    <p className={classes.filterButton}>
+                    <Typography className={classes.text}>
                         Active filters:
-                    </p>
+                    </Typography>
                     {filtersList}
                 </Grid>
             </div>
@@ -72,6 +75,7 @@ class ActiveFilters extends React.Component {
 ActiveFilters.propTypes = {
     classes: PropTypes.object.isRequired,
     filters: PropTypes.object.isRequired,
+    filtersCallback: PropTypes.func
 };
 
 export default withStyles(styles)(ActiveFilters)
