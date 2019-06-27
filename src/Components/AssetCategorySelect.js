@@ -13,7 +13,6 @@ import PeopleIcon from '@material-ui/icons/People';
 import NotInterestedIcon from '@material-ui/icons/NotInterested';
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 
-
 const styles = theme => ({
     root: {
         flexGrow: 1,
@@ -116,35 +115,16 @@ function Option(props) {
     );
 }
 
-const getOptionLabel = (option) => {
-    return option.name.trim();
-};
-
 const formatOptionLabel = (option) => {
     return (
         <div>
             {option.name}
-            <ListItemSecondaryAction>
-                {!option.isOpen &&
-                <Tooltip disableFocusListener
-                         disableTouchListener
-                         placement="left"
-                         title="Project closed"
-                         style={{float: "right", paddingRight: 10, color: "#666666"}}
-                         PopperProps={option.id > 6 && option.id !== 3 ? {style: {paddingRight: 30}} : {}} //TODO in im scrum master
-                >
-                    <NotInterestedIcon fontSize='small'/>
-                </Tooltip>
-                }
-                {option.id > 6 && option.id !== 3 && //TODO if im scrum master
-                <Tooltip disableFocusListener disableTouchListener placement="left" title="Scrum master permissions"
-                         style={{float: "right", paddingRight: 10, color: "#666666"}}>
-                    <PeopleIcon fontSize='small'/>
-                </Tooltip>
-                }
-            </ListItemSecondaryAction>
         </div>
     );
+};
+
+const getOptionLabel = (option) => {
+    return option.name.trim();
 };
 
 const customFilterOption = (option, rawInput) => {
@@ -186,14 +166,8 @@ function Menu(props) {
     );
 }
 
-function getSortedProjects(categories) {
+function getSortedCategories(categories) {
     return categories.slice().sort((a, b) => {
-        if (a.isOpen === true && b.isOpen === false)
-            return 1;
-
-        if (a.isOpen === false && b.isOpen === true)
-            return -1;
-
         return a.name < b.name ? 1 : (a.name === b.name ? 0 : -1)
     }).reverse();
 }
@@ -209,11 +183,11 @@ const components = {
 
 class AssetCategorySelect extends React.Component {
 
-    handleChange = selectedProject => {
-        if (selectedProject === null)
+    handleChange = selectedCategory => {
+        if (selectedCategory === null)
             this.props.categoryChangeCallback(null);
         else
-            this.props.categoryChangeCallback(selectedProject.id);
+            this.props.categoryChangeCallback(selectedCategory.id);
     };
 
     findCategory = (selectedCategoryId) => {
@@ -229,7 +203,7 @@ class AssetCategorySelect extends React.Component {
                 <NoSsr>
                     <Select
                         classes={classes}
-                        options={getSortedProjects(categories)}
+                        options={getSortedCategories(categories)}
                         components={components}
                         value={this.findCategory(selectedCategoryId)}
                         onChange={this.handleChange}
@@ -252,6 +226,7 @@ AssetCategorySelect.propTypes = {
         PropTypes.shape({
             id: PropTypes.number,
             name: PropTypes.string,
+            attributes: PropTypes.array,
         })
     ).isRequired,
     categoryChangeCallback: PropTypes.func,
