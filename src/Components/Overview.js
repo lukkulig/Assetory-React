@@ -4,7 +4,6 @@ import {withStyles} from '@material-ui/core/styles/index';
 import styles from "./Overview.styles";
 import api from "../api";
 import Filters from "./Filters";
-import Grid from "@material-ui/core/Grid";
 import CategoriesTree from "./CategoriesTree";
 import Paper from "@material-ui/core/Paper";
 
@@ -13,7 +12,7 @@ class Overview extends React.Component {
     state = {
         greetings: "",
         allCategories: [],
-        categoryId: "2",
+        categoryId: "1",
         filters: {},
     };
 
@@ -49,28 +48,33 @@ class Overview extends React.Component {
         return (
             <div className={classes.root}>
                 <div className={classes.content}>
-                    <Grid container spacing={2}>
-                        <Grid container item xs={2}>
-                            <Paper className={classes.categoriesTreeSection}>
-                                <CategoriesTree
-                                    categories={this.state.allCategories}
-                                    //categoryChangeCallback={this.handleCategoryChange}
-                                    selectedCategoryId={this.state.categoryId}
-                                />
-                            </Paper>
-                        </Grid>
+                    <div className={classes.categoriesTreeSection}>
+                        <Paper className={classes.paper}>
+                            <CategoriesTree
+                                categories={this.state.allCategories}
+                                //categoryChangeCallback={this.handleCategoryChange}
+                                selectedCategoryId={this.state.categoryId}
+                            />
+                        </Paper>
+                    </div>
+                    <div className={classes.assetsSection}>
                         {this.getActiveCategory() &&
-                        <Grid container item xs={8}>
-                            <Paper className={classes.filtersSection}>
+                        <div className={classes.filtersSection}>
+                            <Paper className={classes.paper}>
                                 <Filters
                                     category={this.getActiveCategory()}
                                     filters={this.state.filters}
                                     overviewCallback={this.handleFiltersChange}
                                 />
                             </Paper>
-                        </Grid>
+                        </div>
                         }
-                    </Grid>
+                        <div className={classes.assetsViewSection}>
+                            <Paper className={classes.paper}>
+                                Tu bedndom assety cnie
+                            </Paper>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
