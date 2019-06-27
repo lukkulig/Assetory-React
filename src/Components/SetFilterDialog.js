@@ -8,15 +8,17 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Fab from "@material-ui/core/Fab";
 
 const styles = theme => ({
     textField: {
         width: '100%',
     },
-    filterButton: {
+    filterFab: {
         marginRight: theme.spacing(1),
         marginBottom: theme.spacing(1),
         height: 30,
+        textTransform: "none",
     },
 });
 
@@ -47,7 +49,7 @@ class SetFilterDialog extends React.Component {
     setFilters = () => {
         this.handleClose();
         let temp = this.state.filters;
-        if(temp[this.props.attribute] === undefined)
+        if (temp[this.props.attribute] === undefined)
             temp[this.props.attribute] = [];
         temp[this.props.attribute].push(this.state.value);
         this.setState({filters: temp});
@@ -63,11 +65,12 @@ class SetFilterDialog extends React.Component {
 
         return (
             <div>
-                <Button className={classes.filterButton}
-                        variant="outlined"
-                        onClick={this.handleClickOpen}>
+                <Fab className={classes.filterFab}
+                     variant="extended"
+                     color="primary"
+                     onClick={this.handleClickOpen}>
                     {attribute}
-                </Button>
+                </Fab>
                 <Dialog
                     open={this.state.open}
                     onClose={this.handleClose}
@@ -78,7 +81,6 @@ class SetFilterDialog extends React.Component {
                         <DialogContentText>
                             Setting filters
                         </DialogContentText>
-
                         <TextField
                             id="filters"
                             label="Filter"

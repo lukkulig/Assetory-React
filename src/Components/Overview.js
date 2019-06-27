@@ -13,7 +13,7 @@ class Overview extends React.Component {
     state = {
         greetings: "",
         allCategories: [],
-        categoryId: "1",
+        categoryId: "2",
         filters: {},
     };
 
@@ -50,7 +50,7 @@ class Overview extends React.Component {
             <div className={classes.root}>
                 <div className={classes.content}>
                     <Grid container spacing={2}>
-                        <Grid item xs={2}>
+                        <Grid container item xs={2}>
                             <Paper className={classes.categoriesTreeSection}>
                                 <CategoriesTree
                                     categories={this.state.allCategories}
@@ -60,7 +60,7 @@ class Overview extends React.Component {
                             </Paper>
                         </Grid>
                         {this.getActiveCategory() &&
-                        <Grid item xs={8}>
+                        <Grid container item xs={8}>
                             <Paper className={classes.filtersSection}>
                                 <Filters
                                     category={this.getActiveCategory()}
