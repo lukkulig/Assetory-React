@@ -5,11 +5,9 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Divider from "@material-ui/core/Divider";
 import TreeMenu from 'react-simple-tree-menu';
-import TreeViewMenu from 'react-simple-tree-menu';
-import ListGroup from 'react-simple-tree-menu';
-import Input from 'react-simple-tree-menu';
-import ListItem from 'react-simple-tree-menu';
-
+import {ListGroup, ListGroupItem} from 'reactstrap';
+import AddCircleOutline from "@material-ui/icons/AddCircleOutline"
+import RemoveCircleOutline from "@material-ui/icons/RemoveCircleOutline"
 
 const styles = ({
     root: {
@@ -35,38 +33,73 @@ const styles = ({
     gridItem: {
         marginLeft: 10,
         marginRight: 10,
-    }
+    },
 });
+
+const DEFAULT_PADDING = 16;
+const ICON_SIZE = 29;
+const LEVEL_SPACE = 30;
+const ToggleIcon = ({on}) =>
+    on ? <RemoveCircleOutline style={{marginRight: 5}} fontSize='small' /> : <AddCircleOutline style={{marginRight: 5}} fontSize='small' />;
+
+const ListItem = ({
+                      level = 0,
+                      hasNodes,
+                      isOpen,
+                      label,
+                      searchTerm,
+                      openNodes,
+                      toggleNode,
+                      matchSearch,
+                      focused,
+                      ...props
+                  }) => (
+    <ListGroupItem
+        {...props}
+        style={{
+            paddingLeft: DEFAULT_PADDING + ICON_SIZE + level * LEVEL_SPACE,
+            cursor: 'pointer',
+            boxShadow: focused ? '0px 0px 5px 0px #222' : 'none',
+            zIndex: focused ? 999 : 'unset',
+            position: 'relative',
+            textAlign: 'left'
+        }}
+    >
+        {hasNodes && (
+            <div
+                style={{ display: 'inline-block' }}
+                onClick={e => {
+                    hasNodes && toggleNode && toggleNode();
+                    e.stopPropagation();
+                }}
+            >
+                <ToggleIcon on={isOpen} />
+            </div>
+        )}
+        {label}
+    </ListGroupItem>
+);
 
 class CategoriesTree extends React.Component {
 
-    render() {
-        const {classes} = this.props;
+    mapToData(categories) {
+        return categories.map( c => ({
+            key : c.id,
+            label : c.name,
+            index : parseInt(c.id),
+            nodes : (c.subcategories !== undefined) ? this.mapToData(c.subcategories) : []
+        }));
+    }
 
-        const treeData = {
-            'first-level-node-1': {               // key
-                label: 'Node 1 at the first level',
-                index: 0, // decide the rendering order on the same level
-                      // any other props you need, e.g. url
-                nodes: {
-                    'second-level-node-1': {
-                        label: 'Node 1 at the second level',
-                        index: 0,
-                        nodes: {
-                            'third-level-node-1': {
-                                label: 'Node 1 at the third level',
-                                index: 0,
-                                nodes: {} // you can remove the nodes property or leave it as an empty array
-                            },
-                        },
-                    },
-                },
-            },
-            'first-level-node-2': {
-                label: 'Node 2 at the first level',
-                index: 1,
-            },
-        };
+    static initialKey(categories) {
+        return (categories[0] !== undefined) ? categories[0].id : "1";
+    }
+
+    render() {
+        const {classes, categories} = this.props;
+
+        console.log(this.mapToData(categories));
+        console.log(CategoriesTree.initialKey(categories));
 
         return (
             <div className={classes.root}>
@@ -81,28 +114,19 @@ class CategoriesTree extends React.Component {
                     </Grid>
                     <Grid className={classes.gridItem} item xs={12}>
                         <div>
-                            {/*<TreeViewMenu*/}
-                            {/*    data={treeData}*/}
-                            {/*    onClickItem={({ key, label, ...props }) => {*/}
-                            {/*        //this.navigate(props.url); // user defined prop*/}
-                            {/*    }}*/}
-                            {/*    debounceTime={125}>*/}
-                            {/*    {({ search, items }) => (*/}
-                            {/*        <>*/}
-                            {/*            <Input onChange={e => search(e.target.value)} placeholder="Type and search" />*/}
-                            {/*            <ListGroup>*/}
-                            {/*                {items.map(props => (*/}
-                            {/*                    // You might need to wrap the third-party component to consume the props*/}
-                            {/*                    // check the story as an example*/}
-                            {/*                    // https://github.com/iannbing/react-simple-tree-menu/blob/master/stories/index.stories.js*/}
-                            {/*                    <ListItem {...props} />*/}
-                            {/*                ))}*/}
-                            {/*            </ListGroup>*/}
-                            {/*        </>*/}
-                            {/*    )}*/}
-                            {/*</TreeViewMenu>*/}
-                            <TreeMenu data={treeData} />
+                            <TreeMenu data={this.mapToData(categories)} hasSearch={false} initialActiveKey={CategoriesTree.initialKey(categories)}>
+                                {({ items }) => (
+                                    <>
+                                        <ListGroup flush={true}>
+                                            {items.map(({ reset, ...props }) => (
+                                                <ListItem {...props} />
+                                            ))}
+                                        </ListGroup>
+                                    </>
+                                )}
+                            </TreeMenu>
                         </div>
+
                     </Grid>
                 </Grid>
 
@@ -113,7 +137,14 @@ class CategoriesTree extends React.Component {
 
 CategoriesTree.propTypes = {
     classes: PropTypes.object.isRequired,
-    categories: PropTypes.array.isRequired,
+    categories: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.string,
+            name: PropTypes.string,
+            subcategories: PropTypes.array
+        })
+    ).isRequired,
+    categoryChangeCallback: PropTypes.func,
     selectedCategoryId: PropTypes.string.isRequired,
 };
 

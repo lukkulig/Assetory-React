@@ -11,8 +11,8 @@ class Overview extends React.Component {
 
     state = {
         greetings: "",
-        allCategories: [],
-        categoryId: "1",
+        categories: [],
+        categoryId: "",
         filters: {},
     };
 
@@ -21,26 +21,65 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getAllCategories(),
             (response) => {
-                this.setState({allCategories: response.content});
-                console.log(this.state.allCategories);
+                this.setState({categories: response.content});
                 document.body.style.cursor = 'default';
             });
     }
 
+    // fetchAndSetSubcategories(categoryId) {
+    //     document.body.style.cursor = 'wait';
+    //     api.fetch(
+    //         api.endpoints.getSubcategories(categoryId),
+    //         (response) => {
+    //             this.setState({subcategories1: response.content});
+    //             console.log(this.state.subcategories1);
+    //             document.body.style.cursor = 'default';
+    //         });
+    // }
+
+
     componentDidMount() {
-        this.fetchAndSetCategories();
+        //this.fetchAndSetCategories();
+        this.setState(
+            {
+                categories: [
+                    {
+                        "id": "1", "name": "All", "path": "all", "attributes": ["Owner"], "subcategories": [
+                            {
+                                "id": "2",
+                                "name": "Software",
+                                "path": "all:software",
+                                "attributes": ["Expiration date"],
+                                "subcategories": [
+                                    {
+                                        "id": "4",
+                                        "name": "SubSoftware",
+                                        "path": "all:software:subsoftware",
+                                        "attributes": ["Expiration date2"]
+                                    },
+                                ]
+                            },
+                            {"id": "3", "name": "Hardware", "path": "all:hardware", "attributes": ["Manufacturer"]}]
+                    }
+                ]
+            });
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
     }
 
     getActiveCategory() {
-        return this.state.allCategories.find(c => c.id === this.state.categoryId) || null
+        return this.state.categories.find(c => c.id === this.state.categoryId) || null
     }
 
     handleFiltersChange = () => {
         console.log("Filters overview:");
         console.log(this.state.filters);
+    };
+
+    handleCategoryChange = () => {
+        console.log("Category change overview:");
+        console.log(this.state.categoryId);
     };
 
     render() {
@@ -51,8 +90,12 @@ class Overview extends React.Component {
                     <div className={classes.categoriesTreeSection}>
                         <Paper className={classes.paper}>
                             <CategoriesTree
-                                categories={this.state.allCategories}
-                                //categoryChangeCallback={this.handleCategoryChange}
+                                categories={this.state.categories.map(c => ({
+                                    id: c.id,
+                                    name: c.name,
+                                    subcategories: c.subcategories
+                                }))}
+                                categoryChangeCallback={this.handleCategoryChange}
                                 selectedCategoryId={this.state.categoryId}
                             />
                         </Paper>
@@ -74,6 +117,7 @@ class Overview extends React.Component {
                                 Tu bedndom assety cnie
                             </Paper>
                         </div>
+
                     </div>
                 </div>
             </div>

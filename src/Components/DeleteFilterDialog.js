@@ -20,8 +20,8 @@ const styles = theme => ({
         height: 30,
         textTransform: "none",
     },
-    test: {
-        padding: -10,
+    icon: {
+        marginLeft: 5,
     },
 });
 
@@ -67,8 +67,8 @@ class DeleteFilterDialog extends React.Component {
                      variant="extended"
                      filters={this.state.filters}
                      onClick={this.handleClickOpen}>
-                    <p>{filterKey + ": " + attribute}</p>
-                    <HighlightOffIcon fontSize='small' className={classes.test}/>
+                    {filterKey + ": " + attribute}
+                    <HighlightOffIcon fontSize='small' className={classes.icon}/>
                 </Fab>
                 <Dialog
                     open={this.state.open}
