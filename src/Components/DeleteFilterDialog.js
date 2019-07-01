@@ -8,18 +8,20 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import Fab from "@material-ui/core/Fab";
 
 const styles = theme => ({
     textField: {
         width: '100%',
     },
-    filterButton: {
+    filterFab: {
         marginRight: theme.spacing(1),
         marginBottom: theme.spacing(1),
         height: 30,
+        textTransform: "none",
     },
-    test: {
-        padding: -10,
+    icon: {
+        marginLeft: 5,
     },
 });
 
@@ -49,7 +51,7 @@ class DeleteFilterDialog extends React.Component {
         let index = temp[this.props.filterKey].indexOf(this.props.attribute);
         if (index !== -1) {
             temp[this.props.filterKey].splice(index, 1);
-            if(temp[this.props.filterKey].length === 0){
+            if (temp[this.props.filterKey].length === 0) {
                 delete temp[this.props.filterKey];
             }
         }
@@ -61,13 +63,13 @@ class DeleteFilterDialog extends React.Component {
 
         return (
             <div>
-                <Button className={classes.filterButton}
-                        variant="outlined"
-                        filters={this.state.filters}
-                        onClick={this.handleClickOpen}>
-                    <p>{filterKey + " : " + attribute}</p>
-                    <HighlightOffIcon fontSize='small' className={classes.test}/>
-                </Button>
+                <Fab className={classes.filterFab}
+                     variant="extended"
+                     filters={this.state.filters}
+                     onClick={this.handleClickOpen}>
+                    {filterKey + ": " + attribute}
+                    <HighlightOffIcon fontSize='small' className={classes.icon}/>
+                </Fab>
                 <Dialog
                     open={this.state.open}
                     onClose={this.handleClose}
