@@ -46,34 +46,84 @@ const styles = theme => ({
     },
 });
 
-const getField = (field) => {
-    return (
-        <ListItem>
-            {field}:
-            <ListItemSecondaryAction>
-                <input type="text"/>
-            </ListItemSecondaryAction>
-        </ListItem>
-    )
-};
-
 class CategoryFieldsList extends React.Component {
 
     render() {
+        //TODO: Problem z dynamicznym tworzeniem textfieldów bo potrzeba tyle samo zmiennych, zrobić jakis dict ktory sobie z tym poradzi albo hashmape :)
         const fields = [];
+        const textFields = [];
         this.props.category.attributes.forEach((val, i) => {
-            fields.push(<TextField label={val}/>);
-            fields.push(<br/>)
+            fields.push('');
+        });
+        this.props.category.attributes.forEach((val, i) => {
+            textFields.push(<TextField
+                label={val}
+                value={fields[i]}
+                onChange={fieldsChangeCallback}/>);
+            textFields.push(<br/>)
         });
         const {classes} = this.props;
+
+        const {
+            assetName, localisation, license, owner, user, assetValue, backup,
+            assetNameChangeCallback,
+            localisationChangeCallback,
+            licenseChangeCallback,
+            ownerChangeCallback,
+            userChangeCallback,
+            assetValueChangeCallback,
+            backupChangeCallback,
+            fieldsChangeCallback,
+
+        } = this.props;
+
         return (
             <div className={classes.root}>
                 <form className={classes.container} noValidate>
-                    <TextField label={"Name"}/>
+                    <TextField
+                        label={"Asset Name"}
+                        value={assetName}
+                        onChange={assetNameChangeCallback}
+                    />
                     <br/>
-                    {fields}
+                    <TextField
+                        label={"Localisation"}
+                        value={localisation}
+                        onChange={localisationChangeCallback}
+                    />
+                    <br/>
+                    <TextField
+                        label={"License"}
+                        value={license}
+                        onChange={licenseChangeCallback}
+                    />
+                    <br/>
+                    <TextField
+                        label={"Owner"}
+                        value={owner}
+                        onChange={ownerChangeCallback}
+                    />
+                    <br/>
+                    <TextField
+                        label={"User"}
+                        value={user}
+                        onChange={userChangeCallback}
+                    />
+                    <br/>
+                    <TextField
+                        label={"Value"}
+                        value={assetValue}
+                        onChange={assetValueChangeCallback}
+                    />
+                    <br/>
+                    <TextField
+                        label={"Backup"}
+                        value={backup}
+                        onChange={backupChangeCallback}
+                    />
+                    <br/>
+                    {textFields}
                 </form>
-
             </div>
 
         );
@@ -83,7 +133,22 @@ class CategoryFieldsList extends React.Component {
 CategoryFieldsList.propTypes = {
     classes: PropTypes.object.isRequired,
     category: PropTypes.object,
-    fields: PropTypes.array,
+    textFields: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.string)),
+    assetName: PropTypes.string,
+    localisation: PropTypes.string,
+    license: PropTypes.string,
+    owner: PropTypes.string,
+    user: PropTypes.string,
+    assetValue: PropTypes.string,
+    backup: PropTypes.string,
+    assetNameChangeCallback: PropTypes.func,
+    localisationChangeCallback: PropTypes.func,
+    licenseChangeCallback: PropTypes.func,
+    ownerChangeCallback: PropTypes.func,
+    userChangeCallback: PropTypes.func,
+    assetValueChangeCallback: PropTypes.func,
+    backupChangeCallback: PropTypes.func,
+    fieldsChangeCallback: PropTypes.func,
 };
 
 export default withStyles(styles)(CategoryFieldsList);

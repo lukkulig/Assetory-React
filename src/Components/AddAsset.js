@@ -1,9 +1,8 @@
 import React from "react";
 import api from "../api";
-import {Grid, Typography} from "@material-ui/core";
+import Typography from "@material-ui/core";
 import PropTypes from "prop-types";
 import AssetCategorySelect from "./AssetCategorySelect.js";
-import CreateCategoryDialog from "./CreateCategoryDialog.js"
 import CategoryFieldsList from "./CategoryFieldsList.js"
 import {Button, Paper} from "@material-ui/core";
 import {withStyles} from "@material-ui/core";
@@ -38,7 +37,7 @@ const styles = theme => ({
     },
     categorySelection: {
         float: "center",
-        width: 500,
+        width: 400,
         paddingLeft: '35%',
     },
     addProjectButton: {
@@ -57,6 +56,13 @@ class AddAsset extends React.Component {
         categoryId: undefined,
         categoryName: undefined,
         assetCategory: undefined,
+        assetName: '',
+        localisation: '',
+        license: '',
+        owner: '',
+        user: '',
+        assetValue: '',
+        backup: '',
         categoryAttributes: []
     };
 
@@ -95,6 +101,38 @@ class AddAsset extends React.Component {
         };
     }
 
+    handleAssetNameChange = (event) => {
+        this.setState({assetName: event.target.value.trim()});
+    };
+
+    handleLocalisationChange = (event) => {
+        this.setState({localisation: event.target.value.trim()});
+    };
+
+    handleLicenseChangeCallback = (event) => {
+        this.setState({license: event.target.value.trim()});
+    };
+
+    handleOwnerChangeCallback = (event) => {
+        this.setState({owner: event.target.value.trim()});
+    };
+
+    handleUserChangeCallback = (event) => {
+        this.setState({user: event.target.value.trim()});
+    };
+
+    handleAssetValueChangeCallback = (event) => {
+        this.setState({assetValue: event.target.value.trim()});
+    };
+
+    handleBackupChangeCallback = (event) => {
+        this.setState({backup: event.target.value.trim()});
+    };
+
+    handleFieldsChangeCallback = (event) => {
+        this.setState({fields: event.target.value.trim()});
+    };
+
     componentDidMount() {
         this.fetchAndSetCategories();
     }
@@ -108,6 +146,9 @@ class AddAsset extends React.Component {
 
     render() {
         const {classes} = this.props;
+        const {
+            assetName, localisation, license, owner, user, assetValue, backup
+        } = this.state;
         return (
             <div className={classes.root}>
                 <div className={classes.title}>
@@ -132,9 +173,23 @@ class AddAsset extends React.Component {
                     <div className={classes.content}>
                         {this.getActiveCategory() &&
                         <CategoryFieldsList
+                            assetName={assetName}
+                            localisation={localisation}
+                            license={license}
+                            owner={owner}
+                            user={user}
+                            assetValue={assetValue}
+                            backup={backup}
                             category={this.getActiveCategory()}
+                            assetNameChangeCallback={this.handleAssetNameChange}
+                            localisationChangeCallback={this.handleLocalisationChange}
+                            licenseChangeCallback={this.handleLicenseChangeCallback}
+                            ownerChangeCallback={this.handleOwnerChangeCallback}
+                            userChangeCallback={this.handleUserChangeCallback}
+                            assetValueChangeCallback={this.handleAssetValueChangeCallback}
+                            backupChangeCallback={this.handleBackupChangeCallback}
+                            fieldsChangeCallback={this.handleFieldsChangeCallback}
                             fields={this.state.categoryAttributes}
-                            // afterCloseUpdateCallback={() => this.fetchAndSetSprints(projectId)}
                         />
                         }
                     </div>
