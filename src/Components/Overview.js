@@ -11,25 +11,26 @@ class Overview extends React.Component {
 
     state = {
         greetings: "",
+        allCategories: [],
         categories: [],
-        categoryId: "",
+        selectedCategoryId: "1",
         filters: {},
     };
 
-    fetchAndSetCategories() {
+    fetchAndSetAllCategories() {
         document.body.style.cursor = 'wait';
         api.fetch(
             api.endpoints.getAllCategories(),
             (response) => {
-                this.setState({categories: response.content});
+                this.setState({allCategories: response.content});
                 document.body.style.cursor = 'default';
             });
     }
 
-    // fetchAndSetSubcategories(categoryId) {
+    // fetchAndSetSubcategories(selectedCategoryId) {
     //     document.body.style.cursor = 'wait';
     //     api.fetch(
-    //         api.endpoints.getSubcategories(categoryId),
+    //         api.endpoints.getSubcategories(selectedCategoryId),
     //         (response) => {
     //             this.setState({subcategories1: response.content});
     //             console.log(this.state.subcategories1);
@@ -39,7 +40,7 @@ class Overview extends React.Component {
 
 
     componentDidMount() {
-        //this.fetchAndSetCategories();
+        this.fetchAndSetAllCategories();
         this.setState(
             {
                 categories: [
@@ -69,7 +70,7 @@ class Overview extends React.Component {
     }
 
     getActiveCategory() {
-        return this.state.categories.find(c => c.id === this.state.categoryId) || null
+         return this.state.allCategories.find(c => c.id === this.state.selectedCategoryId) || null
     }
 
     handleFiltersChange = () => {
@@ -77,9 +78,8 @@ class Overview extends React.Component {
         console.log(this.state.filters);
     };
 
-    handleCategoryChange = () => {
-        console.log("Category change overview:");
-        console.log(this.state.categoryId);
+    handleCategoryChange = (selectedCategoryId) => {
+        this.setState({selectedCategoryId: selectedCategoryId});
     };
 
     render() {
@@ -96,7 +96,7 @@ class Overview extends React.Component {
                                     subcategories: c.subcategories
                                 }))}
                                 categoryChangeCallback={this.handleCategoryChange}
-                                selectedCategoryId={this.state.categoryId}
+                                selectedCategoryId={this.state.selectedCategoryId}
                             />
                         </Paper>
                     </div>

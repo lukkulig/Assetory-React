@@ -40,7 +40,8 @@ const DEFAULT_PADDING = 16;
 const ICON_SIZE = 29;
 const LEVEL_SPACE = 30;
 const ToggleIcon = ({on}) =>
-    on ? <RemoveCircleOutline style={{marginRight: 5}} fontSize='small' /> : <AddCircleOutline style={{marginRight: 5}} fontSize='small' />;
+    on ? <RemoveCircleOutline style={{marginRight: 5}} fontSize='small'/> :
+        <AddCircleOutline style={{marginRight: 5}} fontSize='small'/>;
 
 const ListItem = ({
                       level = 0,
@@ -67,13 +68,13 @@ const ListItem = ({
     >
         {hasNodes && (
             <div
-                style={{ display: 'inline-block' }}
+                style={{display: 'inline-block'}}
                 onClick={e => {
                     hasNodes && toggleNode && toggleNode();
                     e.stopPropagation();
                 }}
             >
-                <ToggleIcon on={isOpen} />
+                <ToggleIcon on={isOpen}/>
             </div>
         )}
         {label}
@@ -82,24 +83,28 @@ const ListItem = ({
 
 class CategoriesTree extends React.Component {
 
-    mapToData(categories) {
-        return categories.map( c => ({
-            key : c.id,
-            label : c.name,
-            index : parseInt(c.id),
-            nodes : (c.subcategories !== undefined) ? this.mapToData(c.subcategories) : []
-        }));
-    }
-
     static initialKey(categories) {
         return (categories[0] !== undefined) ? categories[0].id : "1";
     }
 
+    mapToData(categories) {
+        return categories.map(c => ({
+            key: c.id,
+            label: c.name,
+            index: parseInt(c.id),
+            nodes: (c.subcategories !== undefined) ? this.mapToData(c.subcategories) : []
+        }));
+    }
+
+    handleChange = key => {
+        const pattern = new RegExp("\\d+$");
+        const categoryId = pattern.exec(key)[0];
+        //console.log(categoryId);
+        this.props.categoryChangeCallback(categoryId);
+    };
+
     render() {
         const {classes, categories} = this.props;
-
-        console.log(this.mapToData(categories));
-        console.log(CategoriesTree.initialKey(categories));
 
         return (
             <div className={classes.root}>
@@ -114,11 +119,18 @@ class CategoriesTree extends React.Component {
                     </Grid>
                     <Grid className={classes.gridItem} item xs={12}>
                         <div>
-                            <TreeMenu data={this.mapToData(categories)} hasSearch={false} initialActiveKey={CategoriesTree.initialKey(categories)}>
-                                {({ items }) => (
+                            <TreeMenu
+                                data={this.mapToData(categories)}
+                                hasSearch={false}
+                                initialActiveKey={CategoriesTree.initialKey(categories)}
+                                onClickItem={({key}) =>
+                                    this.handleChange(key)
+                                }>
+                                {({items}) => (
                                     <>
-                                        <ListGroup flush={true}>
-                                            {items.map(({ reset, ...props }) => (
+                                        <ListGroup>
+                                            {/*{console.log(items)}*/}
+                                            {items.map(({reset, ...props}) => (
                                                 <ListItem {...props} />
                                             ))}
                                         </ListGroup>
