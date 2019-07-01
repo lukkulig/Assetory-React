@@ -46,9 +46,10 @@ export default {
             method: "GET"
         }),
 
-        getSubcategories: (categoryId) => ({
-            path: url(`categories/${categoryId}/subcategories`),
+        getCategoryAttributes: (categoryId) => ({
+            path: url(`categories/${categoryId}/attributes`),
             method: "GET"
         })
+
     }
 }

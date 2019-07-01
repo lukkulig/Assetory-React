@@ -52,12 +52,12 @@ class Filters extends React.Component {
     };
 
     render() {
-        const {classes, category, filters} = this.props;
+        const {classes, categoryAttributes, filters} = this.props;
         const setFiltersList = [];
 
         const assetAttributes = ["Category","Localisation","Backup","License","Value","Owner","User"];
 
-        assetAttributes.concat(category.attributes).forEach((val, i) => {
+        assetAttributes.concat(categoryAttributes.reverse()).forEach((val, i) => {
             setFiltersList.push(
                 <SetFilterDialog
                     attribute={val}
@@ -98,7 +98,7 @@ class Filters extends React.Component {
 
 Filters.propTypes = {
     classes: PropTypes.object.isRequired,
-    category: PropTypes.object.isRequired,
+    categoryAttributes: PropTypes.array.isRequired,
     filters: PropTypes.object.isRequired,
     overviewCallback: PropTypes.func,
 };

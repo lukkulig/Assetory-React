@@ -13,7 +13,8 @@ class Overview extends React.Component {
         greetings: "",
         allCategories: [],
         categories: [],
-        selectedCategoryId: "1",
+        selectedCategoryId: "",
+        selectedCategoryAttributes: [],
         filters: {},
     };
 
@@ -27,16 +28,15 @@ class Overview extends React.Component {
             });
     }
 
-    // fetchAndSetSubcategories(selectedCategoryId) {
-    //     document.body.style.cursor = 'wait';
-    //     api.fetch(
-    //         api.endpoints.getSubcategories(selectedCategoryId),
-    //         (response) => {
-    //             this.setState({subcategories1: response.content});
-    //             console.log(this.state.subcategories1);
-    //             document.body.style.cursor = 'default';
-    //         });
-    // }
+    fetchAndSetCategoryAttributes(selectedCategoryId) {
+        document.body.style.cursor = 'wait';
+        api.fetch(
+            api.endpoints.getCategoryAttributes(selectedCategoryId),
+            (response) => {
+                this.setState({selectedCategoryAttributes: response});
+                document.body.style.cursor = 'default';
+            });
+    }
 
 
     componentDidMount() {
@@ -69,8 +69,8 @@ class Overview extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
     }
 
-    getActiveCategory() {
-         return this.state.allCategories.find(c => c.id === this.state.selectedCategoryId) || null
+    isCategorySelected() {
+        return (this.state.selectedCategoryId !== "");
     }
 
     handleFiltersChange = () => {
@@ -80,6 +80,7 @@ class Overview extends React.Component {
 
     handleCategoryChange = (selectedCategoryId) => {
         this.setState({selectedCategoryId: selectedCategoryId});
+        this.fetchAndSetCategoryAttributes(selectedCategoryId);
     };
 
     render() {
@@ -101,11 +102,11 @@ class Overview extends React.Component {
                         </Paper>
                     </div>
                     <div className={classes.assetsSection}>
-                        {this.getActiveCategory() &&
+                        {this.isCategorySelected() &&
                         <div className={classes.filtersSection}>
                             <Paper className={classes.paper}>
                                 <Filters
-                                    category={this.getActiveCategory()}
+                                    categoryAttributes={this.state.selectedCategoryAttributes}
                                     filters={this.state.filters}
                                     overviewCallback={this.handleFiltersChange}
                                 />
