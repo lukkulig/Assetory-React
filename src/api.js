@@ -56,8 +56,16 @@ export default {
             method: "GET"
         }),
         getCategories: () => ({
-            path: url(`categories/`),
+            path: url(`categories`),
             method: "GET"
         }),
+        addAsset: (asset) => ({
+            path: url(`assets`),
+            method: "POST",
+            body: JSON.stringify(asset),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
     }
 }

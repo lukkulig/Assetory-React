@@ -1,7 +1,7 @@
 import React from "react";
 import api from "../api";
-import Typography from "@material-ui/core";
-import PropTypes from "prop-types";
+import {Typography} from "@material-ui/core";
+import {PropTypes} from "prop-types";
 import AssetCategorySelect from "./AssetCategorySelect.js";
 import CategoryFieldsList from "./CategoryFieldsList.js"
 import {Button, Paper} from "@material-ui/core";
@@ -87,7 +87,21 @@ class AddAsset extends React.Component {
     };
 
     handleAddAssetButton = () => {
-        console.log("CLICK ADD ASSET")
+        const asset = {
+            categoryId: this.state.categoryId,
+            name: this.state.assetName,
+            // TODO attributesMap: this.state.categoryAttributes,
+            localisation: this.state.localisation,
+            backup: this.state.backup,
+            license: this.state.license,
+            value: this.state.assetValue,
+            owner: this.state.owner,
+            user: this.state.user
+        };
+
+        api.fetch(
+            api.endpoints.addAsset(asset)
+        )
     };
 
     getActiveCategory() {
