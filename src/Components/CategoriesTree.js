@@ -24,7 +24,7 @@ const styles = ({
         width: "100%",
     },
     divider: {
-        marginLeft: 10,
+        marginTop: 10,
         marginBottom: 10,
     },
     grid: {
@@ -83,23 +83,22 @@ const ListItem = ({
 
 class CategoriesTree extends React.Component {
 
-    static initialKey(categories) {
-        return (categories[0] !== undefined) ? categories[0].id : "1";
-    }
+    // static initialKey(categories) {
+    //     return (categories[0] !== undefined) ? categories[0].id : "1";
+    // }
 
     mapToData(categories) {
         return categories.map(c => ({
-            key: c.id,
-            label: c.name,
-            index: parseInt(c.id),
-            nodes: (c.subcategories !== undefined) ? this.mapToData(c.subcategories) : []
+            key: c.category.id,
+            label: c.category.name,
+            index: parseInt(c.category.id),
+            nodes: (Object.keys(c.subCategories).length !==0) ? this.mapToData(c.subCategories) : []
         }));
     }
 
     handleChange = key => {
         const pattern = new RegExp("\\d+$");
         const categoryId = pattern.exec(key)[0];
-        //console.log(categoryId);
         this.props.categoryChangeCallback(categoryId);
     };
 
@@ -122,14 +121,13 @@ class CategoriesTree extends React.Component {
                             <TreeMenu
                                 data={this.mapToData(categories)}
                                 hasSearch={false}
-                                initialActiveKey={CategoriesTree.initialKey(categories)}
+                                //initialActiveKey={CategoriesTree.initialKey(categories)}
                                 onClickItem={({key}) =>
                                     this.handleChange(key)
                                 }>
                                 {({items}) => (
                                     <>
                                         <ListGroup>
-                                            {/*{console.log(items)}*/}
                                             {items.map(({reset, ...props}) => (
                                                 <ListItem {...props} />
                                             ))}
@@ -151,9 +149,8 @@ CategoriesTree.propTypes = {
     classes: PropTypes.object.isRequired,
     categories: PropTypes.arrayOf(
         PropTypes.shape({
-            id: PropTypes.string,
-            name: PropTypes.string,
-            subcategories: PropTypes.array
+            category: PropTypes.object,
+            subCategories: PropTypes.array
         })
     ).isRequired,
     categoryChangeCallback: PropTypes.func,

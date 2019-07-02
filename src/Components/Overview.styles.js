@@ -17,7 +17,7 @@ const styles = theme => ({
     },
     assetsSection: {
         float: 'left',
-        flexGrow: 99,
+        flexGrow: '99',
         display: 'flex',
         flexDirection: 'column',
         margin: theme.spacing(1)
