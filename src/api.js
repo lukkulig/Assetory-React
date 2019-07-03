@@ -52,7 +52,7 @@ export default {
             headers: {
                 "Content-Type": "application/json"
             }
-        })
+        }),
         getCategoryAttributes: (categoryId) => ({
             path: url(`categories/${categoryId}/attributes`),
             method: "GET"
