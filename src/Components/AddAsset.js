@@ -68,7 +68,7 @@ class AddAsset extends React.Component {
     fetchAndSetCategories() {
         document.body.style.cursor = 'wait';
         api.fetch(
-            api.endpoints.getCategories(),
+            api.endpoints.getAllCategories(),
             (response) => {
                 this.setState({categories: response.content});
                 document.body.style.cursor = 'default';

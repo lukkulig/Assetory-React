@@ -55,7 +55,7 @@ export default {
             path: url(`greeting`),
             method: "GET"
         }),
-        getCategories: () => ({
+        getAllCategories: () => ({
             path: url(`categories`),
             method: "GET"
         }),
