@@ -44,7 +44,6 @@ const styles = theme => ({
 class CategoryFieldsList extends React.Component {
 
     render() {
-        //TODO: Problem z dynamicznym tworzeniem textfieldów bo potrzeba tyle samo zmiennych, zrobić jakis dict ktory sobie z tym poradzi albo hashmape :)
         const {
             fields = [],
             assetName, localisation, license, owner, user, assetValue, backup,
@@ -66,6 +65,7 @@ class CategoryFieldsList extends React.Component {
                 name={val}
                 value={fields[val]}
                 onChange={fieldsChangeCallback}/>);
+            textFields.push(<br/>)
         });
         const {classes} = this.props;
         return (
@@ -76,36 +76,43 @@ class CategoryFieldsList extends React.Component {
                         value={assetName}
                         onChange={assetNameChangeCallback}
                     />
+                    <br/>
                     <TextField
                         label={"Localisation"}
                         value={localisation}
                         onChange={localisationChangeCallback}
                     />
+                    <br/>
                     <TextField
                         label={"License"}
                         value={license}
                         onChange={licenseChangeCallback}
                     />
+                    <br/>
                     <TextField
                         label={"Owner"}
                         value={owner}
                         onChange={ownerChangeCallback}
                     />
+                    <br/>
                     <TextField
                         label={"User"}
                         value={user}
                         onChange={userChangeCallback}
                     />
+                    <br/>
                     <TextField
                         label={"Value"}
                         value={assetValue}
                         onChange={assetValueChangeCallback}
                     />
+                    <br/>
                     <TextField
                         label={"Backup"}
                         value={backup}
                         onChange={backupChangeCallback}
                     />
+                    <br/>
                     {textFields}
                 </form>
             </div>

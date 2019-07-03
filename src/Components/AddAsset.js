@@ -40,7 +40,7 @@ const styles = theme => ({
         width: 400,
         paddingLeft: '35%',
     },
-    addProjectButton: {
+    addAssetButton: {
         marginTop: theme.spacing.unit * 3,
         width: 400,
         height: 50,
@@ -225,7 +225,7 @@ class AddAsset extends React.Component {
                             onClick={this.handleAddAssetButton}
                             color="primary"
                             variant="contained"
-                            className={classes.addProjectButton}
+                            className={classes.addAssetButton}
                         >
                             add asset
                         </Button>
