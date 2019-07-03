@@ -4,10 +4,11 @@ import {withStyles} from '@material-ui/core/styles/index';
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Divider from "@material-ui/core/Divider";
-import Card from "@material-ui/core/Card";
 import List from "@material-ui/core/List";
+import AssetView from "./AssetView";
+import Paper from "@material-ui/core/Paper";
 
-const styles = ({
+const styles = theme => ({
     root: {
         width: "100%",
         float: "left",
@@ -36,10 +37,17 @@ const styles = ({
     list: {
         display: "flex",
         flexDirection: "column",
-        overflow: "auto",
     },
-    card: {
+    assetView: {
         marginBottom: 10,
+    },
+    paper: {
+        float: 'left',
+        height: "100%",
+        width: "100%",
+    },
+    assetViewsContainer: {
+        margin: theme.spacing(1)
     }
 });
 
@@ -58,21 +66,31 @@ class Assets extends React.Component {
 
         const cardList = [];
 
-        Object.keys(assets).forEach((key) => {
+        Object.keys(assets.sort((a, b) => {
+            if (a.name < b.name) return -1;
+            if (b.name < a.name) return 1;
+            return 0;
+        })).forEach((key) => {
             cardList.push(
-                <Card
-                    className={classes.card}
-                    key={key}
-                >
-                    <p>Name: {assets[key].name}</p>
-                    <p>Category: {allCategories.find(c => c.id === assets[key].categoryId).name}</p>
-                    <p>Localisation: {assets[key].localisation}</p>
-                    <p>Backup: {assets[key].backup}</p>
-                    <p>License: {assets[key].license}</p>
-                    <p>Value: {assets[key].value}</p>
-                    <p>Owner: {assets[key].owner}</p>
-                    <p>User: {assets[key].user}</p>
-                </Card>)
+                <div className={classes.assetViewsContainer} key={key}>
+                    <Paper className={classes.paper}>
+                        <AssetView
+                            className={classes.assetView}
+                            asset={({
+                                name: assets[key].name,
+                                category: allCategories.find(c => c.id === assets[key].categoryId).name,
+                                localisation: assets[key].localisation,
+                                backup: assets[key].backup,
+                                license: assets[key].license,
+                                value: assets[key].value,
+                                owner: assets[key].owner,
+                                user: assets[key].user,
+                                attributesMap: assets[key].attributesMap
+                            })}
+                        />
+                    </Paper>
+                </div>
+            )
         });
 
         return (

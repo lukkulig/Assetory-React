@@ -25,7 +25,6 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getAllCategories(),
             (response) => {
-                console.log(response.content);
                 this.setState({allCategories: response.content});
                 document.body.style.cursor = 'default';
             });
@@ -51,26 +50,24 @@ class Overview extends React.Component {
             });
     }
 
-    fetchAndSetAllAssets(){
+    fetchAndSetAllAssets() {
         document.body.style.cursor = 'wait';
         api.fetch(
             api.endpoints.getAllAssets(),
             (response) => {
-                console.log(response.content);
                 this.setState({assets: response.content});
                 document.body.style.cursor = 'default';
             });
     }
 
-    fetchAndSetFilteredAssets(selectedCategoryId){
+    fetchAndSetFilteredAssets(selectedCategoryId) {
         const data = {
             treeCategory: selectedCategoryId,
         };
         api.fetch(
             api.endpoints.getFilteredAssets(data),
-    (assets) => {
-                console.log(selectedCategoryId);
-                console.log(assets.content);
+            (assets) => {
+                this.setState({assets: assets.content});
             }
         );
     }
