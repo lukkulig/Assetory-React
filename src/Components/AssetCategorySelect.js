@@ -8,10 +8,6 @@ import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
 import {emphasize} from '@material-ui/core/styles/colorManipulator';
-import {Tooltip} from "@material-ui/core";
-import PeopleIcon from '@material-ui/icons/People';
-import NotInterestedIcon from '@material-ui/icons/NotInterested';
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 
 const styles = theme => ({
     root: {

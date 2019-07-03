@@ -4,7 +4,7 @@ import {Typography} from "@material-ui/core";
 import {PropTypes} from "prop-types";
 import AssetCategorySelect from "./AssetCategorySelect.js";
 import CategoryFieldsList from "./CategoryFieldsList.js"
-import {Button, Paper} from "@material-ui/core";
+import {Button} from "@material-ui/core";
 import {withStyles} from "@material-ui/core";
 
 const styles = theme => ({
@@ -55,7 +55,6 @@ class AddAsset extends React.Component {
         categories: [],
         categoryId: undefined,
         categoryName: undefined,
-        assetCategory: undefined,
         assetName: '',
         localisation: '',
         license: '',
@@ -63,7 +62,7 @@ class AddAsset extends React.Component {
         user: '',
         assetValue: '',
         backup: '',
-        categoryAttributes: []
+        categoryAttributes: {}
     };
 
     fetchAndSetCategories() {
@@ -88,9 +87,9 @@ class AddAsset extends React.Component {
 
     handleAddAssetButton = () => {
         const asset = {
-            categoryId: this.state.categoryId,
+            category: this.state.categoryId,
             name: this.state.assetName,
-            // TODO attributesMap: this.state.categoryAttributes,
+            attributesMap: this.state.categoryAttributes,
             localisation: this.state.localisation,
             backup: this.state.backup,
             license: this.state.license,
@@ -100,8 +99,19 @@ class AddAsset extends React.Component {
         };
 
         api.fetch(
-            api.endpoints.addAsset(asset)
-        )
+            api.endpoints.addAsset(asset), (action) => {
+                this.setState({
+                    assetName: '',
+                    localisation: '',
+                    license: '',
+                    owner: '',
+                    user: '',
+                    assetValue: '',
+                    backup: '',
+                    categoryAttributes: {}
+                })
+            }
+        );
     };
 
     getActiveCategory() {
@@ -144,7 +154,9 @@ class AddAsset extends React.Component {
     };
 
     handleFieldsChangeCallback = (event) => {
-        this.setState({fields: event.target.value.trim()});
+        let temp = this.state.categoryAttributes;
+        temp[event.target.name] = event.target.value;
+        this.setState({categoryAttributes: temp});
     };
 
     componentDidMount() {
@@ -155,6 +167,7 @@ class AddAsset extends React.Component {
         const {categoryId} = this.getUrlParams(window.location);
         if (prevState.categoryId !== categoryId) {
             this.setState({categoryId: categoryId});
+            this.setState({categoryName: "Ala"})
         }
     }
 
