@@ -1,53 +1,29 @@
 import React from "react";
+import * as PropTypes from "prop-types";
+import {Button, Typography, withStyles} from "@material-ui/core"
 import api from "../api";
-import {Typography} from "@material-ui/core";
-import {PropTypes} from "prop-types";
 import AssetCategorySelect from "./AssetCategorySelect.js";
 import CategoryFieldsList from "./CategoryFieldsList.js"
-import {Button} from "@material-ui/core";
-import {withStyles} from "@material-ui/core";
 
 const styles = theme => ({
-    root: {},
+    root: {
+        textAlign: "center"
+    },
+    header: {
+        textAlign: 'center',
+        padding: 40,
+        width: "100%"
+    },
     content: {
-        float: 'center',
-        textAlign: 'center',
-        paddingLeft: '25%',
-    },
-    sectionTitle: {
-        float: "left",
-        paddingRight: 25,
-    },
-    selectSection: {
-        float: 'left',
-        width: 500,
-        paddingRight: 50,
-    },
-    selectionHeader: {
-        // padding:10,
-    },
-    title: {
-        float: 'center',
-        textAlign: 'center',
-        padding: 40
-    },
-    projectMembers: {
-        float: 'left',
-        marginLeft: '4%',
-    },
-    categorySelection: {
-        float: "center",
-        width: 400,
-        paddingLeft: '35%',
+        display:"inline-block",
+        textAlign: "left",
+        width: 400
     },
     addAssetButton: {
-        marginTop: theme.spacing.unit * 3,
-        width: 400,
+        marginTop: theme.spacing(3),
+        width: "100%",
         height: 50,
-    },
-    close: {
-        padding: theme.spacing.unit / 2,
-    },
+    }
 });
 
 class AddAsset extends React.Component {
@@ -64,6 +40,13 @@ class AddAsset extends React.Component {
         backup: '',
         categoryAttributes: {}
     };
+
+    static getUrlParams(location) {
+        const searchParams = new URLSearchParams(location.search);
+        return {
+            categoryId: parseInt(searchParams.get('category')) || undefined,
+        };
+    }
 
     fetchAndSetCategories() {
         document.body.style.cursor = 'wait';
@@ -99,7 +82,7 @@ class AddAsset extends React.Component {
         };
 
         api.fetch(
-            api.endpoints.addAsset(asset), (action) => {
+            api.endpoints.addAsset(asset), () => {
                 this.setState({
                     assetName: '',
                     localisation: '',
@@ -116,13 +99,6 @@ class AddAsset extends React.Component {
 
     getActiveCategory() {
         return this.state.categories.find(c => parseInt(c.id) === this.state.categoryId) || null
-    }
-
-    getUrlParams(location) {
-        const searchParams = new URLSearchParams(location.search);
-        return {
-            categoryId: parseInt(searchParams.get('category')) || undefined,
-        };
     }
 
     handleAssetNameChange = (event) => {
@@ -164,7 +140,7 @@ class AddAsset extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {categoryId} = this.getUrlParams(window.location);
+        const {categoryId} = AddAsset.getUrlParams(window.location);
         if (prevState.categoryId !== categoryId) {
             this.setState({categoryId: categoryId});
             this.setState({categoryName: "Ala"})
@@ -178,13 +154,13 @@ class AddAsset extends React.Component {
         } = this.state;
         return (
             <div className={classes.root}>
-                <div className={classes.title}>
+                <div className={classes.header}>
                     <Typography variant="h3">
                         Add new asset
                     </Typography>
                 </div>
-                <div className={classes.categorySelection} align={"center"}>
-                    <Typography variant="h6" component="h2" className={classes.sectionTitle}>
+                <div className={classes.content}>
+                    <Typography  variant="h6" component="h2" >
                         Category
                     </Typography>
                     <AssetCategorySelect
@@ -197,41 +173,39 @@ class AddAsset extends React.Component {
                         categoryChangeCallback={this.handleCategoryChange}
                         selectedCategoryId={this.state.categoryId}
                     />
-                    <div className={classes.content}>
-                        {this.getActiveCategory() &&
-                        <CategoryFieldsList
-                            assetName={assetName}
-                            localisation={localisation}
-                            license={license}
-                            owner={owner}
-                            user={user}
-                            assetValue={assetValue}
-                            backup={backup}
-                            category={this.getActiveCategory()}
-                            assetNameChangeCallback={this.handleAssetNameChange}
-                            localisationChangeCallback={this.handleLocalisationChange}
-                            licenseChangeCallback={this.handleLicenseChangeCallback}
-                            ownerChangeCallback={this.handleOwnerChangeCallback}
-                            userChangeCallback={this.handleUserChangeCallback}
-                            assetValueChangeCallback={this.handleAssetValueChangeCallback}
-                            backupChangeCallback={this.handleBackupChangeCallback}
-                            fieldsChangeCallback={this.handleFieldsChangeCallback}
-                            fields={this.state.categoryAttributes}
-                        />
-                        }
-                    </div>
-                    <div>
-                        < Button
-                            onClick={this.handleAddAssetButton}
-                            color="primary"
-                            variant="contained"
-                            className={classes.addAssetButton}
-                        >
-                            add asset
-                        </Button>
-                    </div>
+                    {this.getActiveCategory() &&
+                    <CategoryFieldsList
+                        assetName={assetName}
+                        localisation={localisation}
+                        license={license}
+                        owner={owner}
+                        user={user}
+                        assetValue={assetValue}
+                        backup={backup}
+                        category={this.getActiveCategory()}
+                        assetNameChangeCallback={this.handleAssetNameChange}
+                        localisationChangeCallback={this.handleLocalisationChange}
+                        licenseChangeCallback={this.handleLicenseChangeCallback}
+                        ownerChangeCallback={this.handleOwnerChangeCallback}
+                        userChangeCallback={this.handleUserChangeCallback}
+                        assetValueChangeCallback={this.handleAssetValueChangeCallback}
+                        backupChangeCallback={this.handleBackupChangeCallback}
+                        fieldsChangeCallback={this.handleFieldsChangeCallback}
+                        fields={this.state.categoryAttributes}
+                    />
+                    }
+                    < Button
+                        className={classes.addAssetButton}
+                        onClick={this.handleAddAssetButton}
+                        color="primary"
+                        variant="contained"
+                    >
+                        add asset
+                    </Button>
                 </div>
             </div>
+
+
         );
     }
 }

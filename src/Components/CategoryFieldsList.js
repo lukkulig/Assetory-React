@@ -1,43 +1,15 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import {TextField} from "@material-ui/core";
 
-const styles = theme => ({
+const styles = ({
     root: {
-        float: "left",
-        padding: 15,
+        paddingLeft: 30,
         paddingRight: 30,
     },
-    title: {
-        float: "left",
-        paddingLeft: 15,
-        paddingTop: 5
-    },
-    button: {
-        float: "right",
-        marginTop: 5
-    },
-    header: {
-        float: "left",
-        width: "100%",
-    },
-    content: {
-        paddingTop: 10,
-        clear: "left"
-    },
-    divider: {
-        marginLeft: 10,
-        marginTop: 5,
-        marginBottom: 10,
-    },
-    dialogCloseSprint: {
-        float: "left",
-        marginLeft: 30,
-        marginTop: 5
-    },
     textField: {
-        width: '250px',
+        width: '100%',
     },
 });
 
@@ -58,61 +30,61 @@ class CategoryFieldsList extends React.Component {
             fieldsChangeCallback,
 
         } = this.props;
-        this.props.category.attributes.forEach((val, i) => {
+        this.props.category.attributes.forEach((val) => {
             textFields.push(<TextField
+                style={styles.textField}
                 label={val}
                 key={val}
                 name={val}
                 value={fields[val]}
                 onChange={fieldsChangeCallback}/>);
-            textFields.push(<br/>)
         });
         const {classes} = this.props;
         return (
             <div className={classes.root}>
-                <form className={classes.container} noValidate>
+                <form noValidate>
                     <TextField
+                        className={classes.textField}
                         label={"Asset Name"}
                         value={assetName}
                         onChange={assetNameChangeCallback}
                     />
-                    <br/>
                     <TextField
+                        className={classes.textField}
                         label={"Localisation"}
                         value={localisation}
                         onChange={localisationChangeCallback}
                     />
-                    <br/>
                     <TextField
+                        className={classes.textField}
                         label={"License"}
                         value={license}
                         onChange={licenseChangeCallback}
                     />
-                    <br/>
                     <TextField
+                        className={classes.textField}
                         label={"Owner"}
                         value={owner}
                         onChange={ownerChangeCallback}
                     />
-                    <br/>
                     <TextField
+                        className={classes.textField}
                         label={"User"}
                         value={user}
                         onChange={userChangeCallback}
                     />
-                    <br/>
                     <TextField
+                        className={classes.textField}
                         label={"Value"}
                         value={assetValue}
                         onChange={assetValueChangeCallback}
                     />
-                    <br/>
                     <TextField
+                        className={classes.textField}
                         label={"Backup"}
                         value={backup}
                         onChange={backupChangeCallback}
                     />
-                    <br/>
                     {textFields}
                 </form>
             </div>

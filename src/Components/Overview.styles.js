@@ -6,7 +6,6 @@ const styles = theme => ({
         flexGrow: 1,
         display: 'flex',
         height: "85vh",
-        float: 'center',
         textAlign: 'center',
         padding: theme.spacing(3),
     },
@@ -24,13 +23,13 @@ const styles = theme => ({
     },
     filtersSection: {
         float: 'left',
-        flexGrow: '1',
+        flexGrow: 1,
         marginBottom: theme.spacing(2)
     },
     assetsViewSection: {
         float: 'left',
         clear: 'left',
-        flexGrow: '99',
+        flexGrow: 99,
     },
     paper: {
         float: 'left',
