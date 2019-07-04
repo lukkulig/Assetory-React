@@ -55,7 +55,7 @@ class Filters extends React.Component {
         const {classes, categoryAttributes, filters} = this.props;
         const setFiltersList = [];
 
-        const assetAttributes = ["Category","Localisation","Backup","License","Value","Owner","User"];
+        const assetAttributes = ["Name", "Category","Localisation","Backup","License","Value","Owner","User"];
 
         assetAttributes.concat(categoryAttributes.reverse()).forEach((val, i) => {
             setFiltersList.push(

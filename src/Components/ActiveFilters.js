@@ -40,10 +40,8 @@ class ActiveFilters extends React.Component {
 
         const filtersList = [];
         let i = 0;
-        for (let key in filters) {
-            if (filters.hasOwnProperty(key)) {
-                for (let attr_ind in filters[key]) {
-                    if (filters[key].hasOwnProperty(attr_ind)) {
+        Object.keys(filters).forEach((key) => {
+            Object.keys(filters[key]).forEach((attr_ind) => {
                         filtersList.push(
                             <DeleteFilterDialog
                                 filterKey={key}
@@ -53,10 +51,9 @@ class ActiveFilters extends React.Component {
                                 key={i}
                             />);
                         i++;
-                    }
-                }
-            }
-        }
+                })
+            });
+
         return (
 
             <div className={classes.root}>

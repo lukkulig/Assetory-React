@@ -49,6 +49,25 @@ export default {
         getCategoryAttributes: (categoryId) => ({
             path: url(`categories/${categoryId}/attributes`),
             method: "GET"
+        }),
+
+        getCategoryTrees: () => ({
+            path: url(`categories/trees`),
+            method: "GET"
+        }),
+
+        getAllAssets:() => ({
+            path: url(`assets`),
+            method: "GET"
+        }),
+
+        getFilteredAssets: (assetsFilter) => ({
+            path: url(`assets/filter`),
+            method: "POST",
+            body: JSON.stringify(assetsFilter),
+            headers: {
+                "Content-Type": "application/json"
+            }
         })
 
     }

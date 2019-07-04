@@ -6,6 +6,7 @@ import api from "../api";
 import Filters from "./Filters";
 import CategoriesTree from "./CategoriesTree";
 import Paper from "@material-ui/core/Paper";
+import Assets from "./Assets";
 
 class Overview extends React.Component {
 
@@ -15,6 +16,7 @@ class Overview extends React.Component {
         categories: [],
         selectedCategoryId: "",
         selectedCategoryAttributes: [],
+        assets: [],
         filters: {},
     };
 
@@ -24,6 +26,16 @@ class Overview extends React.Component {
             api.endpoints.getAllCategories(),
             (response) => {
                 this.setState({allCategories: response.content});
+                document.body.style.cursor = 'default';
+            });
+    }
+
+    fetchAndSetCategoryTrees() {
+        document.body.style.cursor = 'wait';
+        api.fetch(
+            api.endpoints.getCategoryTrees(),
+            (response) => {
+                this.setState({categories: response});
                 document.body.style.cursor = 'default';
             });
     }
@@ -38,32 +50,34 @@ class Overview extends React.Component {
             });
     }
 
+    fetchAndSetAllAssets() {
+        document.body.style.cursor = 'wait';
+        api.fetch(
+            api.endpoints.getAllAssets(),
+            (response) => {
+                this.setState({assets: response.content});
+                document.body.style.cursor = 'default';
+            });
+    }
+
+    fetchAndSetFilteredAssets(selectedCategoryId) {
+        const data = {
+            treeCategory: selectedCategoryId,
+        };
+        api.fetch(
+            api.endpoints.getFilteredAssets(data),
+            (assets) => {
+                this.setState({assets: assets.content});
+            }
+        );
+    }
+
 
     componentDidMount() {
         this.fetchAndSetAllCategories();
-        this.setState(
-            {
-                categories: [
-                    {
-                        "id": "1", "name": "All", "path": "all", "attributes": ["Owner"], "subcategories": [
-                            {
-                                "id": "2",
-                                "name": "Software",
-                                "path": "all:software",
-                                "attributes": ["Expiration date"],
-                                "subcategories": [
-                                    {
-                                        "id": "4",
-                                        "name": "SubSoftware",
-                                        "path": "all:software:subsoftware",
-                                        "attributes": ["Expiration date2"]
-                                    },
-                                ]
-                            },
-                            {"id": "3", "name": "Hardware", "path": "all:hardware", "attributes": ["Manufacturer"]}]
-                    }
-                ]
-            });
+        this.fetchAndSetCategoryTrees();
+        this.fetchAndSetAllAssets();
+        this.setState({selectedCategoryId: (this.state.categories[0] !== undefined) ? this.state.categories[0].id : ""});
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -81,10 +95,12 @@ class Overview extends React.Component {
     handleCategoryChange = (selectedCategoryId) => {
         this.setState({selectedCategoryId: selectedCategoryId});
         this.fetchAndSetCategoryAttributes(selectedCategoryId);
+        this.fetchAndSetFilteredAssets(selectedCategoryId);
     };
 
     render() {
         const {classes} = this.props;
+
         return (
             <div className={classes.root}>
                 <div className={classes.content}>
@@ -92,9 +108,8 @@ class Overview extends React.Component {
                         <Paper className={classes.paper}>
                             <CategoriesTree
                                 categories={this.state.categories.map(c => ({
-                                    id: c.id,
-                                    name: c.name,
-                                    subcategories: c.subcategories
+                                    category: c.category,
+                                    subCategories: c.subCategories,
                                 }))}
                                 categoryChangeCallback={this.handleCategoryChange}
                                 selectedCategoryId={this.state.selectedCategoryId}
@@ -113,12 +128,16 @@ class Overview extends React.Component {
                             </Paper>
                         </div>
                         }
+                        {this.isCategorySelected() &&
                         <div className={classes.assetsViewSection}>
                             <Paper className={classes.paper}>
-                                Tu bedndom assety cnie
+                                <Assets
+                                    assets={this.state.assets}
+                                    allCategories={this.state.allCategories}
+                                />
                             </Paper>
                         </div>
-
+                        }
                     </div>
                 </div>
             </div>
