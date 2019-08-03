@@ -83,27 +83,22 @@ const ListItem = ({
 
 class CategoriesTree extends React.Component {
 
-    // static initialKey(categories) {
-    //     return (categories[0] !== undefined) ? categories[0].id : "1";
-    // }
-
     mapToData(categories) {
         return categories.map(c => ({
             key: c.category.id,
             label: c.category.name,
-            index: parseInt(c.category.id),
             nodes: (Object.keys(c.subCategories).length !==0) ? this.mapToData(c.subCategories) : []
         }));
     }
 
     handleChange = key => {
-        const pattern = new RegExp("\\d+$");
-        const categoryId = pattern.exec(key)[0];
+        const pattern = new RegExp("/?([^/]+$)");
+        const categoryId = pattern.exec(key)[1];
         this.props.categoryChangeCallback(categoryId);
     };
 
     render() {
-        const {classes, categories} = this.props;
+        const {classes, categories, selectedCategoryId} = this.props;
 
         return (
             <div className={classes.root}>
@@ -114,14 +109,14 @@ class CategoriesTree extends React.Component {
                 </div>
                 <Grid className={classes.grid} container spacing={2} justify="flex-start" alignItems="flex-start">
                     <Grid className={classes.gridItem} item xs={12}>
-                        <Divider className={classes.divider}/>
+                        <Divider className={classes.divider} component={"hr"}/>
                     </Grid>
                     <Grid className={classes.gridItem} item xs={12}>
                         <div>
                             <TreeMenu
                                 data={this.mapToData(categories)}
                                 hasSearch={false}
-                                //initialActiveKey={CategoriesTree.initialKey(categories)}
+                                initialActiveKey={selectedCategoryId}
                                 onClickItem={({key}) =>
                                     this.handleChange(key)
                                 }>

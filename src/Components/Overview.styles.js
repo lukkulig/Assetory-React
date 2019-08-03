@@ -6,7 +6,6 @@ const styles = theme => ({
         flexGrow: 1,
         display: 'flex',
         height: "85vh",
-        float: 'center',
         textAlign: 'center',
         padding: theme.spacing(3),
     },

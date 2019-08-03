@@ -45,9 +45,11 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getCategoryAttributes(selectedCategoryId),
             (response) => {
-                this.setState({selectedCategoryAttributes: response});
+                this.setState({selectedCategoryAttributes: response.reverse()});
                 document.body.style.cursor = 'default';
+
             });
+
     }
 
     fetchAndSetAllAssets() {
@@ -62,7 +64,8 @@ class Overview extends React.Component {
 
     fetchAndSetFilteredAssets(selectedCategoryId) {
         const data = {
-            treeCategory: selectedCategoryId,
+            mainCategoryId: selectedCategoryId,
+            filters: this.state.filters
         };
         api.fetch(
             api.endpoints.getFilteredAssets(data),
@@ -88,8 +91,7 @@ class Overview extends React.Component {
     }
 
     handleFiltersChange = () => {
-        console.log("Filters overview:");
-        console.log(this.state.filters);
+        this.fetchAndSetFilteredAssets(this.state.selectedCategoryId);
     };
 
     handleCategoryChange = (selectedCategoryId) => {
@@ -128,7 +130,7 @@ class Overview extends React.Component {
                             </Paper>
                         </div>
                         }
-                        {this.isCategorySelected() &&
+                        {this.state.allCategories.length !== 0 &&
                         <div className={classes.assetsViewSection}>
                             <Paper className={classes.paper}>
                                 <Assets

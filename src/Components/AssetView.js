@@ -37,7 +37,7 @@ const styles = ({
 
 const MyListItem = (primary, secondary) => {
     return (
-        <ListItem>
+        <ListItem component={"li"}>
             {primary + ": " + secondary}
         </ListItem>
     )
@@ -50,10 +50,10 @@ class AssetView extends React.Component {
 
         const attributesList = [];
         let i = 0;
-        Object.keys(asset.attributesMap).forEach((key) => {
+        asset.attributes.forEach((attribute) => {
             attributesList.push(
                 <div key={i}>
-                    {MyListItem(key, asset.attributesMap[key])}
+                    {MyListItem(attribute.attribute.name, attribute.value)}
                 </div>
             );
             i++;
@@ -64,45 +64,26 @@ class AssetView extends React.Component {
             <div className={classes.root}>
                 <div className={classes.header}>
                     <Typography className={classes.title} variant="h5" component="h2">
-                        {asset.name}
+                        {asset.name} in {asset.category}
                     </Typography>
                 </div>
                 <Grid className={classes.grid} container spacing={2} justify="flex-start" alignItems="flex-start">
                     <Grid className={classes.gridItem} item xs={12}>
-                        <Divider className={classes.divider}/>
+                        <Divider className={classes.divider} component={"hr"}/>
                     </Grid>
                     <Grid className={classes.gridItem} container item xs={12}>
                         <Grid item xs={4}>
-                            <List dense>
-                                {MyListItem("Category", asset.category)}
-                                {MyListItem("Backup", asset.backup)}
-                                {MyListItem("User", asset.user)}
-                            </List>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <List dense>
-                                {MyListItem("Owner", asset.owner)}
-                                {MyListItem("License", asset.license)}
-                            </List>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <List dense>
-                                {MyListItem("Localisation", asset.localisation)}
-                                {MyListItem("Value", asset.value)}
-                            </List>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <List dense>
+                            <List dense component={"ul"}>
                                 {attributesList.filter(a => {return attributesList.indexOf(a)%3===0})}
                             </List>
                         </Grid>
                         <Grid item xs={4}>
-                            <List dense>
+                            <List dense component={"ul"}>
                                 {attributesList.filter(a => {return attributesList.indexOf(a)%3===1})}
                             </List>
                         </Grid>
                         <Grid item xs={4}>
-                            <List dense>
+                            <List dense component={"ul"}>
                                 {attributesList.filter(a => {return attributesList.indexOf(a)%3===2})}
                             </List>
                         </Grid>
@@ -119,13 +100,7 @@ AssetView.propTypes = {
     asset: PropTypes.shape({
         name: PropTypes.string.isRequired,
         category: PropTypes.string.isRequired,
-        localisation: PropTypes.string.isRequired,
-        backup: PropTypes.string.isRequired,
-        license: PropTypes.string.isRequired,
-        value: PropTypes.number.isRequired,
-        owner: PropTypes.string.isRequired,
-        user: PropTypes.string.isRequired,
-        attributesMap: PropTypes.object.isRequired,
+        attributes: PropTypes.array.isRequired,
     }).isRequired,
 };
 

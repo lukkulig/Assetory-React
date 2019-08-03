@@ -66,32 +66,27 @@ class Assets extends React.Component {
 
         const cardList = [];
 
-        Object.keys(assets.sort((a, b) => {
-            if (a.name < b.name) return -1;
-            if (b.name < a.name) return 1;
-            return 0;
-        })).forEach((key) => {
-            cardList.push(
-                <div className={classes.assetViewsContainer} key={key}>
-                    <Paper className={classes.paper}>
-                        <AssetView
-                            className={classes.assetView}
-                            asset={({
-                                name: assets[key].name,
-                                category: allCategories.find(c => c.id === assets[key].categoryId).name,
-                                localisation: assets[key].localisation,
-                                backup: assets[key].backup,
-                                license: assets[key].license,
-                                value: assets[key].value,
-                                owner: assets[key].owner,
-                                user: assets[key].user,
-                                attributesMap: assets[key].attributesMap
-                            })}
-                        />
-                    </Paper>
-                </div>
-            )
-        });
+        if (assets !== undefined)
+            assets.sort((a, b) => {
+                if (a.name < b.name) return -1;
+                if (b.name < a.name) return 1;
+                return 0;
+            }).forEach((asset, i) => {
+                cardList.push(
+                    <div className={classes.assetViewsContainer} key={i}>
+                        <Paper className={classes.paper}>
+                            <AssetView
+                                className={classes.assetView}
+                                asset={({
+                                    name: asset.name,
+                                    category: allCategories.find(c => c.id === asset.categoryId).name,
+                                    attributes: asset.attributes
+                                })}
+                            />
+                        </Paper>
+                    </div>
+                )
+            });
 
         return (
             <div className={classes.root}>
@@ -102,10 +97,10 @@ class Assets extends React.Component {
                 </div>
                 <Grid className={classes.grid} container spacing={2} justify="flex-start" alignItems="flex-start">
                     <Grid className={classes.gridItem} item xs={12}>
-                        <Divider className={classes.divider}/>
+                        <Divider className={classes.divider} component={"hr"}/>
                     </Grid>
                     <Grid className={classes.gridItem} item xs={12}>
-                        <List className={classes.list}>
+                        <List className={classes.list} component={"ul"}>
                             {cardList}
                         </List>
                     </Grid>
@@ -117,7 +112,14 @@ class Assets extends React.Component {
 
 Assets.propTypes = {
     classes: PropTypes.object.isRequired,
-    assets: PropTypes.array.isRequired,
+    assets: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            name: PropTypes.string.isRequired,
+            categoryId: PropTypes.string.isRequired,
+            attributes: PropTypes.array.isRequired
+        })
+    ),
     allCategories: PropTypes.array.isRequired,
 };
 

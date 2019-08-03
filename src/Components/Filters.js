@@ -55,12 +55,12 @@ class Filters extends React.Component {
         const {classes, categoryAttributes, filters} = this.props;
         const setFiltersList = [];
 
-        const assetAttributes = ["Name", "Category","Localisation","Backup","License","Value","Owner","User"];
+        const assetAttributes = [{name: "Name"},{name: "Category"}];
 
-        assetAttributes.concat(categoryAttributes.reverse()).forEach((val, i) => {
+        assetAttributes.concat(categoryAttributes).forEach((attribute, i) => {
             setFiltersList.push(
                 <SetFilterDialog
-                    attribute={val}
+                    attribute={attribute.name}
                     filters={filters}
                     filtersCallback={this.handleFiltersChange}
                     key={i}
