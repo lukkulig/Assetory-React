@@ -68,7 +68,15 @@ export default {
             headers: {
                 "Content-Type": "application/json"
             }
-        })
+        }),
 
+        addCategory: (category) => ({
+            path: url(`categories`),
+            method: "POST",
+            body: JSON.stringify(category),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
     }
 }

@@ -5,7 +5,7 @@ import {withStyles} from "@material-ui/core";
 import Tabs from 'react-bootstrap/Tabs'
 import Tab from 'react-bootstrap/Tab'
 import AddCategory from './AddCategory'
-import EditCategory from "./EditCategory";
+import EditCategory from './EditCategory';
 
 const styles = theme => ({
     root: {},
