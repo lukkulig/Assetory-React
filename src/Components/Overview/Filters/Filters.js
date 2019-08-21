@@ -1,16 +1,18 @@
 import React from "react";
-import * as PropTypes from "prop-types";
-import {withStyles} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
-import ActiveFilters from "./ActiveFilters";
-import Grid from "@material-ui/core/Grid";
 import Divider from "@material-ui/core/Divider";
 import SetFilterDialog from "./SetFilterDialog";
+import * as PropTypes from "prop-types";
+import withStyles from "@material-ui/core/styles/withStyles";
+import Grid from "@material-ui/core/Grid";
 
 const styles = ({
     root: {
-        width: "100%",
-        float: "left",
+        display: 'grid',
+        gridTemplateRows: '40px 10px 100%',
+        gridTemplateAreas: `'header'
+                            'divider'
+                            'content'`,
     },
     title: {
         float: "left",
@@ -18,23 +20,18 @@ const styles = ({
         paddingTop: 5
     },
     header: {
-        float: "left",
-        width: "100%",
+        gridArea: 'header',
     },
     divider: {
-        marginTop: 10,
-        marginBottom: 10,
+        gridArea: 'divider',
     },
-    grid:{
-        float: "left",
-    },
-    gridItem:{
+    filtersSection: {
+        gridArea: 'content',
         marginLeft: 10,
         marginRight: 10,
-    },
+        display: ''
+    }
 });
-
-
 
 class Filters extends React.Component {
 
@@ -47,7 +44,6 @@ class Filters extends React.Component {
     }
 
     handleFiltersChange = () => {
-        this.forceUpdate();
         this.props.overviewCallback();
     };
 
@@ -55,7 +51,7 @@ class Filters extends React.Component {
         const {classes, categoryAttributes, filters} = this.props;
         const setFiltersList = [];
 
-        const assetAttributes = [{name: "Name"},{name: "Category"}];
+        const assetAttributes = [{name: "Name"}, {name: "Category"}];
 
         assetAttributes.concat(categoryAttributes).forEach((attribute, i) => {
             setFiltersList.push(
@@ -64,7 +60,8 @@ class Filters extends React.Component {
                     filters={filters}
                     filtersCallback={this.handleFiltersChange}
                     key={i}
-                />);
+                />
+            );
         });
 
         return (
@@ -74,23 +71,12 @@ class Filters extends React.Component {
                         Filters
                     </Typography>
                 </div>
-                <Grid className={classes.grid} container spacing={2} justify="flex-start" alignItems="flex-start">
-                    <Grid className={classes.gridItem} item xs={12}>
-                        <Divider className={classes.divider}/>
-                    </Grid>
-                    <Grid className={classes.gridItem} container item xs={12} justify="flex-start">
+                <Divider className={classes.divider}/>
+                <div className={classes.filtersSection}>
+                    <Grid container justify="flex-start">
                         {setFiltersList}
                     </Grid>
-                    {Object.keys(this.props.filters).length !== 0 &&
-                    <Grid className={classes.gridItem} item xs={12}>
-                        <ActiveFilters
-                            filters={this.state.filters}
-                            filtersCallback={this.handleFiltersChange}
-                        />
-                    </Grid>
-                    }
-                </Grid>
-
+                </div>
             </div>
         );
     }
