@@ -5,20 +5,9 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import {Add, Tune, ViewList} from "@material-ui/icons";
 
 const styles = theme => ({
-    root: {
-        flexGrow: 1,
-    },
-    grow: {
-        flexGrow: 1,
-    },
-    core: {
-        marginTop: 65,
-    },
-    appBar: {
-        height: 65,
-    },
     appBarSpacer: theme.mixins.toolbar,
 });
 
@@ -45,15 +34,24 @@ class AssetoryAppBar extends React.Component {
         const {classes} = this.props;
 
         return (
-            <div className={classes.root}>
-                <AppBar className={classes.appBar}>
+            <div>
+                <AppBar>
                     <Toolbar>
-                        <Typography variant="h6" color="inherit" className={classes.grow}>
+                        <Typography variant="h4" color="inherit" style={{flexGrow: 1}}>
                             Assetory
                         </Typography>
-                        <Button color="inherit" onClick={this.handleOverview}>Overview</Button>
-                        <Button color="inherit" onClick={this.handleManageCategories}>Manage Categories</Button>
-                        <Button color="inherit" onClick={this.handleAddAsset}>Add Asset</Button>
+                        <Button color="inherit" size="small" onClick={this.handleOverview}>
+                            <ViewList style={{marginRight: 3}}/>
+                            Overview
+                        </Button>
+                        <Button color="inherit" size="small" onClick={this.handleManageCategories}>
+                            <Tune style={{marginRight: 3}}/>
+                            Manage Categories
+                        </Button>
+                        <Button color="inherit" size="small" onClick={this.handleAddAsset}>
+                            <Add style={{marginRight: 3}}/>
+                            Add Asset
+                        </Button>
                     </Toolbar>
                 </AppBar>
                 <div className={classes.appBarSpacer}/>

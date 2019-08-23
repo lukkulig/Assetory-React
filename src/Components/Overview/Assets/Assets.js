@@ -2,39 +2,44 @@ import React from "react";
 import * as PropTypes from "prop-types";
 import {withStyles} from '@material-ui/core/styles/index';
 import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
 import Divider from "@material-ui/core/Divider";
 import List from "@material-ui/core/List";
 import AssetView from "./AssetView";
 import Paper from "@material-ui/core/Paper";
+import ActiveFilters from "../Filters/ActiveFilters";
 
 const styles = theme => ({
     root: {
-        width: "100%",
-        float: "left",
+        height: '100%',
+        display: 'grid',
+        gridTemplateRows: '40px 10px auto',
+        gridTemplateAreas: `'header'
+                            'divider'
+                            'content'`,
+    },
+    header: {
+        gridArea: 'header',
     },
     title: {
         float: "left",
         paddingLeft: 15,
         paddingTop: 5
     },
-    header: {
-        float: "left",
-        width: "100%",
-    },
     divider: {
-        marginTop: 10,
-        marginBottom: 10,
+        gridArea: 'divider',
+    },
+    listSection: {
+        gridArea: 'content',
+        overflow: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        scrollPaddingRight: 10,
+    },
+    activeFilters: {
         flexGrow: 1,
     },
-    grid: {
-        float: "left",
-    },
-    gridItem: {
-        marginLeft: 10,
-        marginRight: 10,
-    },
     list: {
+        flexGrow: 99,
         display: "flex",
         flexDirection: "column",
     },
@@ -47,7 +52,7 @@ const styles = theme => ({
         width: "100%",
     },
     assetViewsContainer: {
-        margin: theme.spacing(1)
+        margin: theme.spacing(1),
     }
 });
 
@@ -55,11 +60,17 @@ class Assets extends React.Component {
 
     state = {
         assets: [],
+        filters: {}
     };
 
     componentDidMount() {
-        this.setState({assets: this.props.assets})
+        this.setState({assets: this.props.assets});
+        this.setState({filters: this.props.filters});
     }
+
+    handleFiltersChange = () => {
+        this.props.overviewCallback();
+    };
 
     render() {
         const {classes, assets, allCategories} = this.props;
@@ -74,9 +85,10 @@ class Assets extends React.Component {
             }).forEach((asset, i) => {
                 cardList.push(
                     <div className={classes.assetViewsContainer} key={i}>
-                        <Paper className={classes.paper}>
+                        <Paper className={classes.paper} elevation={2}>
                             <AssetView
                                 className={classes.assetView}
+
                                 asset={({
                                     name: asset.name,
                                     category: allCategories.find(c => c.id === asset.categoryId).name,
@@ -95,16 +107,18 @@ class Assets extends React.Component {
                         Assets
                     </Typography>
                 </div>
-                <Grid className={classes.grid} container spacing={2} justify="flex-start" alignItems="flex-start">
-                    <Grid className={classes.gridItem} item xs={12}>
-                        <Divider className={classes.divider} component={"hr"}/>
-                    </Grid>
-                    <Grid className={classes.gridItem} item xs={12}>
-                        <List className={classes.list} component={"ul"}>
-                            {cardList}
-                        </List>
-                    </Grid>
-                </Grid>
+                <Divider className={classes.divider}/>
+                <div className={classes.listSection}>
+                    {Object.keys(this.props.filters).length !== 0 &&
+                    <ActiveFilters className={classes.activeFilters}
+                                   filters={this.state.filters}
+                                   assetsCallback={this.handleFiltersChange}
+                    />
+                    }
+                    <List className={classes.list} component={"ul"}>
+                        {cardList}
+                    </List>
+                </div>
             </div>
         );
     }
@@ -121,6 +135,8 @@ Assets.propTypes = {
         })
     ),
     allCategories: PropTypes.array.isRequired,
+    filters: PropTypes.object.isRequired,
+    overviewCallback: PropTypes.func,
 };
 
 export default withStyles(styles)(Assets)

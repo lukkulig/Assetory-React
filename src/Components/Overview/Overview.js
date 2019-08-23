@@ -2,11 +2,11 @@ import React from 'react';
 import * as PropTypes from "prop-types";
 import {withStyles} from '@material-ui/core/styles/index';
 import styles from "./Overview.styles";
-import api from "../api";
-import Filters from "./Filters";
-import CategoriesTree from "./CategoriesTree";
+import api from "../../api";
+import Filters from "./Filters/Filters";
+import CategoriesTree from "./CategoriesTree/CategoriesTree";
 import Paper from "@material-ui/core/Paper";
-import Assets from "./Assets";
+import Assets from "./Assets/Assets";
 
 class Overview extends React.Component {
 
@@ -104,10 +104,10 @@ class Overview extends React.Component {
         const {classes} = this.props;
 
         return (
-            <div className={classes.root}>
-                <div className={classes.content}>
-                    <div className={classes.categoriesTreeSection}>
-                        <Paper className={classes.paper}>
+            <div className={classes.content}>
+                <div className={classes.sideBarSection}>
+                    <Paper className={classes.paper} elevation={4}>
+                        <div className={classes.categoryTreeSection}>
                             <CategoriesTree
                                 categories={this.state.categories.map(c => ({
                                     category: c.category,
@@ -116,31 +116,29 @@ class Overview extends React.Component {
                                 categoryChangeCallback={this.handleCategoryChange}
                                 selectedCategoryId={this.state.selectedCategoryId}
                             />
-                        </Paper>
-                    </div>
-                    <div className={classes.assetsSection}>
+                        </div>
                         {this.isCategorySelected() &&
                         <div className={classes.filtersSection}>
-                            <Paper className={classes.paper}>
-                                <Filters
-                                    categoryAttributes={this.state.selectedCategoryAttributes}
-                                    filters={this.state.filters}
-                                    overviewCallback={this.handleFiltersChange}
-                                />
-                            </Paper>
+                            <Filters
+                                categoryAttributes={this.state.selectedCategoryAttributes}
+                                filters={this.state.filters}
+                                overviewCallback={this.handleFiltersChange}
+                            />
                         </div>
                         }
-                        {this.state.allCategories.length !== 0 &&
-                        <div className={classes.assetsViewSection}>
-                            <Paper className={classes.paper}>
-                                <Assets
-                                    assets={this.state.assets}
-                                    allCategories={this.state.allCategories}
-                                />
-                            </Paper>
-                        </div>
-                        }
-                    </div>
+                    </Paper>
+                </div>
+                <div className={classes.assetsSection}>
+                    {this.state.allCategories.length !== 0 &&
+                    <Paper className={classes.paper} elevation={4}>
+                        <Assets
+                            assets={this.state.assets}
+                            allCategories={this.state.allCategories}
+                            filters={this.state.filters}
+                            overviewCallback={this.handleFiltersChange}
+                        />
+                    </Paper>
+                    }
                 </div>
             </div>
         );

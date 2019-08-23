@@ -69,7 +69,7 @@ class AssetView extends React.Component {
                 </div>
                 <Grid className={classes.grid} container spacing={2} justify="flex-start" alignItems="flex-start">
                     <Grid className={classes.gridItem} item xs={12}>
-                        <Divider className={classes.divider} component={"hr"}/>
+                        <Divider className={classes.divider}/>
                     </Grid>
                     <Grid className={classes.gridItem} container item xs={12}>
                         <Grid item xs={4}>
