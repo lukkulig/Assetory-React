@@ -40,6 +40,7 @@ class SetFilterDialog extends React.Component {
 
     handleClose = () => {
         this.setState({open: false});
+        this.setState({value: ""});
     };
 
     isValid = () => {
@@ -49,9 +50,9 @@ class SetFilterDialog extends React.Component {
     setFilters = () => {
         this.handleClose();
         let temp = this.state.filters;
-        if (temp[this.props.attribute] === undefined)
-            temp[this.props.attribute] = [];
-        temp[this.props.attribute].push(this.state.value);
+        if (temp[this.props.attribute.key] === undefined)
+            temp[this.props.attribute.key] = [];
+        temp[this.props.attribute.key].push(this.state.value);
         this.setState({filters: temp});
         this.props.filtersCallback();
     };
@@ -63,23 +64,28 @@ class SetFilterDialog extends React.Component {
     render() {
         const {classes, attribute} = this.props;
 
+        let values = attribute.values.sort((a, b) => {
+            return a.label - b.label;
+        }).map(value => "["+value.id+":"+value.label+"]").join(", ");
+
         return (
             <div>
                 <Fab className={classes.filterFab}
                      variant="extended"
                      color="primary"
                      onClick={this.handleClickOpen}>
-                    {attribute}
+                    {attribute.label}
                 </Fab>
                 <Dialog
                     open={this.state.open}
                     onClose={this.handleClose}
                     aria-labelledby="set-filter-form"
                 >
-                    <DialogTitle id="set-filter-form">{attribute}</DialogTitle>
+                    <DialogTitle id="set-filter-form">{attribute.key}</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            Setting filters
+                            Set filters:<br/>
+                            {values}
                         </DialogContentText>
                         <TextField
                             id="filters"
@@ -108,7 +114,16 @@ class SetFilterDialog extends React.Component {
 
 SetFilterDialog.propTypes = {
     classes: PropTypes.object.isRequired,
-    attribute: PropTypes.string.isRequired,
+    attribute: PropTypes.shape({
+        key: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        values: PropTypes.arrayOf(
+            PropTypes.shape({
+                id: PropTypes.string.isRequired,
+                label: PropTypes.string.isRequired
+            })
+        )
+    }),
     filters: PropTypes.object.isRequired,
     filtersCallback: PropTypes.func
 };

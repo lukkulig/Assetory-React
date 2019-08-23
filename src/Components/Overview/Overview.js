@@ -25,7 +25,11 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getAllCategories(),
             (response) => {
-                this.setState({allCategories: response.content});
+                let result = response.content.map(category => ({
+                    id: category.id,
+                    label: category.name
+                }));
+                this.setState({allCategories: result});
                 document.body.style.cursor = 'default';
             });
     }
@@ -47,9 +51,7 @@ class Overview extends React.Component {
             (response) => {
                 this.setState({selectedCategoryAttributes: response.reverse()});
                 document.body.style.cursor = 'default';
-
             });
-
     }
 
     fetchAndSetAllAssets() {
@@ -80,7 +82,6 @@ class Overview extends React.Component {
         this.fetchAndSetAllCategories();
         this.fetchAndSetCategoryTrees();
         this.fetchAndSetAllAssets();
-        this.setState({selectedCategoryId: (this.state.categories[0] !== undefined) ? this.state.categories[0].id : ""});
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -122,6 +123,8 @@ class Overview extends React.Component {
                             <Filters
                                 categoryAttributes={this.state.selectedCategoryAttributes}
                                 filters={this.state.filters}
+                                assets={this.state.assets}
+                                allCategories={this.state.allCategories}
                                 overviewCallback={this.handleFiltersChange}
                             />
                         </div>

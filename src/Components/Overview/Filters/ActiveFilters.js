@@ -4,6 +4,8 @@ import {withStyles} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import DeleteFilterDialog from "./DeleteFilterDialog";
 import Typography from "@material-ui/core/Typography";
+import Filters from "./Filters";
+import * as Constants from "../../../Constants/Constants";
 
 const styles = theme => ({
     root: {
@@ -39,21 +41,25 @@ class ActiveFilters extends React.Component {
     render() {
         const {classes, filters} = this.props;
 
+
+
         const filtersList = [];
         let i = 0;
         Object.keys(filters).forEach((key) => {
             Object.keys(filters[key]).forEach((attr_ind) => {
-                        filtersList.push(
-                            <DeleteFilterDialog
-                                filterKey={key}
-                                attribute={filters[key][attr_ind]}
-                                filters={filters}
-                                activeFiltersCallback={this.handleFiltersChange}
-                                key={i}
-                            />);
-                        i++;
-                })
-            });
+                let filterLabel = ActiveFilters.getLabel(key);
+                filtersList.push(
+                    <DeleteFilterDialog
+                        filterKey={key}
+                        filterLabel={filterLabel}
+                        attribute={filters[key][attr_ind]}
+                        filters={filters}
+                        activeFiltersCallback={this.handleFiltersChange}
+                        key={i}
+                    />);
+                i++;
+            })
+        });
 
         return (
 
@@ -67,6 +73,14 @@ class ActiveFilters extends React.Component {
             </div>
         )
             ;
+    }
+
+    static getLabel(key) {
+        if (key === Constants.NAME_KEY)
+            return Constants.NAME_LABEL;
+        if (key === Constants.CATEGORY_KEY)
+            return Constants.CATEGORY_LABEL;
+        return Filters.getLabel(key);
     }
 }
 

@@ -59,7 +59,7 @@ class DeleteFilterDialog extends React.Component {
     };
 
     render() {
-        const {classes, filterKey, attribute} = this.props;
+        const {classes, filterKey, filterLabel, attribute} = this.props;
 
         return (
             <div>
@@ -67,7 +67,7 @@ class DeleteFilterDialog extends React.Component {
                      variant="extended"
                      filters={this.state.filters}
                      onClick={this.handleClickOpen}>
-                    {filterKey + ": " + attribute}
+                    {filterLabel + ": " + attribute}
                     <HighlightOffIcon fontSize='small' className={classes.icon}/>
                 </Fab>
                 <Dialog
@@ -78,7 +78,7 @@ class DeleteFilterDialog extends React.Component {
                     <DialogTitle id="delete-filter-form">{filterKey}</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            Are you sure you want to delete filter "{attribute}" for {filterKey}?
+                            Are you sure you want to delete filter "{attribute}" for {filterLabel}?
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
@@ -99,6 +99,7 @@ class DeleteFilterDialog extends React.Component {
 DeleteFilterDialog.propTypes = {
     classes: PropTypes.object.isRequired,
     filterKey: PropTypes.string.isRequired,
+    filterLabel: PropTypes.string.isRequired,
     attribute: PropTypes.string.isRequired,
     filters: PropTypes.object.isRequired,
     activeFiltersCallback: PropTypes.func

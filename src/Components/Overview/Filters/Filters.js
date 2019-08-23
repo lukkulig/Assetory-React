@@ -5,6 +5,7 @@ import SetFilterDialog from "./SetFilterDialog";
 import * as PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Grid from "@material-ui/core/Grid";
+import * as Constants from "../../../Constants/Constants";
 
 const styles = ({
     root: {
@@ -39,6 +40,10 @@ class Filters extends React.Component {
         filters: {},
     };
 
+    static getLabel(string) {
+        return string[0].toUpperCase() + string.slice(1).toLowerCase();
+    }
+
     componentDidMount() {
         this.setState({filters: this.props.filters})
     }
@@ -48,15 +53,34 @@ class Filters extends React.Component {
     };
 
     render() {
-        const {classes, categoryAttributes, filters} = this.props;
+        const {classes, categoryAttributes, filters, assets, allCategories} = this.props;
         const setFiltersList = [];
 
-        const assetAttributes = [{name: "Name"}, {name: "Category"}];
+        const assetAttributes = [
+            {
+                key: Constants.NAME_KEY, label: Constants.NAME_LABEL, values: assets.map(asset => ({
+                    id: asset.name,
+                    label: asset.name
+                }))
+            },
+            {key: Constants.CATEGORY_KEY, label: Constants.CATEGORY_LABEL, values: allCategories}
+        ];
 
-        assetAttributes.concat(categoryAttributes).forEach((attribute, i) => {
+        let categoryAttributesMapped = categoryAttributes.map(categoryAttribute => ({
+            key: categoryAttribute.name,
+            label: Filters.getLabel(categoryAttribute.name),
+            values: assets.map(function(asset) {
+                let value = asset.attributes.filter(attribute => attribute.attribute.name === categoryAttribute.name).map(attribute => attribute.value).shift();
+                return {
+                    id: value,
+                    label: value
+                }})
+        }));
+
+        assetAttributes.concat(categoryAttributesMapped).forEach((attribute, i) => {
             setFiltersList.push(
                 <SetFilterDialog
-                    attribute={attribute.name}
+                    attribute={attribute}
                     filters={filters}
                     filtersCallback={this.handleFiltersChange}
                     key={i}
@@ -86,6 +110,15 @@ Filters.propTypes = {
     classes: PropTypes.object.isRequired,
     categoryAttributes: PropTypes.array.isRequired,
     filters: PropTypes.object.isRequired,
+    assets: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            name: PropTypes.string.isRequired,
+            categoryId: PropTypes.string.isRequired,
+            attributes: PropTypes.array.isRequired
+        })
+    ),
+    allCategories: PropTypes.array.isRequired,
     overviewCallback: PropTypes.func,
 };
 
