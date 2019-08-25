@@ -77,6 +77,15 @@ export default {
             headers: {
                 "Content-Type": "application/json"
             }
+        }),
+
+        updateCategory: (category) => ({
+            path: url(`categories`),
+            method: "PUT",
+            body: JSON.stringify(category),
+            headers: {
+                "Content-Type": "application/json"
+            }
         })
     }
 }

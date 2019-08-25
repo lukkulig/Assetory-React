@@ -1,9 +1,8 @@
 import React from "react";
 import * as PropTypes from "prop-types";
-import {withStyles, List, ListItem, Paper} from "@material-ui/core";
+import {withStyles, List, ListItem, Paper, Button} from "@material-ui/core";
 
-const styles = ({
-});
+const styles = ({});
 
 const AttributeListItem = (name, type) => {
     return (
@@ -13,23 +12,31 @@ const AttributeListItem = (name, type) => {
     )
 };
 
-class CategoryAttributes extends React.Component{
+class CategoryAttributes extends React.Component {
     render() {
         const {classes, attributes} = this.props;
 
-        const attributesList = [];
         let i = 0;
+        const attributesList = [];
         attributes.forEach((attribute) => {
             attributesList.push(
                 <div key={i}>
-                    {AttributeListItem(attribute.name, attribute.type)}<br/>
+                    {AttributeListItem(attribute.name, attribute.type)}
+                    <Button
+                        className={classes.button}
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => this.props.deleteAttributeCallback(attribute.name)}
+                    >
+                        Delete
+                    </Button>
+                    <br/>
                 </div>
             );
-            i++;
         });
 
         return (
-            <Paper style={{maxHeight: 200, overflow: 'auto'}}>
+            <Paper style={{maxHeight: 400, overflow: 'auto'}}>
                 <List component={"ul"}>
                     {attributesList}
                 </List>
