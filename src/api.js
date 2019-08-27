@@ -56,7 +56,7 @@ export default {
             method: "GET"
         }),
 
-        getAllAssets:() => ({
+        getAllAssets: () => ({
             path: url(`assets`),
             method: "GET"
         }),
@@ -68,7 +68,24 @@ export default {
             headers: {
                 "Content-Type": "application/json"
             }
-        })
+        }),
 
+        addCategory: (category) => ({
+            path: url(`categories`),
+            method: "POST",
+            body: JSON.stringify(category),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }),
+
+        updateCategory: (category) => ({
+            path: url(`categories`),
+            method: "PUT",
+            body: JSON.stringify(category),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
     }
 }
