@@ -16,7 +16,8 @@ class Overview extends React.Component {
         categories: [],
         selectedCategoryId: "",
         selectedCategoryAttributes: [],
-        assets: [],
+        allAssets: [],
+        filteredAssets: [],
         filters: {},
     };
 
@@ -59,7 +60,8 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getAllAssets(),
             (response) => {
-                this.setState({assets: response.content});
+                this.setState({allAssets: response.content});
+                this.setState({filteredAssets: response.content});
                 document.body.style.cursor = 'default';
             });
     }
@@ -72,7 +74,7 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getFilteredAssets(data),
             (assets) => {
-                this.setState({assets: assets.content});
+                this.setState({filteredAssets: assets.content});
             }
         );
     }
@@ -123,7 +125,7 @@ class Overview extends React.Component {
                             <Filters
                                 categoryAttributes={this.state.selectedCategoryAttributes}
                                 filters={this.state.filters}
-                                assets={this.state.assets}
+                                assets={this.state.allAssets}
                                 allCategories={this.state.allCategories}
                                 overviewCallback={this.handleFiltersChange}
                             />
@@ -135,7 +137,7 @@ class Overview extends React.Component {
                     {this.state.allCategories.length !== 0 &&
                     <Paper className={classes.paper} elevation={4}>
                         <Assets
-                            assets={this.state.assets}
+                            assets={this.state.filteredAssets}
                             allCategories={this.state.allCategories}
                             filters={this.state.filters}
                             overviewCallback={this.handleFiltersChange}

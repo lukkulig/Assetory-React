@@ -64,7 +64,7 @@ class Assets extends React.Component {
     };
 
     componentDidMount() {
-        this.setState({assets: this.props.assets});
+        this.setState({filteredAssets: this.props.assets});
         this.setState({filters: this.props.filters});
     }
 
