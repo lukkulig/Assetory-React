@@ -56,7 +56,7 @@ export default {
             method: "GET"
         }),
 
-        getAllAssets:() => ({
+        getAllAssets: () => ({
             path: url(`assets`),
             method: "GET"
         }),

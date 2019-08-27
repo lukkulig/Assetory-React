@@ -7,9 +7,23 @@ import api from "../api";
 const styles = ({
     root: {},
     content: {
-        textAlign: 'center',
         marginTop: 10,
         marginBottom: 10,
+        marginLeft: 10,
+        marginRight: 10,
+    },
+    attributeContent: {
+        float: 'left',
+        marginTop: 10,
+        marginBottom: 10,
+        marginLeft: 10,
+        marginRight: 10,
+    },
+    textField: {
+        width: 500,
+    },
+    select: {
+        width: 100,
     }
 });
 
@@ -60,7 +74,6 @@ class AddCategory extends React.Component {
     };
 
     handleDeleteAttributeButton = (removedAttributeName) => {
-        console.log(removedAttributeName);
         this.setState({attributes: this.state.attributes.filter(attribute => attribute.name !== removedAttributeName)})
     };
 
@@ -89,7 +102,7 @@ class AddCategory extends React.Component {
                     attributes: [],
                     newAttributeName: '',
                     newAttributeType: 'text',
-                    supercategory: '',
+                    supercategory: undefined,
                     categoryName: ''
                 })
             });
@@ -97,14 +110,13 @@ class AddCategory extends React.Component {
 
     render() {
         const {classes} = this.props;
-        console.log(this.state);
         return (
             <div className={classes.root}>
                 <form className={classes.content} noValidate>
                     <div className={classes.content}>
-                        <h4>Supercategory</h4>
                         <Select
-                            classes={classes}
+                            label={"Supercategory"}
+                            className={classes.select}
                             value={this.state.supercategory.name}
                             onChange={this.handleSupercategoryChange}
                         >
@@ -122,32 +134,38 @@ class AddCategory extends React.Component {
                         />
                     </div>
                     <div className={classes.content}>
-                        <TextField
-                            className={classes.textField}
-                            label={"Additional attribute"}
-                            value={this.state.newAttributeName}
-                            onChange={this.handleAttributeNameChange}
-                            variant="outlined"
-                            helperText="Attribute required for all assets in this category"
-                        />
-                        <Select
-                            classes={classes}
-                            value={this.state.newAttributeType}
-                            onChange={this.handleAttributeTypeChange}
-                        >
-                            <MenuItem value={"text"}>Text</MenuItem>
-                            <MenuItem value={"number"}>Number</MenuItem>
-                            <MenuItem value={"date"}>Date</MenuItem>
-                        </Select>
-                        <Button variant="outlined"
-                                color="primary"
-                                className={classes.button}
-                                onClick={this.handleSaveAttributeButton}
-                        >
-                            Save attribute
-                        </Button>
+                        <div className={classes.attributeContent}>
+                            <TextField
+                                className={classes.textField}
+                                label={"Additional attribute"}
+                                value={this.state.newAttributeName}
+                                onChange={this.handleAttributeNameChange}
+                                variant="outlined"
+                                helperText="Attribute required for all assets in this category"
+                            />
+                        </div>
+                        <div className={classes.attributeContent}>
+                            <Select
+                                className={classes.select}
+                                value={this.state.newAttributeType}
+                                onChange={this.handleAttributeTypeChange}
+                            >
+                                <MenuItem value={"text"}>Text</MenuItem>
+                                <MenuItem value={"number"}>Number</MenuItem>
+                                <MenuItem value={"date"}>Date</MenuItem>
+                            </Select>
+                        </div>
+                        <div className={classes.attributeContent}>
+                            <Button variant="outlined"
+                                    color="primary"
+                                    className={classes.button}
+                                    onClick={this.handleSaveAttributeButton}
+                            >
+                                Save attribute
+                            </Button>
+                        </div>
                     </div>
-                    <div className={classes.content}>
+                    <div className={classes.content} style={{clear: "both"}}>
                         <CategoryAttributes
                             classes={classes}
                             attributes={this.state.attributes}
