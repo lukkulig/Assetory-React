@@ -186,13 +186,13 @@ class AssetCategorySelect extends React.Component {
             this.props.categoryChangeCallback(selectedCategory.id);
     };
 
-    findCategory = (selectedCategoryId) => {
-        const selectedCategory = this.props.categories.find(category => category.id === selectedCategoryId);
-        return selectedCategory === undefined ? null : selectedCategory;
+    findCategory = (selectedCategory) => {
+        const selected = this.props.categories.find(category => category.id === selectedCategory.id);
+        return selected === undefined ? null : selected;
     };
 
     render() {
-        const {classes, categories, selectedCategoryId} = this.props;
+        const {classes, categories} = this.props;
 
         return (
             <div className={classes.root}>
@@ -201,7 +201,7 @@ class AssetCategorySelect extends React.Component {
                         classes={classes}
                         options={getSortedCategories(categories)}
                         components={components}
-                        value={this.findCategory(selectedCategoryId)}
+                        selectedCategoryId={this.findCategory}
                         onChange={this.handleChange}
                         placeholder="Start typing category name..."
                         isClearable
@@ -220,13 +220,13 @@ AssetCategorySelect.propTypes = {
     theme: PropTypes.object.isRequired,
     categories: PropTypes.arrayOf(
         PropTypes.shape({
-            id: PropTypes.number,
+            id: PropTypes.string,
             name: PropTypes.string,
             attributes: PropTypes.array,
         })
     ).isRequired,
     categoryChangeCallback: PropTypes.func,
-    selectedCategoryId: PropTypes.number,
+    selectedCategoryId: PropTypes.string,
 };
 
 export default withStyles(styles, {withTheme: true})(AssetCategorySelect);

@@ -4,6 +4,7 @@ import {Button, Typography, withStyles} from "@material-ui/core"
 import api from "../api";
 import AssetCategorySelect from "./AssetCategorySelect.js";
 import CategoryFieldsList from "./CategoryFieldsList.js"
+import {instanceOf} from "prop-types";
 
 const styles = theme => ({
     root: {
@@ -15,7 +16,7 @@ const styles = theme => ({
         width: "100%"
     },
     content: {
-        display:"inline-block",
+        display: "inline-block",
         textAlign: "left",
         width: 400
     },
@@ -38,13 +39,15 @@ class AddAsset extends React.Component {
         user: '',
         assetValue: '',
         backup: '',
-        categoryAttributes: {}
+        categoryAttributes: [],
+        attributesValues: {},
+        isNotValidate: true
     };
 
     static getUrlParams(location) {
         const searchParams = new URLSearchParams(location.search);
         return {
-            categoryId: parseInt(searchParams.get('category')) || undefined,
+            categoryId: searchParams.get('category') || undefined,
         };
     }
 
@@ -68,19 +71,45 @@ class AddAsset extends React.Component {
         }
     };
 
-    handleAddAssetButton = () => {
-        const asset = {
-            category: this.state.categoryId,
-            name: this.state.assetName,
-            attributesMap: this.state.categoryAttributes,
-            localisation: this.state.localisation,
-            backup: this.state.backup,
-            license: this.state.license,
-            value: this.state.assetValue,
-            owner: this.state.owner,
-            user: this.state.user
-        };
+    fetchAndSetCategoryAttributes(selectedCategoryId) {
+        document.body.style.cursor = 'wait';
+        api.fetch(
+            api.endpoints.getCategoryAttributes(selectedCategoryId),
+            (response) => {
+                this.setState({categoryAttributes: response});
+                document.body.style.cursor = 'default';
+            });
+    }
 
+    addNewAttribute = (name, type, value) => {
+        const attribute = {
+            name: name,
+            type: type
+        };
+        const attrib = {
+            attribute: attribute,
+            value: value
+        };
+        return attrib
+    }
+
+    handleAddAssetButton = () => {
+
+        const attributes = [];
+        attributes.push(this.addNewAttribute("Location", "text", this.state.localisation));
+        attributes.push(this.addNewAttribute("License", "text", this.state.license));
+        attributes.push(this.addNewAttribute("Value", "number", this.state.assetValue));
+        attributes.push(this.addNewAttribute("Owner", "text", this.state.owner));
+        attributes.push(this.addNewAttribute("User", "text", this.state.user));
+        this.state.categoryAttributes.forEach((attribute) => {
+            attributes.push(this.addNewAttribute(attribute.name, attribute.type, this.state.attributesValues[attribute.name]))
+        });
+        const asset = {
+            attributes: attributes,
+            categoryId: this.state.categoryId,
+            name: this.state.assetName,
+        };
+        console.log(JSON.stringify(asset))
         api.fetch(
             api.endpoints.addAsset(asset), () => {
                 this.setState({
@@ -91,14 +120,16 @@ class AddAsset extends React.Component {
                     user: '',
                     assetValue: '',
                     backup: '',
-                    categoryAttributes: {}
+                    categoryAttributes: [],
+                    attributesValues: {},
+                    isNotValidate: true
                 })
             }
         );
     };
 
     getActiveCategory() {
-        return this.state.categories.find(c => parseInt(c.id) === this.state.categoryId) || null
+        return this.state.categories.find(c => c.id === this.state.categoryId) || null
     }
 
     handleAssetNameChange = (event) => {
@@ -129,10 +160,24 @@ class AddAsset extends React.Component {
         this.setState({backup: event.target.value.trim()});
     };
 
-    handleFieldsChangeCallback = (event) => {
-        let temp = this.state.categoryAttributes;
-        temp[event.target.name] = event.target.value;
-        this.setState({categoryAttributes: temp});
+    handleAttributeValuesChangeCallback = (event) => {
+        let temp = this.state.attributesValues;
+        temp[event.target.name.trim()] = event.target.value.trim();
+        this.setState({attributesValues: temp});
+    };
+
+    handleValidateCallback = (event) => {
+        let isValid = true;
+        document.getElementById('textFieldsForm').childNodes.forEach((textfield) => {
+            textfield.childNodes.forEach((child) => {
+                if (child instanceof HTMLDivElement) {
+                    if (child.getElementsByTagName("input")[0].value === "") {
+                        isValid = false;
+                    }
+                }
+            });
+        });
+        this.state.isNotValidate = !isValid;
     };
 
     componentDidMount() {
@@ -143,15 +188,14 @@ class AddAsset extends React.Component {
         const {categoryId} = AddAsset.getUrlParams(window.location);
         if (prevState.categoryId !== categoryId) {
             this.setState({categoryId: categoryId});
-            this.setState({categoryName: "Ala"})
+            if (categoryId !== undefined) {
+                this.fetchAndSetCategoryAttributes(categoryId);
+            }
         }
     }
 
     render() {
         const {classes} = this.props;
-        const {
-            assetName, localisation, license, owner, user, assetValue, backup
-        } = this.state;
         return (
             <div className={classes.root}>
                 <div className={classes.header}>
@@ -160,29 +204,21 @@ class AddAsset extends React.Component {
                     </Typography>
                 </div>
                 <div className={classes.content}>
-                    <Typography  variant="h6" component="h2" >
+                    <Typography variant="h6" component="h2">
                         Category
                     </Typography>
                     <AssetCategorySelect
                         categories={this.state.categories.map(c => ({
-                            id: parseInt(c.id),
+                            id: c.id,
                             name: c.name,
-                            attributes: c.attributes,
-                            path: c.path,
                         }))}
                         categoryChangeCallback={this.handleCategoryChange}
                         selectedCategoryId={this.state.categoryId}
                     />
                     {this.getActiveCategory() &&
                     <CategoryFieldsList
-                        assetName={assetName}
-                        localisation={localisation}
-                        license={license}
-                        owner={owner}
-                        user={user}
-                        assetValue={assetValue}
-                        backup={backup}
                         category={this.getActiveCategory()}
+                        categoryAttributes={this.state.categoryAttributes}
                         assetNameChangeCallback={this.handleAssetNameChange}
                         localisationChangeCallback={this.handleLocalisationChange}
                         licenseChangeCallback={this.handleLicenseChangeCallback}
@@ -190,8 +226,8 @@ class AddAsset extends React.Component {
                         userChangeCallback={this.handleUserChangeCallback}
                         assetValueChangeCallback={this.handleAssetValueChangeCallback}
                         backupChangeCallback={this.handleBackupChangeCallback}
-                        fieldsChangeCallback={this.handleFieldsChangeCallback}
-                        fields={this.state.categoryAttributes}
+                        attributeValuesChangeCallback={this.handleAttributeValuesChangeCallback}
+                        validateCallback={this.handleValidateCallback}
                     />
                     }
                     < Button
@@ -199,13 +235,12 @@ class AddAsset extends React.Component {
                         onClick={this.handleAddAssetButton}
                         color="primary"
                         variant="contained"
+                        disabled={this.state.isNotValidate}
                     >
                         add asset
                     </Button>
                 </div>
             </div>
-
-
         );
     }
 }

@@ -17,8 +17,6 @@ class CategoryFieldsList extends React.Component {
 
     render() {
         const {
-            fields = [],
-            assetName, localisation, license, owner, user, assetValue, backup,
             textFields = [],
             assetNameChangeCallback,
             localisationChangeCallback,
@@ -27,63 +25,64 @@ class CategoryFieldsList extends React.Component {
             userChangeCallback,
             assetValueChangeCallback,
             backupChangeCallback,
-            fieldsChangeCallback,
-
+            attributeValuesChangeCallback,
+            validateCallback,
         } = this.props;
-        this.props.category.attributes.forEach((val) => {
+        this.props.categoryAttributes.forEach((val) => {
             textFields.push(<TextField
                 style={styles.textField}
-                label={val}
-                key={val}
-                name={val}
-                value={fields[val]}
-                onChange={fieldsChangeCallback}/>);
+                label={val.name}
+                key={val.name}
+                name={val.name}
+                type={val.type}
+                onChange={attributeValuesChangeCallback}/>);
         });
         const {classes} = this.props;
         return (
             <div className={classes.root}>
-                <form noValidate>
+                <form noValidate id={"textFieldsForm"} onChange={validateCallback}>
                     <TextField
                         className={classes.textField}
                         label={"Asset Name"}
-                        value={assetName}
+                        type={"text"}
                         onChange={assetNameChangeCallback}
                     />
                     <TextField
                         className={classes.textField}
-                        label={"Localisation"}
-                        value={localisation}
+                        label={"Location"}
+                        type={"text"}
                         onChange={localisationChangeCallback}
                     />
                     <TextField
                         className={classes.textField}
                         label={"License"}
-                        value={license}
+                        type={"text"}
                         onChange={licenseChangeCallback}
                     />
                     <TextField
                         className={classes.textField}
                         label={"Owner"}
-                        value={owner}
+                        type={"text"}
                         onChange={ownerChangeCallback}
                     />
                     <TextField
                         className={classes.textField}
                         label={"User"}
-                        value={user}
+                        type={"text"}
                         onChange={userChangeCallback}
                     />
                     <TextField
                         className={classes.textField}
                         label={"Value"}
-                        value={assetValue}
+                        type={"number"}
                         onChange={assetValueChangeCallback}
                     />
                     <TextField
                         className={classes.textField}
                         label={"Backup"}
-                        value={backup}
+                        type={"text"}
                         onChange={backupChangeCallback}
+
                     />
                     {textFields}
                 </form>
@@ -96,14 +95,7 @@ class CategoryFieldsList extends React.Component {
 CategoryFieldsList.propTypes = {
     classes: PropTypes.object.isRequired,
     category: PropTypes.object,
-    fields: PropTypes.objectOf(PropTypes.string),
-    assetName: PropTypes.string,
-    localisation: PropTypes.string,
-    license: PropTypes.string,
-    owner: PropTypes.string,
-    user: PropTypes.string,
-    assetValue: PropTypes.string,
-    backup: PropTypes.string,
+    categoryAttributes: PropTypes.array,
     assetNameChangeCallback: PropTypes.func,
     localisationChangeCallback: PropTypes.func,
     licenseChangeCallback: PropTypes.func,
@@ -111,7 +103,8 @@ CategoryFieldsList.propTypes = {
     userChangeCallback: PropTypes.func,
     assetValueChangeCallback: PropTypes.func,
     backupChangeCallback: PropTypes.func,
-    fieldsChangeCallback: PropTypes.func,
+    attributeValuesChangeCallback: PropTypes.func,
+    validateCallback: PropTypes.func,
 };
 
 export default withStyles(styles)(CategoryFieldsList);
