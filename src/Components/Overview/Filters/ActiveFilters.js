@@ -16,6 +16,7 @@ const styles = theme => ({
         marginRight: 10,
     },
     text: {
+        marginTop: '4px',
         marginRight: theme.spacing(1)
     }
 });
@@ -32,7 +33,7 @@ class ActiveFilters extends React.Component {
 
     handleFiltersChange = (filters) => {
         this.setState({filters: filters});
-        this.props.filtersCallback();
+        this.props.assetsCallback();
     };
 
     render() {
@@ -40,10 +41,8 @@ class ActiveFilters extends React.Component {
 
         const filtersList = [];
         let i = 0;
-        for (let key in filters) {
-            if (filters.hasOwnProperty(key)) {
-                for (let attr_ind in filters[key]) {
-                    if (filters[key].hasOwnProperty(attr_ind)) {
+        Object.keys(filters).forEach((key) => {
+            Object.keys(filters[key]).forEach((attr_ind) => {
                         filtersList.push(
                             <DeleteFilterDialog
                                 filterKey={key}
@@ -53,14 +52,13 @@ class ActiveFilters extends React.Component {
                                 key={i}
                             />);
                         i++;
-                    }
-                }
-            }
-        }
+                })
+            });
+
         return (
 
             <div className={classes.root}>
-                <Grid className={classes.grid} container item xs={12} justify="flex-start">
+                <Grid className={classes.grid} container justify="flex-start">
                     <Typography className={classes.text}>
                         Active filters:
                     </Typography>
@@ -75,7 +73,7 @@ class ActiveFilters extends React.Component {
 ActiveFilters.propTypes = {
     classes: PropTypes.object.isRequired,
     filters: PropTypes.object.isRequired,
-    filtersCallback: PropTypes.func
+    assetsCallback: PropTypes.func
 };
 
 export default withStyles(styles)(ActiveFilters)

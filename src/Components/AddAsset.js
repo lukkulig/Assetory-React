@@ -4,7 +4,6 @@ import {Button, Typography, withStyles} from "@material-ui/core"
 import api from "../api";
 import AssetCategorySelect from "./AssetCategorySelect.js";
 import CategoryFieldsList from "./CategoryFieldsList.js"
-import {instanceOf} from "prop-types";
 
 const styles = theme => ({
     root: {
@@ -17,8 +16,9 @@ const styles = theme => ({
     },
     content: {
         display: "inline-block",
-        textAlign: "left",
-        width: 400
+        width: 400,
+        textAlign: 'center',
+        padding: theme.spacing.unit * 3
     },
     addAssetButton: {
         marginTop: theme.spacing(3),

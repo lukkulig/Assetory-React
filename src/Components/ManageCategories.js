@@ -2,11 +2,14 @@ import React from "react";
 import Typography from "@material-ui/core/Typography";
 import * as PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core";
+import Tabs from 'react-bootstrap/Tabs'
+import Tab from 'react-bootstrap/Tab'
+import AddCategory from './AddCategory'
+import EditCategory from './EditCategory';
 
 const styles = theme => ({
     root: {},
     content: {
-        float: 'center',
         textAlign: 'center',
         padding: theme.spacing.unit * 3,
     }
@@ -18,9 +21,14 @@ class ManageCategories extends React.Component {
         return (
             <div className={classes.root}>
                 <div className={classes.content}>
-                    <Typography variant="h4" gutterBottom>
-                        ManageCategories
-                    </Typography>
+                    <Tabs defaultActiveKey="editCategory" id="categoryActions">
+                        <Tab eventKey="addCategory" title="Add Category">
+                            <AddCategory/>
+                        </Tab>
+                        <Tab eventKey="editCategory" title="Edit Category">
+                            <EditCategory/>
+                        </Tab>
+                    </Tabs>
                 </div>
             </div>
         );

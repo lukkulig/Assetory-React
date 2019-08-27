@@ -9,14 +9,16 @@
     "bootstrap": "^4.3.1",
     "classnames": "^2.2.6",
     "node": "^7.6.0",
+    "node-sass": "^4.12.0",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
-    "reactstrap": "^8.0.0",
+    "react-bootstrap": "^1.0.0-beta.11",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.0",
-    "react-simple-tree-menu": "^1.1.3",
     "react-scripts": "2.1.8",
-    "react-select": "^2.4.3"
+    "react-select": "^2.4.3",
+    "react-simple-tree-menu": "^1.1.3",
+    "reactstrap": "^8.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
