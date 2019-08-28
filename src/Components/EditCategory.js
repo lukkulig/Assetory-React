@@ -47,7 +47,6 @@ class EditCategory extends React.Component {
             api.endpoints.getAllCategories(),
             (response) => {
                 this.setState({categories: response.content});
-                this.setState({supercategory: this.state.categories.slice(-1)[0]});
                 document.body.style.cursor = 'default';
             });
     }
@@ -56,10 +55,6 @@ class EditCategory extends React.Component {
         const foundCategory = this.state.categories.find(category => category.id === categoryId);
         return foundCategory === undefined ? null : foundCategory;
     };
-
-    // handleSupercategoryChange = (event) => {
-    //     this.setState({supercategory: this.findCategory(event.target.value)});
-    // };
 
     handleCategoryChange = (event) => {
         let category = this.findCategory(event.target.value);
@@ -113,18 +108,18 @@ class EditCategory extends React.Component {
         return (
             <div className={classes.root}>
                 <form className={classes.content} noValidate>
-                    {/*<div className={classes.content}>*/}
-                    {/*    <Select*/}
-                    {/*        label={"Supercategory"}*/}
-                    {/*        className={classes.select}*/}
-                    {/*        value={this.state.supercategory === null ? '' : this.state.supercategory.name}*/}
-                    {/*        onChange={this.handleSupercategoryChange}*/}
-                    {/*        disabled*/}
-                    {/*    >*/}
-                    {/*        {this.state.categories.map(category => <MenuItem*/}
-                    {/*            value={category.id}>{category.name}</MenuItem>)}*/}
-                    {/*    </Select>*/}
-                    {/*</div>*/}
+                    <div className={classes.content}>
+                        <TextField
+                            label={"Supercategory"}
+                            className={classes.select}
+                            value={this.state.supercategory === undefined ? '' : this.state.supercategory.name}
+                            onChange={this.handleSupercategoryChange}
+                            disabled
+                        >
+                            {this.state.categories.map(category => <MenuItem
+                                value={category.id}>{category.name}</MenuItem>)}
+                        </TextField>
+                    </div>
                     <div className={classes.content}>
                         <Select
                             className={classes.textField}

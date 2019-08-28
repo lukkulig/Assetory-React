@@ -47,7 +47,7 @@ class AddCategory extends React.Component {
             api.endpoints.getAllCategories(),
             (response) => {
                 this.setState({categories: response.content});
-                this.setState({supercategory: this.state.categories.slice(-1)[0]});
+                this.setState({supercategory: this.state.categories.size === 0 ? undefined : this.state.categories.slice(-1)[0]});
                 document.body.style.cursor = 'default';
             });
     }
@@ -98,7 +98,6 @@ class AddCategory extends React.Component {
                 supercategory.subcategoryIds = supercategory.subcategoryIds.concat([category.id]);
                 api.fetch(api.endpoints.updateCategory(supercategory));
                 this.setState({
-                    categories: [],
                     attributes: [],
                     newAttributeName: '',
                     newAttributeType: 'text',
@@ -117,7 +116,7 @@ class AddCategory extends React.Component {
                         <Select
                             label={"Supercategory"}
                             className={classes.select}
-                            value={this.state.supercategory.name}
+                            value={this.state.supercategory === undefined ? '' : this.state.supercategory.name}
                             onChange={this.handleSupercategoryChange}
                         >
                             {this.state.categories.map(category => <MenuItem
