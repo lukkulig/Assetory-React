@@ -86,6 +86,16 @@ export default {
             headers: {
                 "Content-Type": "application/json"
             }
-        })
+        }),
+
+        deleteCategory: (categoryId) => ({
+            path: url(`categories/${categoryId}`),
+            method: "DELETE"
+        }),
+
+        deleteCategoryWithContent: (categoryId) => ({
+            path: url(`categories/${categoryId}/with-content`),
+            method: "DELETE"
+        }),
     }
 }

@@ -12,13 +12,6 @@ const styles = ({
         marginLeft: 10,
         marginRight: 10,
     },
-    attributeContent: {
-        float: 'left',
-        marginTop: 10,
-        marginBottom: 10,
-        marginLeft: 10,
-        marginRight: 10,
-    },
     textField: {
         width: 500,
     },
@@ -34,6 +27,7 @@ class AddCategory extends React.Component {
         newAttributeName: '',
         newAttributeType: 'text',
         supercategory: '',
+        supercategoryAttributes: [],
         categoryName: ''
     };
 
@@ -47,7 +41,17 @@ class AddCategory extends React.Component {
             api.endpoints.getAllCategories(),
             (response) => {
                 this.setState({categories: response.content});
-                this.setState({supercategory: this.state.categories.size === 0 ? undefined : this.state.categories.slice(-1)[0]});
+                this.setState({supercategory: this.state.categories.size === 0 ? undefined : this.state.categories.slice(-1)[0]},
+                    () => {
+                        if (this.state.supercategory !== undefined && this.state.supercategory !== null) {
+                            api.fetch(
+                                api.endpoints.getCategoryAttributes(this.state.supercategory.id),
+                                (response) => {
+                                    this.setState({supercategoryAttributes: response.content})
+                                }
+                            )
+                        }
+                    });
                 document.body.style.cursor = 'default';
             });
     }
@@ -58,7 +62,17 @@ class AddCategory extends React.Component {
     };
 
     handleSupercategoryChange = (event) => {
-        this.setState({supercategory: this.findCategory(event.target.value)});
+        this.setState({supercategory: this.findCategory(event.target.value)},
+            () => {
+                if (this.state.supercategory !== undefined && this.state.supercategory !== null) {
+                    api.fetch(
+                        api.endpoints.getCategoryAttributes(this.state.supercategory.id),
+                        (response) => {
+                            this.setState({supercategoryAttributes: response.content})
+                        }
+                    )
+                }
+            });
     };
 
     handleCategoryNameChange = (event) => {
@@ -96,15 +110,17 @@ class AddCategory extends React.Component {
             (category) => {
                 let supercategory = this.state.supercategory;
                 supercategory.subcategoryIds = supercategory.subcategoryIds.concat([category.id]);
-                api.fetch(api.endpoints.updateCategory(supercategory));
+                api.fetch(api.endpoints.updateCategory(supercategory), () => null);
                 this.setState({
                     attributes: [],
                     newAttributeName: '',
                     newAttributeType: 'text',
                     supercategory: undefined,
-                    categoryName: ''
+                    supercategoryAttributes: [],
+                    categoryName: '',
                 })
             });
+        this.fetchAndSetCategories();
     };
 
     render() {
@@ -132,42 +148,16 @@ class AddCategory extends React.Component {
                             variant="outlined"
                         />
                     </div>
-                    <div className={classes.content}>
-                        <div className={classes.attributeContent}>
-                            <TextField
-                                className={classes.textField}
-                                label={"Additional attribute"}
-                                value={this.state.newAttributeName}
-                                onChange={this.handleAttributeNameChange}
-                                variant="outlined"
-                                helperText="Attribute required for all assets in this category"
-                            />
-                        </div>
-                        <div className={classes.attributeContent}>
-                            <Select
-                                className={classes.select}
-                                value={this.state.newAttributeType}
-                                onChange={this.handleAttributeTypeChange}
-                            >
-                                <MenuItem value={"text"}>Text</MenuItem>
-                                <MenuItem value={"number"}>Number</MenuItem>
-                                <MenuItem value={"date"}>Date</MenuItem>
-                            </Select>
-                        </div>
-                        <div className={classes.attributeContent}>
-                            <Button variant="outlined"
-                                    color="primary"
-                                    className={classes.button}
-                                    onClick={this.handleSaveAttributeButton}
-                            >
-                                Save attribute
-                            </Button>
-                        </div>
-                    </div>
                     <div className={classes.content} style={{clear: "both"}}>
                         <CategoryAttributes
                             classes={classes}
                             attributes={this.state.attributes}
+                            supercategoryAttributes={this.state.supercategoryAttributes}
+                            newAttributeName={this.state.newAttributeName}
+                            newAttributeType={this.state.newAttributeType}
+                            attributeNameChangeCallback={this.handleAttributeNameChange}
+                            attributeTypeChangeCallback={this.handleAttributeTypeChange}
+                            saveAttributeCallback={this.handleSaveAttributeButton}
                             deleteAttributeCallback={this.handleDeleteAttributeButton}
                         />
                     </div>
