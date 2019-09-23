@@ -40,10 +40,6 @@ class Filters extends React.Component {
         filters: {},
     };
 
-    static getLabel(string) {
-        return string[0].toUpperCase() + string.slice(1).toLowerCase();
-    }
-
     componentDidMount() {
         this.setState({filters: this.props.filters})
     }
@@ -58,34 +54,41 @@ class Filters extends React.Component {
 
         const assetAttributes = [
             {
-                key: Constants.NAME_KEY, label: Constants.NAME_LABEL, values: assets.map(asset => ({
-                    id: asset.name,
-                    label: asset.name
-                }))
+                key: Constants.NAME_KEY, label: Constants.NAME_LABEL, values:
+                    Array.from(new Set(assets.map(asset => asset.name))).map(name => ({
+                        id: name,
+                        label: name
+                    })).filter((el) => !(filters[Constants.NAME_KEY] || []).map(filter => filter.id).includes(el.id))
             },
-            {key: Constants.CATEGORY_KEY, label: Constants.CATEGORY_LABEL, values: allCategories}
+            {key: Constants.CATEGORY_KEY, label: Constants.CATEGORY_LABEL, values: allCategories.filter((el) =>
+                    !(filters[Constants.CATEGORY_KEY] || []).map(filter => filter.id).includes(el.id) && el.label!=="All")}
         ];
 
         let categoryAttributesMapped = categoryAttributes.map(categoryAttribute => ({
             key: categoryAttribute.name,
-            label: Filters.getLabel(categoryAttribute.name),
-            values: assets.map(function(asset) {
-                let value = asset.attributes.filter(attribute => attribute.attribute.name === categoryAttribute.name).map(attribute => attribute.value).shift();
-                return {
-                    id: value,
-                    label: value
-                }})
+            label: categoryAttribute.name,
+            values: Array.from(new Set(assets.map(asset => {
+                let values = asset.attributes.filter(attribute => attribute.attribute.name === categoryAttribute.name).map(attribute => attribute.value);
+                if (Array.isArray(values) && values.length)
+                    return values.shift();
+                return null;
+        }).filter(values => values !== null)))
+                .map(name => ({
+                id: name,
+                label: name
+            })).filter((el) => !(filters[categoryAttribute.name] || []).map(filter => filter.id).includes(el.id))
         }));
 
         assetAttributes.concat(categoryAttributesMapped).forEach((attribute, i) => {
-            setFiltersList.push(
-                <SetFilterDialog
-                    attribute={attribute}
-                    filters={filters}
-                    filtersCallback={this.handleFiltersChange}
-                    key={i}
-                />
-            );
+            if (Array.isArray(attribute.values) && attribute.values.length)
+                setFiltersList.push(
+                    <SetFilterDialog
+                        attribute={attribute}
+                        filters={filters}
+                        filtersCallback={this.handleFiltersChange}
+                        key={i}
+                    />
+                );
         });
 
         return (

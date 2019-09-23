@@ -67,9 +67,15 @@ class Overview extends React.Component {
     }
 
     fetchAndSetFilteredAssets(selectedCategoryId) {
+        let filters = Object.keys(this.state.filters).reduce((result, key) => {
+            result[key] = this.state.filters[key].map((filter) => {
+                 return filter.id
+            });
+            return result
+        }, {});
         const data = {
             mainCategoryId: selectedCategoryId,
-            filters: this.state.filters
+            filters: filters
         };
         api.fetch(
             api.endpoints.getFilteredAssets(data),
@@ -140,6 +146,7 @@ class Overview extends React.Component {
                             assets={this.state.filteredAssets}
                             allCategories={this.state.allCategories}
                             filters={this.state.filters}
+                            categoryAttributes={this.state.selectedCategoryAttributes}
                             overviewCallback={this.handleFiltersChange}
                         />
                     </Paper>

@@ -73,7 +73,7 @@ class Assets extends React.Component {
     };
 
     render() {
-        const {classes, assets, allCategories} = this.props;
+        const {classes, assets, allCategories, categoryAttributes} = this.props;
 
         const cardList = [];
 
@@ -110,6 +110,7 @@ class Assets extends React.Component {
                     {Object.keys(this.props.filters).length !== 0 &&
                     <ActiveFilters className={classes.activeFilters}
                                    filters={this.state.filters}
+                                   categoryAttributes={categoryAttributes}
                                    assetsCallback={this.handleFiltersChange}
                     />
                     }
@@ -134,6 +135,7 @@ Assets.propTypes = {
     ),
     allCategories: PropTypes.array.isRequired,
     filters: PropTypes.object.isRequired,
+    categoryAttributes: PropTypes.array.isRequired,
     overviewCallback: PropTypes.func,
 };
 

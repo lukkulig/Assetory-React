@@ -48,11 +48,18 @@ class DeleteFilterDialog extends React.Component {
     deleteFilter = () => {
         this.handleClose();
         let temp = this.state.filters;
-        let index = temp[this.props.filterKey].indexOf(this.props.attribute);
-        if (index !== -1) {
-            temp[this.props.filterKey].splice(index, 1);
-            if (temp[this.props.filterKey].length === 0) {
-                delete temp[this.props.filterKey];
+        if (this.props.filterKey === undefined) {
+            for (let key in temp) {
+                if (temp.hasOwnProperty(key))
+                    delete temp[key];
+            }
+        } else {
+            let index = temp[this.props.filterKey].indexOf(this.props.attribute);
+            if (index !== -1) {
+                temp[this.props.filterKey].splice(index, 1);
+                if (temp[this.props.filterKey].length === 0) {
+                    delete temp[this.props.filterKey];
+                }
             }
         }
         this.props.activeFiltersCallback(this.state.filters);
@@ -61,13 +68,20 @@ class DeleteFilterDialog extends React.Component {
     render() {
         const {classes, filterKey, filterLabel, attribute} = this.props;
 
+        let contentText;
+        if (filterKey !== undefined) {
+            contentText = "Are you sure you want to delete filter \"" + attribute.label + "\"?"
+        } else {
+            contentText = "Are you sure you want to delete all filters?"
+        }
+
         return (
             <div>
                 <Fab className={classes.filterFab}
                      variant="extended"
                      filters={this.state.filters}
                      onClick={this.handleClickOpen}>
-                    {filterLabel + ": " + attribute}
+                    {attribute.label}
                     <HighlightOffIcon fontSize='small' className={classes.icon}/>
                 </Fab>
                 <Dialog
@@ -75,10 +89,10 @@ class DeleteFilterDialog extends React.Component {
                     onClose={this.handleClose}
                     aria-labelledby="delete-filter-form"
                 >
-                    <DialogTitle id="delete-filter-form">{filterKey}</DialogTitle>
+                    <DialogTitle id="delete-filter-form">{filterLabel}</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            Are you sure you want to delete filter "{attribute}" for {filterLabel}?
+                            {contentText}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
@@ -98,9 +112,9 @@ class DeleteFilterDialog extends React.Component {
 
 DeleteFilterDialog.propTypes = {
     classes: PropTypes.object.isRequired,
-    filterKey: PropTypes.string.isRequired,
+    filterKey: PropTypes.string,
     filterLabel: PropTypes.string.isRequired,
-    attribute: PropTypes.string.isRequired,
+    attribute: PropTypes.object.isRequired,
     filters: PropTypes.object.isRequired,
     activeFiltersCallback: PropTypes.func
 };

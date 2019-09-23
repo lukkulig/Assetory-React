@@ -4,7 +4,6 @@ import {withStyles} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import DeleteFilterDialog from "./DeleteFilterDialog";
 import Typography from "@material-ui/core/Typography";
-import Filters from "./Filters";
 import * as Constants from "../../../Constants/Constants";
 
 const styles = theme => ({
@@ -39,15 +38,34 @@ class ActiveFilters extends React.Component {
     };
 
     render() {
-        const {classes, filters} = this.props;
-
-
+        const {classes, filters, categoryAttributes} = this.props;
 
         const filtersList = [];
-        let i = 0;
-        Object.keys(filters).forEach((key) => {
+        filtersList.push(
+            <DeleteFilterDialog
+                filterLabel={"Delete All"}
+                attribute={{key: "delete_all", label: "Delete All"}}
+                filters={filters}
+                activeFiltersCallback={this.handleFiltersChange}
+                key={0}
+            />);
+        let i = 1;
+
+        let categoryAttributesNames = [Constants.NAME_KEY, Constants.CATEGORY_KEY].concat(categoryAttributes.map(categoryAttribute => {
+            return categoryAttribute.name;
+        }));
+
+        Object.keys(filters).sort((a, b) =>{
+            return categoryAttributesNames.indexOf(a) - categoryAttributesNames.indexOf(b);
+        }).forEach((key) => {
+            let filterLabel = ActiveFilters.getLabel(key);
+            filtersList.push(
+                <Typography className={classes.text} key={i}>
+                    <b>{filterLabel}</b>:
+                </Typography>
+            );
+            i++;
             Object.keys(filters[key]).forEach((attr_ind) => {
-                let filterLabel = ActiveFilters.getLabel(key);
                 filtersList.push(
                     <DeleteFilterDialog
                         filterKey={key}
@@ -65,9 +83,6 @@ class ActiveFilters extends React.Component {
 
             <div className={classes.root}>
                 <Grid className={classes.grid} container justify="flex-start">
-                    <Typography className={classes.text}>
-                        Active filters:
-                    </Typography>
                     {filtersList}
                 </Grid>
             </div>
@@ -80,13 +95,14 @@ class ActiveFilters extends React.Component {
             return Constants.NAME_LABEL;
         if (key === Constants.CATEGORY_KEY)
             return Constants.CATEGORY_LABEL;
-        return Filters.getLabel(key);
+        return key;
     }
 }
 
 ActiveFilters.propTypes = {
     classes: PropTypes.object.isRequired,
     filters: PropTypes.object.isRequired,
+    categoryAttributes: PropTypes.array.isRequired,
     assetsCallback: PropTypes.func
 };
 

@@ -10,17 +10,14 @@ import {
     DialogContentText,
     DialogTitle,
     Fab,
-    MenuItem,
     NoSsr,
-    Paper,
-    TextField,
     Typography
 } from "@material-ui/core";
 
 const styles = theme => ({
     root: {
         width: 400,
-        height: 400
+        height: 250
     },
     filterFab: {
         marginRight: theme.spacing(1),
@@ -71,53 +68,6 @@ function NoOptionsMessage(props) {
     );
 }
 
-function inputComponent({inputRef, ...props}) {
-    return <div style={{height: 50}} ref={inputRef} {...props} />;
-}
-
-function Control(props) {
-    const {
-        children,
-        innerProps,
-        innerRef,
-        selectProps: {classes, TextFieldProps},
-    } = props;
-    return (
-        <TextField
-            fullWidth
-            InputProps={{
-                inputComponent,
-                inputProps: {
-                    className: classes.input,
-                    inputRef: innerRef,
-                    children: children,
-                    ...innerProps,
-                },
-            }}
-            {...TextFieldProps}
-        />
-    );
-}
-
-function Option(props) {
-    return (
-        <MenuItem
-            buttonRef={props.innerRef}
-            selected={props.isFocused}
-            component="div"
-            className={props.selectProps.classes.option}
-            style={{
-                background: props.isSelected ? 'primary' : 'secondary',
-            }}
-            {...props.innerProps}
-        >
-            {props.children}
-
-        </MenuItem>
-
-    );
-}
-
 function Placeholder(props) {
     return (
         <Typography
@@ -130,34 +80,17 @@ function Placeholder(props) {
     );
 }
 
-function SingleValue(props) {
-    return (
-        <div>{props.children}</div>
-    );
-}
-
-function Menu(props) {
-    return (
-        <Paper square className={props.selectProps.classes.paper} {...props.innerProps}>
-            {props.children}
-        </Paper>
-    );
-}
 
 const components = {
-    Control,
-    Menu,
     NoOptionsMessage,
-    Option,
-    Placeholder,
-    SingleValue,
+    Placeholder
 };
 
 class SetFilterDialog extends React.Component {
 
     state = {
         open: false,
-        selectedFilter: null,
+        selectedFilters: null,
         filters: {},
     };
 
@@ -176,30 +109,23 @@ class SetFilterDialog extends React.Component {
 
     setFilters = () => {
         this.handleClose();
-        console.log(this.state.selectedFilter.id);
         let temp = this.state.filters;
         if (temp[this.props.attribute.key] === undefined)
             temp[this.props.attribute.key] = [];
-        temp[this.props.attribute.key].push(this.state.selectedFilter.id);
+        Array.prototype.push.apply(temp[this.props.attribute.key],this.state.selectedFilters);
         this.setState({filters: temp});
-        this.setState({
-            selectedFilter: null,
-        });
+        this.setState({selectedFilters: null});
         this.props.filtersCallback();
     };
 
     handleFilterChange = selectedFilter => {
         this.setState({
-            selectedFilter: selectedFilter,
+            selectedFilters: selectedFilter,
         });
     };
 
     render() {
         const {classes, attribute} = this.props;
-
-        let values = attribute.values.sort((a, b) => {
-            return a.label - b.label;
-        }).map(value => "[" + value.id + ":" + value.label + "]").join(", ");
 
         return (
             <div>
@@ -213,6 +139,7 @@ class SetFilterDialog extends React.Component {
                     open={this.state.open}
                     onClose={this.handleClose}
                     aria-labelledby="set-filter-form"
+                    disableBackdropClick
                 >
                     <DialogTitle id="set-filter-form">{attribute.label}</DialogTitle>
                     <DialogContent className={classes.root}>
@@ -224,11 +151,15 @@ class SetFilterDialog extends React.Component {
                                 classes={classes}
                                 options={attribute.values}
                                 components={components}
-                                value={this.state.selectedFilter}
+                                value={this.state.selectedFilters}
+                                maxMenuHeight={150}
                                 onChange={this.handleFilterChange}
                                 placeholder="Add new filter"
                                 isClearable
-                                filterOption={this.customFilterOption}
+                                isMulti
+                                closeMenuOnSelect={false}
+                                getOptionValue={option => option.id}
+                                getLabelValue={option => option.label}
                             />
                         </NoSsr>
                     </DialogContent>
@@ -236,7 +167,7 @@ class SetFilterDialog extends React.Component {
                         <Button onClick={this.handleClose} color="primary">
                             Cancel
                         </Button>
-                        <Button onClick={this.setFilters} color="primary" disabled={!this.state.selectedFilter}>
+                        <Button onClick={this.setFilters} color="primary" disabled={!this.state.selectedFilters}>
                             Set filters
                         </Button>
                     </DialogActions>
@@ -244,18 +175,6 @@ class SetFilterDialog extends React.Component {
             </div>
         );
     }
-
-    customFilterOption = (option, rawInput) => {
-        if (rawInput === "")
-            return true;
-        const words = rawInput.toUpperCase().split(' ');
-        const labelWords = option.label.toUpperCase().split(' ');
-
-        return words.reduce(
-            (acc, cur) => acc && (labelWords.includes(cur)),
-            true,
-        );
-    };
 
 }
 
