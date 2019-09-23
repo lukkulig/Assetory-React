@@ -64,7 +64,7 @@ class Assets extends React.Component {
     };
 
     componentDidMount() {
-        this.setState({assets: this.props.assets});
+        this.setState({filteredAssets: this.props.assets});
         this.setState({filters: this.props.filters});
     }
 
@@ -73,15 +73,13 @@ class Assets extends React.Component {
     };
 
     render() {
-        const {classes, assets, allCategories} = this.props;
+        const {classes, assets, allCategories, categoryAttributes} = this.props;
 
         const cardList = [];
 
         if (assets !== undefined)
             assets.sort((a, b) => {
-                if (a.name < b.name) return -1;
-                if (b.name < a.name) return 1;
-                return 0;
+                return a.name - b.name;
             }).forEach((asset, i) => {
                 cardList.push(
                     <div className={classes.assetViewsContainer} key={i}>
@@ -91,7 +89,7 @@ class Assets extends React.Component {
 
                                 asset={({
                                     name: asset.name,
-                                    category: allCategories.find(c => c.id === asset.categoryId).name,
+                                    category: allCategories.find(c => c.id === asset.categoryId).label,
                                     attributes: asset.attributes
                                 })}
                             />
@@ -112,6 +110,7 @@ class Assets extends React.Component {
                     {Object.keys(this.props.filters).length !== 0 &&
                     <ActiveFilters className={classes.activeFilters}
                                    filters={this.state.filters}
+                                   categoryAttributes={categoryAttributes}
                                    assetsCallback={this.handleFiltersChange}
                     />
                     }
@@ -136,6 +135,7 @@ Assets.propTypes = {
     ),
     allCategories: PropTypes.array.isRequired,
     filters: PropTypes.object.isRequired,
+    categoryAttributes: PropTypes.array.isRequired,
     overviewCallback: PropTypes.func,
 };
 
