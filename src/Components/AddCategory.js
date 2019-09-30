@@ -68,7 +68,7 @@ class AddCategory extends React.Component {
                     api.fetch(
                         api.endpoints.getCategoryAttributes(this.state.supercategory.id),
                         (response) => {
-                            this.setState({supercategoryAttributes: response.content})
+                            this.setState({supercategoryAttributes: response})
                         }
                     )
                 }
@@ -118,9 +118,9 @@ class AddCategory extends React.Component {
                     supercategory: undefined,
                     supercategoryAttributes: [],
                     categoryName: '',
-                })
+                });
+                this.fetchAndSetCategories();
             });
-        this.fetchAndSetCategories();
     };
 
     render() {

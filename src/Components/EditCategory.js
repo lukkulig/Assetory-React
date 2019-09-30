@@ -74,12 +74,10 @@ class EditCategory extends React.Component {
             newAttributeType: 'text',
             category: newCategory
         }, () => {
-            console.log(this.state.category);
             if (this.state.category !== undefined && this.state.category.parentCategoryId !== null) {
                 api.fetch(
                     api.endpoints.getCategoryAttributes(newCategory.parentCategoryId),
                     (response) => {
-                        console.log(response);
                         this.setState({supercategoryAttributes: response})
                     }
                 )
@@ -153,7 +151,6 @@ class EditCategory extends React.Component {
 
     render() {
         const {classes} = this.props;
-        console.log(this.state.supercategoryAttributes);
         return (
             <div className={classes.root}>
                 <form className={classes.content} noValidate>
