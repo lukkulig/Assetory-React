@@ -64,12 +64,13 @@ class CategoryAttributes extends React.Component {
             <div>
                 <div className={classes.attributeContent}>
                     <TextField
+                        error={this.props.attributeNameError}
                         className={classes.textField}
                         label={"Additional attribute"}
                         value={this.props.newAttributeName}
                         onChange={this.props.attributeNameChangeCallback}
                         variant="outlined"
-                        helperText="Attribute required for all assets in this category"
+                        helperText={this.props.attributeNameError === true ? 'There is already attribute with that name in this category' : 'Attribute required for all assets in this category'}
                     />
                 </div>
                 <div className={classes.attributeContent}>
@@ -88,6 +89,7 @@ class CategoryAttributes extends React.Component {
                             color="primary"
                             className={classes.button}
                             onClick={this.props.saveAttributeCallback}
+                            disabled={this.props.attributeNameError}
                     >
                         Save attribute
                     </Button>

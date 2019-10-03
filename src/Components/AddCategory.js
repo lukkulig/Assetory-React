@@ -28,7 +28,9 @@ class AddCategory extends React.Component {
         newAttributeType: 'text',
         supercategory: '',
         supercategoryAttributes: [],
-        categoryName: ''
+        categoryName: '',
+        categoryNameError: false,
+        attributeNameError: false,
     };
 
     componentDidMount() {
@@ -76,10 +78,22 @@ class AddCategory extends React.Component {
     };
 
     handleCategoryNameChange = (event) => {
+        if (this.state.categories.map(category => category.name).includes(event.target.value) && this.state.categoryNameError === false) {
+            this.setState({categoryNameError: true})
+        } else if (this.state.categoryNameError === true) {
+            this.setState({categoryNameError: false})
+        }
         this.setState({categoryName: event.target.value})
     };
 
     handleAttributeNameChange = (event) => {
+        let allAttributes = this.state.attributes;
+        allAttributes = allAttributes.concat(this.state.supercategoryAttributes);
+        if (allAttributes.map(attribute => attribute.name).includes(event.target.value) && this.state.attributeNameError === false) {
+            this.setState({attributeNameError: true})
+        } else if (this.state.attributeNameError === true) {
+            this.setState({attributeNameError: false})
+        }
         this.setState({newAttributeName: event.target.value})
     };
 
@@ -118,6 +132,7 @@ class AddCategory extends React.Component {
                     supercategory: undefined,
                     supercategoryAttributes: [],
                     categoryName: '',
+
                 });
                 this.fetchAndSetCategories();
             });
@@ -141,11 +156,13 @@ class AddCategory extends React.Component {
                     </div>
                     <div className={classes.content}>
                         <TextField
+                            error={this.state.categoryNameError}
                             className={classes.textField}
                             label={"Category name"}
                             value={this.state.categoryName}
                             onChange={this.handleCategoryNameChange}
                             variant="outlined"
+                            helperText={this.state.categoryNameError === true ? 'Category with that name already exists' : ''}
                         />
                     </div>
                     <div className={classes.content} style={{clear: "both"}}>
@@ -159,6 +176,7 @@ class AddCategory extends React.Component {
                             attributeTypeChangeCallback={this.handleAttributeTypeChange}
                             saveAttributeCallback={this.handleSaveAttributeButton}
                             deleteAttributeCallback={this.handleDeleteAttributeButton}
+                            attributeNameError={this.state.attributeNameError}
                         />
                     </div>
                     <div className={classes.content}>
@@ -166,6 +184,7 @@ class AddCategory extends React.Component {
                                 color="primary"
                                 className={classes.button}
                                 onClick={this.handleAddCategoryButton}
+                                disabled={this.state.categoryNameError}
                         >
                             Add category
                         </Button>

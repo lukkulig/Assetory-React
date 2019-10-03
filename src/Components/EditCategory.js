@@ -45,6 +45,7 @@ class EditCategory extends React.Component {
         category: undefined,
         deleteDialogOpen: false,
         deleteWithContent: false,
+        attributeNameError: false,
     };
 
     componentDidMount() {
@@ -86,6 +87,14 @@ class EditCategory extends React.Component {
     };
 
     handleAttributeNameChange = (event) => {
+        let allAttributes = this.state.attributes;
+        allAttributes = allAttributes.concat(this.state.supercategoryAttributes);
+        console.log(allAttributes);
+        if (allAttributes.map(attribute => attribute.name).includes(event.target.value) && this.state.attributeNameError === false) {
+            this.setState({attributeNameError: true})
+        } else if (this.state.attributeNameError === true) {
+            this.setState({attributeNameError: false})
+        }
         this.setState({newAttributeName: event.target.value})
     };
 
@@ -151,6 +160,7 @@ class EditCategory extends React.Component {
 
     render() {
         const {classes} = this.props;
+
         return (
             <div className={classes.root}>
                 <form className={classes.content} noValidate>
@@ -217,6 +227,7 @@ class EditCategory extends React.Component {
                             attributeTypeChangeCallback={this.handleAttributeTypeChange}
                             saveAttributeCallback={this.handleSaveAttributeButton}
                             deleteAttributeCallback={this.handleDeleteAttributeButton}
+                            attributeNameError={this.state.attributeNameError}
                         />
                     </div>
                     <div className={classes.content}>
