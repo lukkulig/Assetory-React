@@ -16,7 +16,7 @@ import {
 
 const styles = theme => ({
     root: {
-        width: 400,
+        width: 600,
         height: 250
     },
     filterFab: {
@@ -104,7 +104,7 @@ class SetFilterDialog extends React.Component {
 
     handleClose = () => {
         this.setState({open: false});
-        this.setState({value: ""});
+        this.setState({selectedFilters: null});
     };
 
     setFilters = () => {
@@ -127,6 +127,10 @@ class SetFilterDialog extends React.Component {
     render() {
         const {classes, attribute} = this.props;
 
+        let collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+        let attributeValues = attribute.values.sort((a, b) => {
+            return collator.compare(a.label, b.label);
+        });
         return (
             <div>
                 <Fab className={classes.filterFab}
@@ -149,7 +153,7 @@ class SetFilterDialog extends React.Component {
                         <NoSsr>
                             <Select
                                 classes={classes}
-                                options={attribute.values}
+                                options={attributeValues}
                                 components={components}
                                 value={this.state.selectedFilters}
                                 maxMenuHeight={150}

@@ -1,38 +1,29 @@
 import React from "react";
 import * as PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core";
-import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
+import ListItem from "@material-ui/core/ListItem";
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
+import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import ExpansionPanel from "@material-ui/core/ExpansionPanel";
+import Grid from "@material-ui/core/Grid";
 import Divider from "@material-ui/core/Divider";
 import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
+import Button from "@material-ui/core/Button";
+import ExpansionPanelActions from "@material-ui/core/ExpansionPanelActions";
 
 const styles = ({
-    root: {
-        width: "100%",
-        float: "left",
-    },
     title: {
-        float: "left",
-        paddingLeft: 15,
-        paddingTop: 5
+        marginRight: 5
     },
-    header: {
-        float: "left",
-        width: "100%",
-    },
-    divider: {
-        marginTop: 10,
-        marginBottom: 10,
-        flexGrow: 1,
+    titleTag: {},
+    deleteButton: {
+        float: "right",
     },
     grid: {
         float: "left",
-    },
-    gridItem: {
-        marginLeft: 10,
-        marginRight: 10,
-    },
+    }
 });
 
 const MyListItem = (primary, secondary) => {
@@ -61,36 +52,52 @@ class AssetView extends React.Component {
         });
 
         return (
-            <div className={classes.root}>
-                <div className={classes.header}>
-                    <Typography className={classes.title} variant="h5" component="h2">
-                        {asset.name} in {asset.category}
+            <ExpansionPanel>
+                <ExpansionPanelSummary
+                    expandIcon={<ExpandMoreIcon/>}
+                    aria-controls="panel2a-content"
+                    id="panel2a-header"
+                >
+                    <Typography className={classes.title} variant="h6">
+                        {asset.name}
                     </Typography>
-                </div>
-                <Grid className={classes.grid} container spacing={2} justify="flex-start" alignItems="flex-start">
-                    <Grid className={classes.gridItem} item xs={12}>
-                        <Divider className={classes.divider}/>
+                    <Typography className={classes.titleTag} variant="overline" color="textSecondary">
+                        {asset.category}
+                    </Typography>
+                </ExpansionPanelSummary>
+                <Divider/>
+                <ExpansionPanelDetails>
+                    <Grid container item xs={12}>
+                        <Grid item xs={4}>
+                            <List dense component={"ul"}>
+                                {attributesList.filter(a => {
+                                    return attributesList.indexOf(a) % 3 === 0
+                                })}
+                            </List>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <List dense component={"ul"}>
+                                {attributesList.filter(a => {
+                                    return attributesList.indexOf(a) % 3 === 1
+                                })}
+                            </List>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <List dense component={"ul"}>
+                                {attributesList.filter(a => {
+                                    return attributesList.indexOf(a) % 3 === 2
+                                })}
+                            </List>
+                        </Grid>
                     </Grid>
-                    <Grid className={classes.gridItem} container item xs={12}>
-                        <Grid item xs={4}>
-                            <List dense component={"ul"}>
-                                {attributesList.filter(a => {return attributesList.indexOf(a)%3===0})}
-                            </List>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <List dense component={"ul"}>
-                                {attributesList.filter(a => {return attributesList.indexOf(a)%3===1})}
-                            </List>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <List dense component={"ul"}>
-                                {attributesList.filter(a => {return attributesList.indexOf(a)%3===2})}
-                            </List>
-                        </Grid>
-                    </Grid>
-                </Grid>
-
-            </div>
+                </ExpansionPanelDetails>
+                <Divider/>
+                <ExpansionPanelActions>
+                    <Button size="small" color="secondary" variant="contained">
+                        Delete
+                    </Button>
+                </ExpansionPanelActions>
+            </ExpansionPanel>
         );
     }
 }
