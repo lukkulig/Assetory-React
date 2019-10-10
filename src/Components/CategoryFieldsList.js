@@ -19,14 +19,10 @@ class CategoryFieldsList extends React.Component {
         const {
             textFields = [],
             assetNameChangeCallback,
-            localisationChangeCallback,
-            licenseChangeCallback,
-            ownerChangeCallback,
-            userChangeCallback,
-            assetValueChangeCallback,
-            backupChangeCallback,
+            validateAssertNameCallback,
             attributeValuesChangeCallback,
             validateCallback,
+            isAssetNameUnique
         } = this.props;
         this.props.categoryAttributes.forEach((val) => {
             textFields.push(<TextField
@@ -35,54 +31,27 @@ class CategoryFieldsList extends React.Component {
                 key={val.name}
                 name={val.name}
                 type={val.type}
-                onChange={attributeValuesChangeCallback}/>);
+                InputLabelProps={{
+                    shrink: true,
+                }}
+                onChange={attributeValuesChangeCallback}
+            />);
         });
         const {classes} = this.props;
         return (
             <div className={classes.root}>
                 <form noValidate id={"textFieldsForm"} onChange={validateCallback}>
                     <TextField
+                        error={!isAssetNameUnique}
+                        helperText={!isAssetNameUnique ? "This name is already in database" : ''}
                         className={classes.textField}
                         label={"Asset Name"}
                         type={"text"}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
                         onChange={assetNameChangeCallback}
-                    />
-                    <TextField
-                        className={classes.textField}
-                        label={"Location"}
-                        type={"text"}
-                        onChange={localisationChangeCallback}
-                    />
-                    <TextField
-                        className={classes.textField}
-                        label={"License"}
-                        type={"text"}
-                        onChange={licenseChangeCallback}
-                    />
-                    <TextField
-                        className={classes.textField}
-                        label={"Owner"}
-                        type={"text"}
-                        onChange={ownerChangeCallback}
-                    />
-                    <TextField
-                        className={classes.textField}
-                        label={"User"}
-                        type={"text"}
-                        onChange={userChangeCallback}
-                    />
-                    <TextField
-                        className={classes.textField}
-                        label={"Value"}
-                        type={"number"}
-                        onChange={assetValueChangeCallback}
-                    />
-                    <TextField
-                        className={classes.textField}
-                        label={"Backup"}
-                        type={"text"}
-                        onChange={backupChangeCallback}
-
+                        onBlur={validateAssertNameCallback}
                     />
                     {textFields}
                 </form>
@@ -97,14 +66,10 @@ CategoryFieldsList.propTypes = {
     category: PropTypes.object,
     categoryAttributes: PropTypes.array,
     assetNameChangeCallback: PropTypes.func,
-    localisationChangeCallback: PropTypes.func,
-    licenseChangeCallback: PropTypes.func,
-    ownerChangeCallback: PropTypes.func,
-    userChangeCallback: PropTypes.func,
-    assetValueChangeCallback: PropTypes.func,
-    backupChangeCallback: PropTypes.func,
+    validateAssertNameCallback: PropTypes.func,
     attributeValuesChangeCallback: PropTypes.func,
     validateCallback: PropTypes.func,
+    isAssetNameUnique: PropTypes.bool,
 };
 
 export default withStyles(styles)(CategoryFieldsList);

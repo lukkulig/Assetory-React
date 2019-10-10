@@ -68,6 +68,12 @@ export default {
             method: "GET"
         }),
 
+        getAssetByName: (name) => ({
+            path: url(`assets/name`),
+            body: name,
+            method: "POST"
+        }),
+
         getFilteredAssets: (assetsFilter) => ({
             path: url(`assets/filter`),
             method: "POST",

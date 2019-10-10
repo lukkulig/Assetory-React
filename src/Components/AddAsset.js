@@ -33,15 +33,10 @@ class AddAsset extends React.Component {
         categoryId: undefined,
         categoryName: undefined,
         assetName: '',
-        localisation: '',
-        license: '',
-        owner: '',
-        user: '',
-        assetValue: '',
-        backup: '',
         categoryAttributes: [],
         attributesValues: {},
-        isNotValidate: true
+        isNotValidate: true,
+        isAssetNameUnique: true,
     };
 
     static getUrlParams(location) {
@@ -59,6 +54,23 @@ class AddAsset extends React.Component {
                 this.setState({categories: response.content});
                 document.body.style.cursor = 'default';
             });
+    }
+
+    fetchAssetNameAndValidate() {
+        const name = this.state.assetName;
+        if (name !== '') {
+            api.fetch(
+                api.endpoints.getAssetByName(name),
+                (response) => {
+                    if (response.length !== 0) {
+                        this.setState({isAssetNameUnique: false});
+                    } else {
+                        this.setState({isAssetNameUnique: true});
+                    }
+                });
+        } else {
+            this.setState({isAssetNameUnique: true});
+        }
     }
 
     handleCategoryChange = (categoryId) => {
@@ -91,16 +103,11 @@ class AddAsset extends React.Component {
             value: value
         };
         return attrib
-    }
+    };
 
     handleAddAssetButton = () => {
 
         const attributes = [];
-        attributes.push(this.addNewAttribute("Location", "text", this.state.localisation));
-        attributes.push(this.addNewAttribute("License", "text", this.state.license));
-        attributes.push(this.addNewAttribute("Value", "number", this.state.assetValue));
-        attributes.push(this.addNewAttribute("Owner", "text", this.state.owner));
-        attributes.push(this.addNewAttribute("User", "text", this.state.user));
         this.state.categoryAttributes.forEach((attribute) => {
             attributes.push(this.addNewAttribute(attribute.name, attribute.type, this.state.attributesValues[attribute.name]))
         });
@@ -109,17 +116,12 @@ class AddAsset extends React.Component {
             categoryId: this.state.categoryId,
             name: this.state.assetName,
         };
-        console.log(JSON.stringify(asset))
+        console.log(JSON.stringify(asset));
         api.fetch(
             api.endpoints.addAsset(asset), () => {
                 this.setState({
+                    categoryId: undefined,
                     assetName: '',
-                    localisation: '',
-                    license: '',
-                    owner: '',
-                    user: '',
-                    assetValue: '',
-                    backup: '',
                     categoryAttributes: [],
                     attributesValues: {},
                     isNotValidate: true
@@ -132,32 +134,12 @@ class AddAsset extends React.Component {
         return this.state.categories.find(c => c.id === this.state.categoryId) || null
     }
 
+    validateAssertName = () => {
+        this.fetchAssetNameAndValidate();
+    };
+
     handleAssetNameChange = (event) => {
         this.setState({assetName: event.target.value.trim()});
-    };
-
-    handleLocalisationChange = (event) => {
-        this.setState({localisation: event.target.value.trim()});
-    };
-
-    handleLicenseChangeCallback = (event) => {
-        this.setState({license: event.target.value.trim()});
-    };
-
-    handleOwnerChangeCallback = (event) => {
-        this.setState({owner: event.target.value.trim()});
-    };
-
-    handleUserChangeCallback = (event) => {
-        this.setState({user: event.target.value.trim()});
-    };
-
-    handleAssetValueChangeCallback = (event) => {
-        this.setState({assetValue: event.target.value.trim()});
-    };
-
-    handleBackupChangeCallback = (event) => {
-        this.setState({backup: event.target.value.trim()});
     };
 
     handleAttributeValuesChangeCallback = (event) => {
@@ -177,7 +159,7 @@ class AddAsset extends React.Component {
                 }
             });
         });
-        this.state.isNotValidate = !isValid;
+        this.setState( {isNotValidate: !isValid});
     };
 
     componentDidMount() {
@@ -220,14 +202,10 @@ class AddAsset extends React.Component {
                         category={this.getActiveCategory()}
                         categoryAttributes={this.state.categoryAttributes}
                         assetNameChangeCallback={this.handleAssetNameChange}
-                        localisationChangeCallback={this.handleLocalisationChange}
-                        licenseChangeCallback={this.handleLicenseChangeCallback}
-                        ownerChangeCallback={this.handleOwnerChangeCallback}
-                        userChangeCallback={this.handleUserChangeCallback}
-                        assetValueChangeCallback={this.handleAssetValueChangeCallback}
-                        backupChangeCallback={this.handleBackupChangeCallback}
+                        validateAssertNameCallback={this.validateAssertName}
                         attributeValuesChangeCallback={this.handleAttributeValuesChangeCallback}
                         validateCallback={this.handleValidateCallback}
+                        isAssetNameUnique={this.state.isAssetNameUnique}
                     />
                     }
                     < Button
@@ -235,7 +213,7 @@ class AddAsset extends React.Component {
                         onClick={this.handleAddAssetButton}
                         color="primary"
                         variant="contained"
-                        disabled={this.state.isNotValidate}
+                        disabled={this.state.isNotValidate || !this.state.isAssetNameUnique}
                     >
                         add asset
                     </Button>
