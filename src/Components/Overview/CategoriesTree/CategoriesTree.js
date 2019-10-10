@@ -50,8 +50,22 @@ class CategoriesTree extends React.Component {
         this.props.categoryChangeCallback(categoryId);
     };
 
+    getIdIfHasChildren(categories, prefix) {
+        let ids = [];
+        categories.forEach((category) => {
+            if (Array.isArray(category.subCategories) && category.subCategories.length) {
+                ids.push(prefix + category.category.id);
+                let subCategoriesIds = this.getIdIfHasChildren(category.subCategories, prefix + category.category.id + "/");
+                ids = ids.concat(subCategoriesIds);
+            }
+        });
+        return ids;
+    }
+
     render() {
-        const {classes, categories, selectedCategoryId} = this.props;
+        const {classes, categories, initialSelectedCategoryId} = this.props;
+
+        let initialOpenCategories = this.getIdIfHasChildren(categories, "");
 
         return (
             <div className={classes.root}>
@@ -65,14 +79,15 @@ class CategoriesTree extends React.Component {
                     <TreeMenu
                         data={this.mapToData(categories)}
                         hasSearch={false}
-                        initialActiveKey={selectedCategoryId}
+                        initialActiveKey={initialSelectedCategoryId}
+                        initialOpenNodes={initialOpenCategories}
                         onClickItem={({key}) =>
                             this.handleChange(key)
                         }>
                         {({items}) => (
                             <>
                                 <ListGroup>
-                                    {items.map(({reset, ...props}) => (
+                                    {items.map(({...props}) => (
                                         <ListItem {...props} />
                                     ))}
                                 </ListGroup>
@@ -94,7 +109,7 @@ CategoriesTree.propTypes = {
         })
     ).isRequired,
     categoryChangeCallback: PropTypes.func,
-    selectedCategoryId: PropTypes.string.isRequired,
+    initialSelectedCategoryId: PropTypes.string.isRequired,
 };
 
 export default withStyles(styles)(CategoriesTree)

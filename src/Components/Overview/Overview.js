@@ -14,9 +14,9 @@ class Overview extends React.Component {
         greetings: "",
         allCategories: [],
         categories: [],
-        selectedCategoryId: "",
-        selectedCategoryAttributes: [],
-        allAssets: [],
+        selectedCategoryId: null,
+        initialSelectedCategoryId: null,
+        selectedCategoryAttributes: null,
         filteredAssets: [],
         filters: {},
     };
@@ -42,6 +42,11 @@ class Overview extends React.Component {
             (response) => {
                 this.setState({categories: response});
                 document.body.style.cursor = 'default';
+                if (Array.isArray(response) && response.length) {
+                    let initialSelectedCategoryId = response[0].category.id;
+                    this.setState( {selectedCategoryId: initialSelectedCategoryId});
+                    this.setState( {initialSelectedCategoryId: initialSelectedCategoryId});
+                }
             });
     }
 
@@ -50,7 +55,7 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getCategoryAttributes(selectedCategoryId),
             (response) => {
-                this.setState({selectedCategoryAttributes: response.reverse()});
+                this.setState({selectedCategoryAttributes: response});
                 document.body.style.cursor = 'default';
             });
     }
@@ -60,7 +65,6 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getAllAssets(),
             (response) => {
-                this.setState({allAssets: response.content});
                 this.setState({filteredAssets: response.content});
                 document.body.style.cursor = 'default';
             });
@@ -95,10 +99,6 @@ class Overview extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
     }
 
-    isCategorySelected() {
-        return (this.state.selectedCategoryId !== "");
-    }
-
     handleFiltersChange = () => {
         this.fetchAndSetFilteredAssets(this.state.selectedCategoryId);
     };
@@ -112,10 +112,15 @@ class Overview extends React.Component {
     render() {
         const {classes} = this.props;
 
+        if (this.state.selectedCategoryId !== null && this.state.selectedCategoryAttributes === null) {
+            this.fetchAndSetCategoryAttributes(this.state.selectedCategoryId);
+        }
         return (
+            (this.state.selectedCategoryAttributes !== null &&
             <div className={classes.content}>
                 <div className={classes.sideBarSection}>
                     <Paper className={classes.paper} elevation={4}>
+                        {this.state.initialSelectedCategoryId !== null &&
                         <div className={classes.categoryTreeSection}>
                             <CategoriesTree
                                 categories={this.state.categories.map(c => ({
@@ -123,16 +128,18 @@ class Overview extends React.Component {
                                     subCategories: c.subCategories,
                                 }))}
                                 categoryChangeCallback={this.handleCategoryChange}
-                                selectedCategoryId={this.state.selectedCategoryId}
+                                initialSelectedCategoryId={this.state.initialSelectedCategoryId}
                             />
                         </div>
-                        {this.isCategorySelected() &&
+                        }
+                        {this.state.selectedCategoryId !== null &&
                         <div className={classes.filtersSection}>
                             <Filters
                                 categoryAttributes={this.state.selectedCategoryAttributes}
                                 filters={this.state.filters}
-                                assets={this.state.allAssets}
+                                assets={this.state.filteredAssets}
                                 allCategories={this.state.allCategories}
+                                selectedCategoryId={this.state.selectedCategoryId}
                                 overviewCallback={this.handleFiltersChange}
                             />
                         </div>
@@ -153,6 +160,7 @@ class Overview extends React.Component {
                     }
                 </div>
             </div>
+            )
         );
     }
 }
