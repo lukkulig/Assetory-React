@@ -49,7 +49,7 @@ class Filters extends React.Component {
     };
 
     render() {
-        const {classes, categoryAttributes, filters, assets, allCategories} = this.props;
+        const {classes, categoryAttributes, filters, assets, allCategories, selectedCategoryId} = this.props;
         const setFiltersList = [];
 
         const assetAttributes = [
@@ -60,8 +60,12 @@ class Filters extends React.Component {
                         label: name
                     })).filter((el) => !(filters[Constants.NAME_KEY] || []).map(filter => filter.id).includes(el.id))
             },
-            {key: Constants.CATEGORY_KEY, label: Constants.CATEGORY_LABEL, values: allCategories.filter((el) =>
-                    !(filters[Constants.CATEGORY_KEY] || []).map(filter => filter.id).includes(el.id) && el.label!=="All")}
+            {key: Constants.CATEGORY_KEY, label: Constants.CATEGORY_LABEL, values:
+                    Array.from(new Set(assets.map(asset => asset.categoryId))).map(categoryId => ({
+                        id: categoryId,
+                        label: allCategories.find(c => c.id === categoryId).label
+                    })).filter((el) => !(filters[Constants.CATEGORY_KEY] || []).map(filter => filter.id).includes(el.id) && el.id!==selectedCategoryId)
+            }
         ];
 
         let categoryAttributesMapped = categoryAttributes.map(categoryAttribute => ({
@@ -122,6 +126,7 @@ Filters.propTypes = {
         })
     ),
     allCategories: PropTypes.array.isRequired,
+    selectedCategoryId: PropTypes.string.isRequired,
     overviewCallback: PropTypes.func,
 };
 
