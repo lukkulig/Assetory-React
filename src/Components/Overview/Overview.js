@@ -16,7 +16,8 @@ class Overview extends React.Component {
         categories: [],
         selectedCategoryId: "",
         selectedCategoryAttributes: [],
-        assets: [],
+        allAssets: [],
+        filteredAssets: [],
         filters: {},
     };
 
@@ -25,7 +26,11 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getAllCategories(),
             (response) => {
-                this.setState({allCategories: response.content});
+                let result = response.content.map(category => ({
+                    id: category.id,
+                    label: category.name
+                }));
+                this.setState({allCategories: result});
                 document.body.style.cursor = 'default';
             });
     }
@@ -47,9 +52,7 @@ class Overview extends React.Component {
             (response) => {
                 this.setState({selectedCategoryAttributes: response.reverse()});
                 document.body.style.cursor = 'default';
-
             });
-
     }
 
     fetchAndSetAllAssets() {
@@ -57,20 +60,27 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getAllAssets(),
             (response) => {
-                this.setState({assets: response.content});
+                this.setState({allAssets: response.content});
+                this.setState({filteredAssets: response.content});
                 document.body.style.cursor = 'default';
             });
     }
 
     fetchAndSetFilteredAssets(selectedCategoryId) {
+        let filters = Object.keys(this.state.filters).reduce((result, key) => {
+            result[key] = this.state.filters[key].map((filter) => {
+                 return filter.id
+            });
+            return result
+        }, {});
         const data = {
             mainCategoryId: selectedCategoryId,
-            filters: this.state.filters
+            filters: filters
         };
         api.fetch(
             api.endpoints.getFilteredAssets(data),
             (assets) => {
-                this.setState({assets: assets.content});
+                this.setState({filteredAssets: assets.content});
             }
         );
     }
@@ -80,7 +90,6 @@ class Overview extends React.Component {
         this.fetchAndSetAllCategories();
         this.fetchAndSetCategoryTrees();
         this.fetchAndSetAllAssets();
-        this.setState({selectedCategoryId: (this.state.categories[0] !== undefined) ? this.state.categories[0].id : ""});
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -122,6 +131,8 @@ class Overview extends React.Component {
                             <Filters
                                 categoryAttributes={this.state.selectedCategoryAttributes}
                                 filters={this.state.filters}
+                                assets={this.state.allAssets}
+                                allCategories={this.state.allCategories}
                                 overviewCallback={this.handleFiltersChange}
                             />
                         </div>
@@ -132,9 +143,10 @@ class Overview extends React.Component {
                     {this.state.allCategories.length !== 0 &&
                     <Paper className={classes.paper} elevation={4}>
                         <Assets
-                            assets={this.state.assets}
+                            assets={this.state.filteredAssets}
                             allCategories={this.state.allCategories}
                             filters={this.state.filters}
+                            categoryAttributes={this.state.selectedCategoryAttributes}
                             overviewCallback={this.handleFiltersChange}
                         />
                     </Paper>

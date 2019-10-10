@@ -5,6 +5,7 @@ import SetFilterDialog from "./SetFilterDialog";
 import * as PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Grid from "@material-ui/core/Grid";
+import * as Constants from "../../../Constants/Constants";
 
 const styles = ({
     root: {
@@ -48,20 +49,46 @@ class Filters extends React.Component {
     };
 
     render() {
-        const {classes, categoryAttributes, filters} = this.props;
+        const {classes, categoryAttributes, filters, assets, allCategories} = this.props;
         const setFiltersList = [];
 
-        const assetAttributes = [{name: "Name"}, {name: "Category"}];
+        const assetAttributes = [
+            {
+                key: Constants.NAME_KEY, label: Constants.NAME_LABEL, values:
+                    Array.from(new Set(assets.map(asset => asset.name))).map(name => ({
+                        id: name,
+                        label: name
+                    })).filter((el) => !(filters[Constants.NAME_KEY] || []).map(filter => filter.id).includes(el.id))
+            },
+            {key: Constants.CATEGORY_KEY, label: Constants.CATEGORY_LABEL, values: allCategories.filter((el) =>
+                    !(filters[Constants.CATEGORY_KEY] || []).map(filter => filter.id).includes(el.id) && el.label!=="All")}
+        ];
 
-        assetAttributes.concat(categoryAttributes).forEach((attribute, i) => {
-            setFiltersList.push(
-                <SetFilterDialog
-                    attribute={attribute.name}
-                    filters={filters}
-                    filtersCallback={this.handleFiltersChange}
-                    key={i}
-                />
-            );
+        let categoryAttributesMapped = categoryAttributes.map(categoryAttribute => ({
+            key: categoryAttribute.name,
+            label: categoryAttribute.name,
+            values: Array.from(new Set(assets.map(asset => {
+                let values = asset.attributes.filter(attribute => attribute.attribute.name === categoryAttribute.name).map(attribute => attribute.value);
+                if (Array.isArray(values) && values.length)
+                    return values.shift();
+                return null;
+        }).filter(values => values !== null)))
+                .map(name => ({
+                id: name,
+                label: name
+            })).filter((el) => !(filters[categoryAttribute.name] || []).map(filter => filter.id).includes(el.id))
+        }));
+
+        assetAttributes.concat(categoryAttributesMapped).forEach((attribute, i) => {
+            if (Array.isArray(attribute.values) && attribute.values.length)
+                setFiltersList.push(
+                    <SetFilterDialog
+                        attribute={attribute}
+                        filters={filters}
+                        filtersCallback={this.handleFiltersChange}
+                        key={i}
+                    />
+                );
         });
 
         return (
@@ -86,6 +113,15 @@ Filters.propTypes = {
     classes: PropTypes.object.isRequired,
     categoryAttributes: PropTypes.array.isRequired,
     filters: PropTypes.object.isRequired,
+    assets: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            name: PropTypes.string.isRequired,
+            categoryId: PropTypes.string.isRequired,
+            attributes: PropTypes.array.isRequired
+        })
+    ),
+    allCategories: PropTypes.array.isRequired,
     overviewCallback: PropTypes.func,
 };
 

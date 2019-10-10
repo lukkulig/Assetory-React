@@ -12,13 +12,6 @@ const styles = ({
         marginLeft: 10,
         marginRight: 10,
     },
-    attributeContent: {
-        float: 'left',
-        marginTop: 10,
-        marginBottom: 10,
-        marginLeft: 10,
-        marginRight: 10,
-    },
     textField: {
         width: 500,
     },
@@ -34,7 +27,10 @@ class AddCategory extends React.Component {
         newAttributeName: '',
         newAttributeType: 'text',
         supercategory: '',
-        categoryName: ''
+        supercategoryAttributes: [],
+        categoryName: '',
+        categoryNameError: false,
+        attributeNameError: false,
     };
 
     componentDidMount() {
@@ -47,7 +43,17 @@ class AddCategory extends React.Component {
             api.endpoints.getAllCategories(),
             (response) => {
                 this.setState({categories: response.content});
-                this.setState({supercategory: this.state.categories.slice(-1)[0]});
+                this.setState({supercategory: this.state.categories.size === 0 ? undefined : this.state.categories.slice(-1)[0]},
+                    () => {
+                        if (this.state.supercategory !== undefined && this.state.supercategory !== null) {
+                            api.fetch(
+                                api.endpoints.getCategoryAttributes(this.state.supercategory.id),
+                                (response) => {
+                                    this.setState({supercategoryAttributes: response.content})
+                                }
+                            )
+                        }
+                    });
                 document.body.style.cursor = 'default';
             });
     }
@@ -58,14 +64,36 @@ class AddCategory extends React.Component {
     };
 
     handleSupercategoryChange = (event) => {
-        this.setState({supercategory: this.findCategory(event.target.value)});
+        this.setState({supercategory: this.findCategory(event.target.value)},
+            () => {
+                if (this.state.supercategory !== undefined && this.state.supercategory !== null) {
+                    api.fetch(
+                        api.endpoints.getCategoryAttributes(this.state.supercategory.id),
+                        (response) => {
+                            this.setState({supercategoryAttributes: response})
+                        }
+                    )
+                }
+            });
     };
 
     handleCategoryNameChange = (event) => {
+        if (this.state.categories.map(category => category.name).includes(event.target.value) && this.state.categoryNameError === false) {
+            this.setState({categoryNameError: true})
+        } else if (this.state.categoryNameError === true) {
+            this.setState({categoryNameError: false})
+        }
         this.setState({categoryName: event.target.value})
     };
 
     handleAttributeNameChange = (event) => {
+        let allAttributes = this.state.attributes;
+        allAttributes = allAttributes.concat(this.state.supercategoryAttributes);
+        if (allAttributes.map(attribute => attribute.name).includes(event.target.value) && this.state.attributeNameError === false) {
+            this.setState({attributeNameError: true})
+        } else if (this.state.attributeNameError === true) {
+            this.setState({attributeNameError: false})
+        }
         this.setState({newAttributeName: event.target.value})
     };
 
@@ -96,15 +124,17 @@ class AddCategory extends React.Component {
             (category) => {
                 let supercategory = this.state.supercategory;
                 supercategory.subcategoryIds = supercategory.subcategoryIds.concat([category.id]);
-                api.fetch(api.endpoints.updateCategory(supercategory));
+                api.fetch(api.endpoints.updateCategory(supercategory), () => null);
                 this.setState({
-                    categories: [],
                     attributes: [],
                     newAttributeName: '',
                     newAttributeType: 'text',
                     supercategory: undefined,
-                    categoryName: ''
-                })
+                    supercategoryAttributes: [],
+                    categoryName: '',
+
+                });
+                this.fetchAndSetCategories();
             });
     };
 
@@ -117,7 +147,7 @@ class AddCategory extends React.Component {
                         <Select
                             label={"Supercategory"}
                             className={classes.select}
-                            value={this.state.supercategory.name}
+                            value={this.state.supercategory === undefined ? '' : this.state.supercategory.name}
                             onChange={this.handleSupercategoryChange}
                         >
                             {this.state.categories.map(category => <MenuItem
@@ -126,50 +156,27 @@ class AddCategory extends React.Component {
                     </div>
                     <div className={classes.content}>
                         <TextField
+                            error={this.state.categoryNameError}
                             className={classes.textField}
                             label={"Category name"}
                             value={this.state.categoryName}
                             onChange={this.handleCategoryNameChange}
                             variant="outlined"
+                            helperText={this.state.categoryNameError === true ? 'Category with that name already exists' : ''}
                         />
-                    </div>
-                    <div className={classes.content}>
-                        <div className={classes.attributeContent}>
-                            <TextField
-                                className={classes.textField}
-                                label={"Additional attribute"}
-                                value={this.state.newAttributeName}
-                                onChange={this.handleAttributeNameChange}
-                                variant="outlined"
-                                helperText="Attribute required for all assets in this category"
-                            />
-                        </div>
-                        <div className={classes.attributeContent}>
-                            <Select
-                                className={classes.select}
-                                value={this.state.newAttributeType}
-                                onChange={this.handleAttributeTypeChange}
-                            >
-                                <MenuItem value={"text"}>Text</MenuItem>
-                                <MenuItem value={"number"}>Number</MenuItem>
-                                <MenuItem value={"date"}>Date</MenuItem>
-                            </Select>
-                        </div>
-                        <div className={classes.attributeContent}>
-                            <Button variant="outlined"
-                                    color="primary"
-                                    className={classes.button}
-                                    onClick={this.handleSaveAttributeButton}
-                            >
-                                Save attribute
-                            </Button>
-                        </div>
                     </div>
                     <div className={classes.content} style={{clear: "both"}}>
                         <CategoryAttributes
                             classes={classes}
                             attributes={this.state.attributes}
+                            supercategoryAttributes={this.state.supercategoryAttributes}
+                            newAttributeName={this.state.newAttributeName}
+                            newAttributeType={this.state.newAttributeType}
+                            attributeNameChangeCallback={this.handleAttributeNameChange}
+                            attributeTypeChangeCallback={this.handleAttributeTypeChange}
+                            saveAttributeCallback={this.handleSaveAttributeButton}
                             deleteAttributeCallback={this.handleDeleteAttributeButton}
+                            attributeNameError={this.state.attributeNameError}
                         />
                     </div>
                     <div className={classes.content}>
@@ -177,6 +184,7 @@ class AddCategory extends React.Component {
                                 color="primary"
                                 className={classes.button}
                                 onClick={this.handleAddCategoryButton}
+                                disabled={this.state.categoryNameError}
                         >
                             Add category
                         </Button>
