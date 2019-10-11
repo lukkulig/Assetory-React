@@ -1,6 +1,17 @@
 import React from "react";
 import * as PropTypes from "prop-types";
-import {withStyles, List, ListItem, Paper, Button, TextField, Select, MenuItem} from "@material-ui/core";
+import {
+    withStyles,
+    List,
+    ListItem,
+    Paper,
+    Button,
+    TextField,
+    Select,
+    MenuItem,
+    Checkbox,
+    FormControlLabel
+} from "@material-ui/core";
 
 const styles = ({
     attributesListBox: {
@@ -19,10 +30,21 @@ const styles = ({
     },
 });
 
-const AttributeListItem = (name, type) => {
+const AttributeListItem = (name, type, required, handleChange, fromSupercategory, id) => {
     return (
         <ListItem component={"li"} style={{float: "left"}}>
             {name + " (" + type + ")"}
+            <FormControlLabel
+                control={<Checkbox
+                    id={id}
+                    disabled={fromSupercategory}
+                    checked={required}
+                    onChange={handleChange}
+                    value="required"
+                    color="primary"/>}
+                label="Required"
+                labelPlacement="start"
+            />
         </ListItem>
     )
 };
@@ -36,16 +58,17 @@ class CategoryAttributes extends React.Component {
             this.props.supercategoryAttributes.forEach((attribute) => {
                 attributesList.push(
                     <div key={i}>
-                        {AttributeListItem(attribute.name, attribute.type)}
+                        {AttributeListItem(attribute.name, attribute.type, attribute.required, this.props.attributeRequiredChangeCallback, true, i.toString())}
                         <br/>
                     </div>
                 );
+                i++;
             });
         }
         this.props.attributes.forEach((attribute) => {
             attributesList.push(
                 <div key={i}>
-                    {AttributeListItem(attribute.name, attribute.type)}
+                    {AttributeListItem(attribute.name, attribute.type, attribute.required, this.props.attributeRequiredChangeCallback, true, i.toString())}
                     <Button style={{float: "left"}}
                             className={classes.button}
                             variant="contained"
@@ -85,6 +108,18 @@ class CategoryAttributes extends React.Component {
                     </Select>
                 </div>
                 <div className={classes.attributeContent}>
+                    <FormControlLabel
+                        control={<Checkbox
+                            id={"new"}
+                            checked={this.props.newAttributeRequired}
+                            onChange={this.props.attributeRequiredChangeCallback}
+                            value="required"
+                            color="primary"/>}
+                        label="Required"
+                        labelPlacement="start"
+                    />
+                </div>
+                <div className={classes.attributeContent}>
                     <Button variant="outlined"
                             color="primary"
                             className={classes.button}
@@ -108,16 +143,20 @@ CategoryAttributes.propTypes = {
     classes: PropTypes.object.isRequired,
     attributes: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired,
-        type: PropTypes.string.isRequired
+        type: PropTypes.string.isRequired,
+        required: PropTypes.string.isRequired,
     })).isRequired,
     supercategoryAttributes: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired,
-        type: PropTypes.string.isRequired
+        type: PropTypes.string.isRequired,
+        required: PropTypes.string.isRequired,
     })).isRequired,
     newAttributeName: PropTypes.string.isRequired,
     newAttributeType: PropTypes.string.isRequired,
+    newAttributeRequired: PropTypes.bool.isRequired,
     attributeNameChangeCallback: PropTypes.func.isRequired,
     attributeTypeChangeCallback: PropTypes.func.isRequired,
+    attributeRequiredChangeCallback: PropTypes.func.isRequired,
     saveAttributeCallback: PropTypes.func.isRequired,
     deleteAttributeCallback: PropTypes.func.isRequired,
 };
