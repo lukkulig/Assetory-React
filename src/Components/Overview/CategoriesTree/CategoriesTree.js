@@ -6,6 +6,7 @@ import Divider from "@material-ui/core/Divider";
 import TreeMenu from 'react-simple-tree-menu';
 import {ListGroup} from 'reactstrap';
 import ListItem from "./ListItem";
+import {BeatLoader} from "react-spinners";
 
 
 const styles = ({
@@ -32,6 +33,11 @@ const styles = ({
         marginLeft: 10,
         marginRight: 10,
     },
+    noContent: {
+        width: "100%",
+        textAlign: "center",
+        paddingTop: 10
+    }
 });
 
 class CategoriesTree extends React.Component {
@@ -62,38 +68,55 @@ class CategoriesTree extends React.Component {
         return ids;
     }
 
+    isLoading() {
+        return this.props.categories === null
+            || this.props.initialSelectedCategoryId === null;
+    }
+
     render() {
         const {classes, categories, initialSelectedCategoryId} = this.props;
 
-        let initialOpenCategories = this.getIdIfHasChildren(categories, "");
+        let initialOpenCategories = [];
+        if (!this.isLoading()) {
+            initialOpenCategories = this.getIdIfHasChildren(categories, "");
+        }
 
         return (
             <div className={classes.root}>
                 <div className={classes.header}>
-                    <Typography className={classes.title} variant="h5" component="h2">
+                    <Typography className={classes.title} variant="h5">
                         Categories
                     </Typography>
                 </div>
                 <Divider className={classes.divider}/>
                 <div className={classes.treeSection}>
-                    <TreeMenu
-                        data={this.mapToData(categories)}
-                        hasSearch={false}
-                        initialActiveKey={initialSelectedCategoryId}
-                        initialOpenNodes={initialOpenCategories}
-                        onClickItem={({key}) =>
-                            this.handleChange(key)
-                        }>
-                        {({items}) => (
-                            <>
-                                <ListGroup>
-                                    {items.map(({...props}) => (
-                                        <ListItem {...props} />
-                                    ))}
-                                </ListGroup>
-                            </>
-                        )}
-                    </TreeMenu>
+                    {!this.isLoading() ? (
+                        <TreeMenu
+                            data={this.mapToData(categories)}
+                            hasSearch={false}
+                            initialActiveKey={initialSelectedCategoryId}
+                            initialOpenNodes={initialOpenCategories}
+                            onClickItem={({key}) =>
+                                this.handleChange(key)
+                            }>
+                            {({items}) => (
+                                <>
+                                    <ListGroup>
+                                        {items.map(({...props}) => (
+                                            <ListItem {...props} />
+                                        ))}
+                                    </ListGroup>
+                                </>
+                            )}
+                        </TreeMenu>
+                    ) : (
+                        <div className={classes.noContent}>
+                            <BeatLoader
+                                size={10}
+                                color={"#3f51b5"}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         );
@@ -107,9 +130,9 @@ CategoriesTree.propTypes = {
             category: PropTypes.object,
             subCategories: PropTypes.array
         })
-    ).isRequired,
+    ),
     categoryChangeCallback: PropTypes.func,
-    initialSelectedCategoryId: PropTypes.string.isRequired,
+    initialSelectedCategoryId: PropTypes.string,
 };
 
 export default withStyles(styles)(CategoriesTree)
