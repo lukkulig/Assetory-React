@@ -15,31 +15,6 @@ export default {
                 action(response);
             });
     },
-    // fetchString: (opt, action) => {
-    //     fetch(opt.path, {
-    //         method: opt.method,
-    //         body: opt.body,
-    //         headers: opt.headers,
-    //         credentials: 'include'
-    //     })
-    //         .then(res => res.text())
-    //         .then(response => {
-    //             action(response);
-    //         });
-    // },
-    fetchHandleError: (opt, action, errorCallback) => {
-        fetch(opt.path, {
-            method: opt.method,
-            body: opt.body,
-            headers: opt.headers,
-            credentials: 'include'
-        })
-            .then(res => res.json())
-            .then(response => {
-                action(response);
-            })
-            .catch(errorCallback);
-    },
     endpoints: {
         getAllCategories: () => ({
             path: url(`categories`),
@@ -55,6 +30,11 @@ export default {
         }),
         getCategoryAttributes: (categoryId) => ({
             path: url(`categories/${categoryId}/attributes`),
+            method: "GET"
+        }),
+
+        getCategoryAttributesValues: (categoryId) => ({
+            path: url(`categories/${categoryId}/attributes/values`),
             method: "GET"
         }),
 
@@ -104,5 +84,9 @@ export default {
             path: url(`categories/${categoryId}/with-content`),
             method: "DELETE"
         }),
+        deleteAsset: (assetId) => ({
+            path: url(`assets/${assetId}`),
+            method: "DELETE"
+        })
     }
 }

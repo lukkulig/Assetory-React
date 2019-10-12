@@ -30,12 +30,7 @@ class DeleteFilterDialog extends React.Component {
     state = {
         open: false,
         value: "",
-        filters: {},
     };
-
-    componentDidMount() {
-        this.setState({filters: this.props.filters})
-    }
 
     handleClickOpen = () => {
         this.setState({open: true});
@@ -47,7 +42,7 @@ class DeleteFilterDialog extends React.Component {
 
     deleteFilter = () => {
         this.handleClose();
-        let temp = this.state.filters;
+        let temp = this.props.filters;
         if (this.props.filterKey === undefined) {
             for (let key in temp) {
                 if (temp.hasOwnProperty(key))
@@ -62,11 +57,11 @@ class DeleteFilterDialog extends React.Component {
                 }
             }
         }
-        this.props.activeFiltersCallback(this.state.filters);
+        this.props.activeFiltersCallback();
     };
 
     render() {
-        const {classes, filterKey, filterLabel, attribute} = this.props;
+        const {classes, filterKey, filterLabel, attribute, filters} = this.props;
 
         let contentText;
         if (filterKey !== undefined) {
@@ -79,7 +74,7 @@ class DeleteFilterDialog extends React.Component {
             <div>
                 <Fab className={classes.filterFab}
                      variant="extended"
-                     filters={this.state.filters}
+                     filters={filters}
                      onClick={this.handleClickOpen}>
                     {attribute.label}
                     <HighlightOffIcon fontSize='small' className={classes.icon}/>

@@ -44,8 +44,8 @@ class Overview extends React.Component {
                 document.body.style.cursor = 'default';
                 if (Array.isArray(response) && response.length) {
                     let initialSelectedCategoryId = response[0].category.id;
-                    this.setState( {selectedCategoryId: initialSelectedCategoryId});
-                    this.setState( {initialSelectedCategoryId: initialSelectedCategoryId});
+                    this.setState({selectedCategoryId: initialSelectedCategoryId});
+                    this.setState({initialSelectedCategoryId: initialSelectedCategoryId});
                 }
             });
     }
@@ -70,16 +70,19 @@ class Overview extends React.Component {
             });
     }
 
-    fetchAndSetFilteredAssets(selectedCategoryId) {
-        let filters = Object.keys(this.state.filters).reduce((result, key) => {
-            result[key] = this.state.filters[key].map((filter) => {
-                 return filter.id
-            });
-            return result
-        }, {});
+    fetchAndSetFilteredAssets(selectedCategoryId, filters) {
+        let filtersReduced = filters;
+        if (Object.keys(filters).length !== 0) {
+            filtersReduced = Object.keys(filters).reduce((result, key) => {
+                result[key] = this.state.filters[key].map((filter) => {
+                    return filter.id
+                });
+                return result
+            }, {});
+        }
         const data = {
             mainCategoryId: selectedCategoryId,
-            filters: filters
+            filters: filtersReduced
         };
         api.fetch(
             api.endpoints.getFilteredAssets(data),
@@ -96,17 +99,15 @@ class Overview extends React.Component {
         this.fetchAndSetAllAssets();
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-    }
-
     handleFiltersChange = () => {
-        this.fetchAndSetFilteredAssets(this.state.selectedCategoryId);
+        this.fetchAndSetFilteredAssets(this.state.selectedCategoryId, this.state.filters);
     };
 
     handleCategoryChange = (selectedCategoryId) => {
         this.setState({selectedCategoryId: selectedCategoryId});
+        this.setState({filters: {}});
         this.fetchAndSetCategoryAttributes(selectedCategoryId);
-        this.fetchAndSetFilteredAssets(selectedCategoryId);
+        this.fetchAndSetFilteredAssets(selectedCategoryId, {});
     };
 
     render() {
@@ -117,49 +118,49 @@ class Overview extends React.Component {
         }
         return (
             (this.state.selectedCategoryAttributes !== null &&
-            <div className={classes.content}>
-                <div className={classes.sideBarSection}>
-                    <Paper className={classes.paper} elevation={4}>
-                        {this.state.initialSelectedCategoryId !== null &&
-                        <div className={classes.categoryTreeSection}>
-                            <CategoriesTree
-                                categories={this.state.categories.map(c => ({
-                                    category: c.category,
-                                    subCategories: c.subCategories,
-                                }))}
-                                categoryChangeCallback={this.handleCategoryChange}
-                                initialSelectedCategoryId={this.state.initialSelectedCategoryId}
-                            />
-                        </div>
-                        }
-                        {this.state.selectedCategoryId !== null &&
-                        <div className={classes.filtersSection}>
-                            <Filters
-                                categoryAttributes={this.state.selectedCategoryAttributes}
-                                filters={this.state.filters}
+                <div className={classes.content}>
+                    <div className={classes.sideBarSection}>
+                        <Paper className={classes.paper} elevation={4}>
+                            {this.state.initialSelectedCategoryId !== null &&
+                            <div className={classes.categoryTreeSection}>
+                                <CategoriesTree
+                                    categories={this.state.categories.map(c => ({
+                                        category: c.category,
+                                        subCategories: c.subCategories,
+                                    }))}
+                                    categoryChangeCallback={this.handleCategoryChange}
+                                    initialSelectedCategoryId={this.state.initialSelectedCategoryId}
+                                />
+                            </div>
+                            }
+                            {this.state.selectedCategoryId !== null &&
+                            <div className={classes.filtersSection}>
+                                <Filters
+                                    categoryAttributes={this.state.selectedCategoryAttributes}
+                                    filters={this.state.filters}
+                                    assets={this.state.filteredAssets}
+                                    allCategories={this.state.allCategories}
+                                    selectedCategoryId={this.state.selectedCategoryId}
+                                    overviewCallback={this.handleFiltersChange}
+                                />
+                            </div>
+                            }
+                        </Paper>
+                    </div>
+                    <div className={classes.assetsSection}>
+                        {this.state.allCategories.length !== 0 &&
+                        <Paper className={classes.paper} elevation={4}>
+                            <Assets
                                 assets={this.state.filteredAssets}
                                 allCategories={this.state.allCategories}
-                                selectedCategoryId={this.state.selectedCategoryId}
+                                filters={this.state.filters}
+                                categoryAttributes={this.state.selectedCategoryAttributes}
                                 overviewCallback={this.handleFiltersChange}
                             />
-                        </div>
+                        </Paper>
                         }
-                    </Paper>
+                    </div>
                 </div>
-                <div className={classes.assetsSection}>
-                    {this.state.allCategories.length !== 0 &&
-                    <Paper className={classes.paper} elevation={4}>
-                        <Assets
-                            assets={this.state.filteredAssets}
-                            allCategories={this.state.allCategories}
-                            filters={this.state.filters}
-                            categoryAttributes={this.state.selectedCategoryAttributes}
-                            overviewCallback={this.handleFiltersChange}
-                        />
-                    </Paper>
-                    }
-                </div>
-            </div>
             )
         );
     }

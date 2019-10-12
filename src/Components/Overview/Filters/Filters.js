@@ -36,14 +36,6 @@ const styles = ({
 
 class Filters extends React.Component {
 
-    state = {
-        filters: {},
-    };
-
-    componentDidMount() {
-        this.setState({filters: this.props.filters})
-    }
-
     handleFiltersChange = () => {
         this.props.overviewCallback();
     };

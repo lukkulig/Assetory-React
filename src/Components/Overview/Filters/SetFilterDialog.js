@@ -98,6 +98,13 @@ class SetFilterDialog extends React.Component {
         this.setState({filters: this.props.filters})
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.filters !== this.props.filters) {
+            this.setState({filters: this.props.filters})
+
+        }
+    }
+
     handleClickOpen = () => {
         this.setState({open: true});
     };

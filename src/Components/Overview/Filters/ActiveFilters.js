@@ -24,16 +24,7 @@ const styles = theme => ({
 
 class ActiveFilters extends React.Component {
 
-    state = {
-        filters: {},
-    };
-
-    componentDidMount() {
-        this.setState({filters: this.props.filters});
-    }
-
-    handleFiltersChange = (filters) => {
-        this.setState({filters: filters});
+    handleFiltersChange = () => {
         this.props.assetsCallback();
     };
 

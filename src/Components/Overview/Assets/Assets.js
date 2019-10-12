@@ -46,22 +46,12 @@ const styles = ({
 
 class Assets extends React.Component {
 
-    state = {
-        assets: [],
-        filters: {}
-    };
-
-    componentDidMount() {
-        this.setState({filteredAssets: this.props.assets});
-        this.setState({filters: this.props.filters});
-    }
-
     handleFiltersChange = () => {
         this.props.overviewCallback();
     };
 
     render() {
-        const {classes, assets, allCategories, categoryAttributes} = this.props;
+        const {classes, assets, allCategories, filters, categoryAttributes} = this.props;
 
         const cardList = [];
 
@@ -90,10 +80,10 @@ class Assets extends React.Component {
                     </Typography>
                 </div>
                 <Divider className={classes.divider}/>
-                {Object.keys(this.props.filters).length !== 0 &&
+                {Object.keys(filters).length !== 0 &&
                 <div className={classes.activeFilters}>
                     <ActiveFilters
-                                   filters={this.state.filters}
+                                   filters={filters}
                                    categoryAttributes={categoryAttributes}
                                    assetsCallback={this.handleFiltersChange}
                     />
