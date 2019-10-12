@@ -177,7 +177,7 @@ class AddAsset extends React.Component {
                 }
             });
         });
-        this.state.isNotValidate = !isValid;
+        this.setState({isNotValidate: !isValid});
     };
 
     componentDidMount() {

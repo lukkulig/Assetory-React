@@ -195,4 +195,8 @@ class AddCategory extends React.Component {
     }
 }
 
+AddCategory.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
 export default withStyles(styles)(AddCategory)
