@@ -37,7 +37,6 @@ const styles = ({
 
 class EditCategory extends React.Component {
     state = {
-        categories: [],
         attributes: [],
         newAttributeName: '',
         newAttributeType: 'text',
@@ -47,6 +46,12 @@ class EditCategory extends React.Component {
         deleteDialogOpen: false,
         deleteWithContent: false,
         attributeNameError: false,
+        oldEditedAttributeName: '',
+        editedAttributeName: '',
+        editedAttributeType: 'text',
+        editedAttributeRequired: false,
+        editAttributeDialogOpen: false,
+        editedAttributeNameError: false,
     };
 
     componentDidMount() {
@@ -58,13 +63,13 @@ class EditCategory extends React.Component {
         api.fetch(
             api.endpoints.getAllCategories(),
             (response) => {
-                this.setState({categories: response.content});
+                this.props.mainCategoryChangeCallback(response.content);
                 document.body.style.cursor = 'default';
             });
     }
 
     findCategory = (categoryId) => {
-        const foundCategory = this.state.categories.find(category => category.id === categoryId);
+        const foundCategory = this.props.categories.find(category => category.id === categoryId);
         return foundCategory === undefined ? null : foundCategory;
     };
 
@@ -124,6 +129,55 @@ class EditCategory extends React.Component {
         });
     };
 
+    handleEditedAttributeNameChange = (event) => {
+        let allAttributes = this.state.attributes;
+        allAttributes = allAttributes.concat(this.state.supercategoryAttributes);
+        if (allAttributes.map(attribute => attribute.name).includes(event.target.value) && this.state.editedAttributeNameError === false) {
+            this.setState({editedAttributeNameError: true})
+        } else if (this.state.editedAttributeNameError === true) {
+            this.setState({editedAttributeNameError: false})
+        }
+        this.setState({editedAttributeName: event.target.value})
+    };
+
+    handleEditedAttributeTypeChange = (event) => {
+        this.setState({editedAttributeType: event.target.value})
+    };
+
+    handleEditedAttributeRequiredChange = (event) => {
+        this.setState({editedAttributeRequired: !this.state.editedAttributeRequired})
+    };
+
+    handleEditAttributeButton = (attributeName) => {
+        const foundAttribute = this.state.attributes.find(attribute => attribute.name === attributeName);
+        this.setState({
+            oldEditedAttributeName: foundAttribute.name,
+            editedAttributeName: foundAttribute.name,
+            editedAttributeType: foundAttribute.type,
+            editedAttributeRequired: foundAttribute.required,
+            editAttributeDialogOpen: true,
+        })
+    };
+
+    handleSaveEditedAttributeButton = () => {
+        let attribute = {
+            name: this.state.editedAttributeName,
+            type: this.state.editedAttributeType,
+            required: this.state.editedAttributeRequired,
+        };
+        let newAttributes = this.state.attributes.filter(a => a.name !== this.state.oldEditedAttributeName);
+        newAttributes = newAttributes.concat([attribute]);
+        this.setState({
+            attributes: newAttributes,
+            oldEditedAttributeName: '',
+            editedAttributeName: '',
+            editedAttributeType: 'text',
+            editedAttributeRequired: false,
+            editAttributeDialogOpen: false,
+            editedAttributeNameError: false,
+        });
+    };
+
     handleSaveCategoryButton = () => {
         let category = this.state.category;
         category.additionalAttributes = this.state.attributes;
@@ -145,7 +199,6 @@ class EditCategory extends React.Component {
     };
 
     handleDeleteOptionChange = (event) => {
-        console.log(this.state.category);
         this.setState({deleteWithContent: event.target.value === "with-content"});
     };
 
@@ -194,7 +247,7 @@ class EditCategory extends React.Component {
                             onChange={this.handleCategoryChange}
                             variant="outlined"
                         >
-                            {this.state.categories.map(category => <MenuItem
+                            {this.props.categories.map(category => <MenuItem
                                 value={category.id}>{category.name}</MenuItem>)}
                         </Select>
                         <React.Fragment>
@@ -252,6 +305,15 @@ class EditCategory extends React.Component {
                             saveAttributeCallback={this.handleSaveAttributeButton}
                             deleteAttributeCallback={this.handleDeleteAttributeButton}
                             attributeNameError={this.state.attributeNameError}
+                            editedAttributeName={this.state.editedAttributeName}
+                            editedAttributeType={this.state.editedAttributeType}
+                            editedAttributeRequired={this.state.newAttributeRequired}
+                            editedAttributeNameChangeCallback={this.handleEditedAttributeNameChange}
+                            editedAttributeTypeChangeCallback={this.handleEditedAttributeTypeChange}
+                            editedAttributeRequiredChangeCallback={this.handleEditedAttributeRequiredChange}
+                            saveEditedAttributeCallback={this.handleSaveEditedAttributeButton}
+                            editAttributeCallback={this.handleEditAttributeButton}
+                            editAttributeDialogOpen={this.state.editAttributeDialogOpen}
                         />
                     </div>
                     <div className={classes.content}>
@@ -268,5 +330,20 @@ class EditCategory extends React.Component {
         );
     }
 }
+
+EditCategory.propTypes = {
+    mainCategoryChangeCallback: PropTypes.func.isRequired,
+    categories: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        parentCategoryId: PropTypes.string.isRequired,
+        subCategoryId: PropTypes.arrayOf(PropTypes.string).isRequired,
+        additionalAttributes: PropTypes.arrayOf(PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            type: PropTypes.string.isRequired,
+            required: PropTypes.string.isRequired,
+        })).isRequired,
+    })).isRequired,
+};
 
 export default withStyles(styles)(EditCategory)
