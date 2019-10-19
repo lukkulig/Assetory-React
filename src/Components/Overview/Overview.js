@@ -27,12 +27,14 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getAllCategories(),
             (response) => {
-                let result = response.content.map(category => ({
-                    id: category.id,
-                    name: category.name
-                }));
-                this.setState({allCategories: result});
-                document.body.style.cursor = 'default';
+                if (response.status !== 500) {
+                    let result = response.content.map(category => ({
+                        id: category.id,
+                        name: category.name
+                    }));
+                    this.setState({allCategories: result});
+                    document.body.style.cursor = 'default';
+                }
             });
     };
 
@@ -41,14 +43,16 @@ class Overview extends React.Component {
         return api.fetch(
             api.endpoints.getCategoryTrees(),
             (response) => {
-                this.setState({categories: response});
-                document.body.style.cursor = 'default';
-                if (Array.isArray(response) && response.length) {
-                    let initialSelectedCategoryId = response[0].category.id;
-                    this.setState({
-                        selectedCategoryId: initialSelectedCategoryId,
-                        initialSelectedCategoryId: initialSelectedCategoryId
-                    });
+                if (response.status !== 500) {
+                    this.setState({categories: response});
+                    document.body.style.cursor = 'default';
+                    if (Array.isArray(response) && response.length) {
+                        let initialSelectedCategoryId = response[0].category.id;
+                        this.setState({
+                            selectedCategoryId: initialSelectedCategoryId,
+                            initialSelectedCategoryId: initialSelectedCategoryId
+                        });
+                    }
                 }
             });
     };
@@ -121,7 +125,7 @@ class Overview extends React.Component {
         return (
             <div className={classes.content}>
                 <div className={classes.sideBarSection}>
-                    <Paper className={classes.paper} elevation={4}>
+                    <Paper className={classes.sideBarPaper} elevation={4}>
                         <div className={classes.categoryTreeSection}>
                             <CategoriesTree
                                 categories={this.state.categories !== null ? this.state.categories.map(c => ({
@@ -147,7 +151,7 @@ class Overview extends React.Component {
                     </Paper>
                 </div>
                 <div className={classes.assetsSection}>
-                    <Paper className={classes.paper} elevation={4}>
+                    <Paper className={classes.assetsPaper} elevation={4}>
                         <Assets
                             assets={this.state.filteredAssets}
                             allCategories={this.state.allCategories}
