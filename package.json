@@ -18,6 +18,7 @@
     "react-scripts": "2.1.8",
     "react-select": "^2.4.3",
     "react-simple-tree-menu": "^1.1.3",
+    "react-spinners": "^0.6.1",
     "reactstrap": "^8.0.0"
   },
   "scripts": {

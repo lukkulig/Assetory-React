@@ -6,6 +6,7 @@ import Divider from "@material-ui/core/Divider";
 import List from "@material-ui/core/List";
 import AssetView from "./AssetView";
 import ActiveFilters from "../Filters/ActiveFilters";
+import {BeatLoader} from "react-spinners";
 
 const styles = ({
     root: {
@@ -41,6 +42,11 @@ const styles = ({
     },
     list: {
         padding: 10
+    },
+    noContent: {
+        width: "100%",
+        textAlign: "center",
+        paddingTop: 10
     }
 });
 
@@ -50,32 +56,38 @@ class Assets extends React.Component {
         this.props.overviewCallback();
     };
 
+    isLoading() {
+        return this.props.allCategories === null
+            || this.props.assets === null;
+    }
+
     render() {
         const {classes, assets, allCategories, filters, categoryAttributes} = this.props;
 
-        const cardList = [];
+        let cardList = [];
 
-        let collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
-        if (assets !== undefined)
-            assets.sort((a, b) => {
-                return collator.compare(a.name, b.name);
-            }).forEach((asset, i) => {
-                cardList.push(
-                    <AssetView
-                        key={i}
-                        asset={({
-                            name: asset.name,
-                            category: allCategories.find(c => c.id === asset.categoryId).label,
-                            attributes: asset.attributes
-                        })}
-                    />
-                )
-            });
-
+        if (!this.isLoading()) {
+            let collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+            if (assets !== undefined)
+                assets.sort((a, b) => {
+                    return collator.compare(a.name, b.name);
+                }).forEach((asset, i) => {
+                    cardList.push(
+                        <AssetView
+                            key={i}
+                            asset={({
+                                name: asset.name,
+                                category: allCategories.find(c => c.id === asset.categoryId).name,
+                                attributes: asset.attributes
+                            })}
+                        />
+                    )
+                });
+        }
         return (
             <div className={classes.root}>
                 <div className={classes.header}>
-                    <Typography className={classes.title} variant="h5" component="h2">
+                    <Typography className={classes.title} variant="h5">
                         Assets
                     </Typography>
                 </div>
@@ -83,15 +95,30 @@ class Assets extends React.Component {
                 {Object.keys(filters).length !== 0 &&
                 <div className={classes.activeFilters}>
                     <ActiveFilters
-                                   filters={filters}
-                                   categoryAttributes={categoryAttributes}
-                                   assetsCallback={this.handleFiltersChange}
+                        filters={filters}
+                        categoryAttributes={categoryAttributes}
+                        assetsCallback={this.handleFiltersChange}
                     />
                 </div>
                 }
                 <div className={classes.listSection}>
                     <List className={classes.list} component={"ul"}>
-                        {cardList}
+                        {!this.isLoading() ? (
+                            cardList.length ? (
+                                cardList
+                            ) : (
+                                <Typography className={classes.noContent} color="textSecondary">
+                                    There's no assets
+                                </Typography>
+                            )
+                        ) : (
+                            <div className={classes.noContent}>
+                                <BeatLoader
+                                    size={10}
+                                    color={"#3f51b5"}
+                                />
+                            </div>
+                        )}
                     </List>
                 </div>
             </div>
@@ -109,9 +136,9 @@ Assets.propTypes = {
             attributes: PropTypes.array.isRequired
         })
     ),
-    allCategories: PropTypes.array.isRequired,
+    allCategories: PropTypes.array,
     filters: PropTypes.object.isRequired,
-    categoryAttributes: PropTypes.array.isRequired,
+    categoryAttributes: PropTypes.array,
     overviewCallback: PropTypes.func,
 };
 

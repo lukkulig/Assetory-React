@@ -6,6 +6,7 @@ import * as PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Grid from "@material-ui/core/Grid";
 import * as Constants from "../../../Constants/Constants";
+import {BeatLoader} from "react-spinners";
 
 const styles = ({
     root: {
@@ -31,6 +32,11 @@ const styles = ({
         marginLeft: 10,
         marginRight: 10,
         display: ''
+    },
+    noContent: {
+        width: "100%",
+        textAlign: "center",
+        paddingTop: 10
     }
 });
 
@@ -40,64 +46,114 @@ class Filters extends React.Component {
         this.props.overviewCallback();
     };
 
-    render() {
-        const {classes, categoryAttributes, filters, assets, allCategories, selectedCategoryId} = this.props;
-        const setFiltersList = [];
+    isLoading() {
+        return this.props.categoryAttributesValues === null
+            || this.props.selectedCategoryId === null
+            || this.props.allCategories == null;
+    }
 
-        const assetAttributes = [
-            {
-                key: Constants.NAME_KEY, label: Constants.NAME_LABEL, values:
-                    Array.from(new Set(assets.map(asset => asset.name))).map(name => ({
-                        id: name,
-                        label: name
-                    })).filter((el) => !(filters[Constants.NAME_KEY] || []).map(filter => filter.id).includes(el.id))
-            },
-            {key: Constants.CATEGORY_KEY, label: Constants.CATEGORY_LABEL, values:
-                    Array.from(new Set(assets.map(asset => asset.categoryId))).map(categoryId => ({
-                        id: categoryId,
-                        label: allCategories.find(c => c.id === categoryId).label
-                    })).filter((el) => !(filters[Constants.CATEGORY_KEY] || []).map(filter => filter.id).includes(el.id) && el.id!==selectedCategoryId)
+    getSubcategories(category, selectedCategoryId) {
+        if (category.category.id === selectedCategoryId) {
+            return category.subCategories;
+        } else if (category.subCategories !== null) {
+            let result = null;
+            for (let i = 0; result == null && i < category.subCategories.length; i++) {
+                result = this.getSubcategories(category.subCategories[i], selectedCategoryId);
             }
-        ];
+            return result;
+        }
+        return null;
+    }
 
-        let categoryAttributesMapped = categoryAttributes.map(categoryAttribute => ({
-            key: categoryAttribute.name,
-            label: categoryAttribute.name,
-            values: Array.from(new Set(assets.map(asset => {
-                let values = asset.attributes.filter(attribute => attribute.attribute.name === categoryAttribute.name).map(attribute => attribute.value);
-                if (Array.isArray(values) && values.length)
-                    return values.shift();
-                return null;
-        }).filter(values => values !== null)))
-                .map(name => ({
-                id: name,
-                label: name
-            })).filter((el) => !(filters[categoryAttribute.name] || []).map(filter => filter.id).includes(el.id))
-        }));
-
-        assetAttributes.concat(categoryAttributesMapped).forEach((attribute, i) => {
-            if (Array.isArray(attribute.values) && attribute.values.length)
-                setFiltersList.push(
-                    <SetFilterDialog
-                        attribute={attribute}
-                        filters={filters}
-                        filtersCallback={this.handleFiltersChange}
-                        key={i}
-                    />
-                );
+    prepareCategoryFilters(categories, prefix) {
+        let filterValues = [];
+        categories.forEach((category) => {
+            filterValues.push({
+                id: category.category.id,
+                label: prefix + category.category.name
+            });
+            let subCategoriesIds = this.prepareCategoryFilters(category.subCategories, prefix + "    \t");
+            filterValues = filterValues.concat(subCategoriesIds);
         });
+        return filterValues;
+    }
+
+    render() {
+        const {classes, categoryAttributesValues, filters, selectedCategoryId, allCategories} = this.props;
+        let setFiltersList = [];
+
+        if (!this.isLoading()) {
+
+            let subcategories = this.getSubcategories(allCategories.shift(), selectedCategoryId);
+            let categoryValues = this.prepareCategoryFilters(subcategories, "");
+
+            const assetAttributes = [
+                {
+                    key: Constants.NAME_KEY, label: Constants.NAME_LABEL, values:
+                        Array.from(new Set(categoryAttributesValues[Constants.NAME_KEY])).map(value => ({
+                            id: value,
+                            label: value
+                        })).filter((el) => !(filters[Constants.NAME_KEY] || []).map(filter => filter.id).includes(el.id))
+                },
+                {
+                    key: Constants.CATEGORY_KEY, label: Constants.CATEGORY_LABEL, values: categoryValues.filter((el) =>
+                        !(filters[Constants.CATEGORY_KEY] || []).map(filter => filter.id).includes(el.id))
+                }
+            ];
+
+            let categoryAttributesMapped = [];
+            Object.keys(categoryAttributesValues).forEach(categoryAttribute => {
+                if (categoryAttribute !== Constants.NAME_KEY) {
+                    categoryAttributesMapped.push({
+                        key: categoryAttribute,
+                        label: categoryAttribute,
+                        values: Array.from(new Set(categoryAttributesValues[categoryAttribute])).map(value => ({
+                            id: value,
+                            label: value
+                        })).filter((el) => !(filters[categoryAttribute.name] || []).map(filter => filter.id).includes(el.id))
+                    })
+                }
+            });
+
+            assetAttributes.concat(categoryAttributesMapped).forEach((attribute, i) => {
+                if (Array.isArray(attribute.values) && attribute.values.length)
+                    setFiltersList.push(
+                        <SetFilterDialog
+                            attribute={attribute}
+                            filters={filters}
+                            filtersCallback={this.handleFiltersChange}
+                            key={i}
+                        />
+                    );
+            });
+        }
 
         return (
             <div className={classes.root}>
                 <div className={classes.header}>
-                    <Typography className={classes.title} variant="h5" component="h2">
+                    <Typography className={classes.title} variant="h5">
                         Filters
                     </Typography>
                 </div>
                 <Divider className={classes.divider}/>
                 <div className={classes.filtersSection}>
                     <Grid container justify="flex-start">
-                        {setFiltersList}
+                        {!this.isLoading() ? (
+                            setFiltersList.length ? (
+                                setFiltersList
+                            ) : (
+                                <Typography className={classes.noContent} color="textSecondary">
+                                    There's no filters
+                                </Typography>
+                            )
+                        ) : (
+                            <div className={classes.noContent}>
+                                <BeatLoader
+                                    size={10}
+                                    color={"#3f51b5"}
+                                />
+                            </div>
+                        )}
                     </Grid>
                 </div>
             </div>
@@ -107,18 +163,15 @@ class Filters extends React.Component {
 
 Filters.propTypes = {
     classes: PropTypes.object.isRequired,
-    categoryAttributes: PropTypes.array.isRequired,
+    categoryAttributesValues: PropTypes.object,
     filters: PropTypes.object.isRequired,
-    assets: PropTypes.arrayOf(
+    selectedCategoryId: PropTypes.string,
+    allCategories: PropTypes.arrayOf(
         PropTypes.shape({
-            id: PropTypes.string.isRequired,
-            name: PropTypes.string.isRequired,
-            categoryId: PropTypes.string.isRequired,
-            attributes: PropTypes.array.isRequired
+            category: PropTypes.object,
+            subCategories: PropTypes.array
         })
     ),
-    allCategories: PropTypes.array.isRequired,
-    selectedCategoryId: PropTypes.string.isRequired,
     overviewCallback: PropTypes.func,
 };
 
