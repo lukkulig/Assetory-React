@@ -2,7 +2,6 @@ import React from "react";
 import * as PropTypes from "prop-types";
 import {
     withStyles,
-    TextField,
     Button,
     Select,
     MenuItem,
@@ -344,6 +343,7 @@ EditCategory.propTypes = {
             required: PropTypes.string.isRequired,
         })).isRequired,
     })).isRequired,
+    classes: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(EditCategory)

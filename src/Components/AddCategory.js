@@ -288,6 +288,7 @@ AddCategory.propTypes = {
             required: PropTypes.string.isRequired,
         })).isRequired,
     })).isRequired,
+    classes: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(AddCategory)

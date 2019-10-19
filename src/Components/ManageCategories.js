@@ -1,5 +1,4 @@
 import React from "react";
-import Typography from "@material-ui/core/Typography";
 import * as PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core";
 import Tabs from 'react-bootstrap/Tabs'

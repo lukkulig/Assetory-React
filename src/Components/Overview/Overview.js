@@ -14,9 +14,10 @@ class Overview extends React.Component {
         greetings: "",
         allCategories: [],
         categories: [],
-        selectedCategoryId: "",
-        selectedCategoryAttributes: [],
-        assets: [],
+        selectedCategoryId: null,
+        initialSelectedCategoryId: null,
+        selectedCategoryAttributes: null,
+        filteredAssets: [],
         filters: {},
     };
 
@@ -25,7 +26,11 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getAllCategories(),
             (response) => {
-                this.setState({allCategories: response.content});
+                let result = response.content.map(category => ({
+                    id: category.id,
+                    label: category.name
+                }));
+                this.setState({allCategories: result});
                 document.body.style.cursor = 'default';
             });
     }
@@ -37,6 +42,11 @@ class Overview extends React.Component {
             (response) => {
                 this.setState({categories: response});
                 document.body.style.cursor = 'default';
+                if (Array.isArray(response) && response.length) {
+                    let initialSelectedCategoryId = response[0].category.id;
+                    this.setState({selectedCategoryId: initialSelectedCategoryId});
+                    this.setState({initialSelectedCategoryId: initialSelectedCategoryId});
+                }
             });
     }
 
@@ -45,11 +55,9 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getCategoryAttributes(selectedCategoryId),
             (response) => {
-                this.setState({selectedCategoryAttributes: response.reverse()});
+                this.setState({selectedCategoryAttributes: response});
                 document.body.style.cursor = 'default';
-
             });
-
     }
 
     fetchAndSetAllAssets() {
@@ -57,20 +65,29 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getAllAssets(),
             (response) => {
-                this.setState({assets: response.content});
+                this.setState({filteredAssets: response.content});
                 document.body.style.cursor = 'default';
             });
     }
 
-    fetchAndSetFilteredAssets(selectedCategoryId) {
+    fetchAndSetFilteredAssets(selectedCategoryId, filters) {
+        let filtersReduced = filters;
+        if (Object.keys(filters).length !== 0) {
+            filtersReduced = Object.keys(filters).reduce((result, key) => {
+                result[key] = this.state.filters[key].map((filter) => {
+                    return filter.id
+                });
+                return result
+            }, {});
+        }
         const data = {
             mainCategoryId: selectedCategoryId,
-            filters: this.state.filters
+            filters: filtersReduced
         };
         api.fetch(
             api.endpoints.getFilteredAssets(data),
             (assets) => {
-                this.setState({assets: assets.content});
+                this.setState({filteredAssets: assets.content});
             }
         );
     }
@@ -80,67 +97,71 @@ class Overview extends React.Component {
         this.fetchAndSetAllCategories();
         this.fetchAndSetCategoryTrees();
         this.fetchAndSetAllAssets();
-        this.setState({selectedCategoryId: (this.state.categories[0] !== undefined) ? this.state.categories[0].id : ""});
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
-    }
-
-    isCategorySelected() {
-        return (this.state.selectedCategoryId !== "");
     }
 
     handleFiltersChange = () => {
-        this.fetchAndSetFilteredAssets(this.state.selectedCategoryId);
+        this.fetchAndSetFilteredAssets(this.state.selectedCategoryId, this.state.filters);
     };
 
     handleCategoryChange = (selectedCategoryId) => {
         this.setState({selectedCategoryId: selectedCategoryId});
+        this.setState({filters: {}});
         this.fetchAndSetCategoryAttributes(selectedCategoryId);
-        this.fetchAndSetFilteredAssets(selectedCategoryId);
+        this.fetchAndSetFilteredAssets(selectedCategoryId, {});
     };
 
     render() {
         const {classes} = this.props;
 
+        if (this.state.selectedCategoryId !== null && this.state.selectedCategoryAttributes === null) {
+            this.fetchAndSetCategoryAttributes(this.state.selectedCategoryId);
+        }
         return (
-            <div className={classes.content}>
-                <div className={classes.sideBarSection}>
-                    <Paper className={classes.paper} elevation={4}>
-                        <div className={classes.categoryTreeSection}>
-                            <CategoriesTree
-                                categories={this.state.categories.map(c => ({
-                                    category: c.category,
-                                    subCategories: c.subCategories,
-                                }))}
-                                categoryChangeCallback={this.handleCategoryChange}
-                                selectedCategoryId={this.state.selectedCategoryId}
-                            />
-                        </div>
-                        {this.isCategorySelected() &&
-                        <div className={classes.filtersSection}>
-                            <Filters
-                                categoryAttributes={this.state.selectedCategoryAttributes}
+            (this.state.selectedCategoryAttributes !== null &&
+                <div className={classes.content}>
+                    <div className={classes.sideBarSection}>
+                        <Paper className={classes.paper} elevation={4}>
+                            {this.state.initialSelectedCategoryId !== null &&
+                            <div className={classes.categoryTreeSection}>
+                                <CategoriesTree
+                                    categories={this.state.categories.map(c => ({
+                                        category: c.category,
+                                        subCategories: c.subCategories,
+                                    }))}
+                                    categoryChangeCallback={this.handleCategoryChange}
+                                    initialSelectedCategoryId={this.state.initialSelectedCategoryId}
+                                />
+                            </div>
+                            }
+                            {this.state.selectedCategoryId !== null &&
+                            <div className={classes.filtersSection}>
+                                <Filters
+                                    categoryAttributes={this.state.selectedCategoryAttributes}
+                                    filters={this.state.filters}
+                                    assets={this.state.filteredAssets}
+                                    allCategories={this.state.allCategories}
+                                    selectedCategoryId={this.state.selectedCategoryId}
+                                    overviewCallback={this.handleFiltersChange}
+                                />
+                            </div>
+                            }
+                        </Paper>
+                    </div>
+                    <div className={classes.assetsSection}>
+                        {this.state.allCategories.length !== 0 &&
+                        <Paper className={classes.paper} elevation={4}>
+                            <Assets
+                                assets={this.state.filteredAssets}
+                                allCategories={this.state.allCategories}
                                 filters={this.state.filters}
+                                categoryAttributes={this.state.selectedCategoryAttributes}
                                 overviewCallback={this.handleFiltersChange}
                             />
-                        </div>
+                        </Paper>
                         }
-                    </Paper>
+                    </div>
                 </div>
-                <div className={classes.assetsSection}>
-                    {this.state.allCategories.length !== 0 &&
-                    <Paper className={classes.paper} elevation={4}>
-                        <Assets
-                            assets={this.state.assets}
-                            allCategories={this.state.allCategories}
-                            filters={this.state.filters}
-                            overviewCallback={this.handleFiltersChange}
-                        />
-                    </Paper>
-                    }
-                </div>
-            </div>
+            )
         );
     }
 }

@@ -1,18 +1,23 @@
 import React from 'react';
 import * as PropTypes from "prop-types";
 import {withStyles} from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import Button from "@material-ui/core/Button";
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Fab from "@material-ui/core/Fab";
+import Select from "react-select";
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Fab,
+    NoSsr,
+    Typography
+} from "@material-ui/core";
 
 const styles = theme => ({
-    textField: {
-        width: '100%',
+    root: {
+        width: 600,
+        height: 250
     },
     filterFab: {
         marginRight: theme.spacing(1),
@@ -20,18 +25,84 @@ const styles = theme => ({
         height: 30,
         textTransform: "none",
     },
+    dialog: {
+        height: "1000"
+    },
+    input: {
+        display: 'flex',
+        padding: 0,
+    },
+    option: {
+        fontSize: 14,
+
+    },
+    noOptionsMessage: {
+        padding: `${theme.spacing()}px ${theme.spacing(2)}px`,
+    },
+    singleValue: {
+        fontSize: 14,
+    },
+    placeholder: {
+        position: 'absolute',
+        left: 10,
+        fontSize: 14,
+    },
+    paper: {
+        position: 'absolute',
+        zIndex: 1,
+        marginTop: 0,
+        left: 0,
+        right: 0,
+    },
 });
+
+function NoOptionsMessage(props) {
+    return (
+        <Typography
+            color="textSecondary"
+            className={props.selectProps.classes.noOptionsMessage}
+            {...props.innerProps}
+        >
+            {props.children}
+        </Typography>
+    );
+}
+
+function Placeholder(props) {
+    return (
+        <Typography
+            color="textSecondary"
+            className={props.selectProps.classes.placeholder}
+            {...props.innerProps}
+        >
+            {props.children}
+        </Typography>
+    );
+}
+
+
+const components = {
+    NoOptionsMessage,
+    Placeholder
+};
 
 class SetFilterDialog extends React.Component {
 
     state = {
         open: false,
-        value: "",
+        selectedFilters: null,
         filters: {},
     };
 
     componentDidMount() {
         this.setState({filters: this.props.filters})
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.filters !== this.props.filters) {
+            this.setState({filters: this.props.filters})
+
+        }
     }
 
     handleClickOpen = () => {
@@ -40,62 +111,74 @@ class SetFilterDialog extends React.Component {
 
     handleClose = () => {
         this.setState({open: false});
-    };
-
-    isValid = () => {
-        return true;
+        this.setState({selectedFilters: null});
     };
 
     setFilters = () => {
         this.handleClose();
         let temp = this.state.filters;
-        if (temp[this.props.attribute] === undefined)
-            temp[this.props.attribute] = [];
-        temp[this.props.attribute].push(this.state.value);
+        if (temp[this.props.attribute.key] === undefined)
+            temp[this.props.attribute.key] = [];
+        Array.prototype.push.apply(temp[this.props.attribute.key],this.state.selectedFilters);
         this.setState({filters: temp});
+        this.setState({selectedFilters: null});
         this.props.filtersCallback();
     };
 
-    handleChange = name => event => {
-        this.setState({[name]: event.target.value});
+    handleFilterChange = selectedFilter => {
+        this.setState({
+            selectedFilters: selectedFilter,
+        });
     };
 
     render() {
         const {classes, attribute} = this.props;
 
+        let collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+        let attributeValues = attribute.values.sort((a, b) => {
+            return collator.compare(a.label, b.label);
+        });
         return (
             <div>
                 <Fab className={classes.filterFab}
                      variant="extended"
                      color="primary"
                      onClick={this.handleClickOpen}>
-                    {attribute}
+                    {attribute.label}
                 </Fab>
                 <Dialog
                     open={this.state.open}
                     onClose={this.handleClose}
                     aria-labelledby="set-filter-form"
+                    disableBackdropClick
                 >
-                    <DialogTitle id="set-filter-form">{attribute}</DialogTitle>
-                    <DialogContent>
+                    <DialogTitle id="set-filter-form">{attribute.label}</DialogTitle>
+                    <DialogContent className={classes.root}>
                         <DialogContentText>
-                            Setting filters
+                            Set filters:<br/>
                         </DialogContentText>
-                        <TextField
-                            id="filters"
-                            label="Filter"
-                            className={classes.textField}
-                            value={this.state.value}
-                            onChange={this.handleChange("value")}
-                            margin="normal"
-                            type="string"
-                        />
+                        <NoSsr>
+                            <Select
+                                classes={classes}
+                                options={attributeValues}
+                                components={components}
+                                value={this.state.selectedFilters}
+                                maxMenuHeight={150}
+                                onChange={this.handleFilterChange}
+                                placeholder="Add new filter"
+                                isClearable
+                                isMulti
+                                closeMenuOnSelect={false}
+                                getOptionValue={option => option.id}
+                                getLabelValue={option => option.label}
+                            />
+                        </NoSsr>
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={this.handleClose} color="primary">
                             Cancel
                         </Button>
-                        <Button onClick={this.setFilters} color="primary" disabled={!this.isValid()}>
+                        <Button onClick={this.setFilters} color="primary" disabled={!this.state.selectedFilters}>
                             Set filters
                         </Button>
                     </DialogActions>
@@ -108,7 +191,16 @@ class SetFilterDialog extends React.Component {
 
 SetFilterDialog.propTypes = {
     classes: PropTypes.object.isRequired,
-    attribute: PropTypes.string.isRequired,
+    attribute: PropTypes.shape({
+        key: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        values: PropTypes.arrayOf(
+            PropTypes.shape({
+                id: PropTypes.string.isRequired,
+                label: PropTypes.string.isRequired
+            })
+        )
+    }),
     filters: PropTypes.object.isRequired,
     filtersCallback: PropTypes.func
 };

@@ -14,10 +14,6 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogContentText,
-    FormControl,
-    RadioGroup,
-    Radio,
     DialogActions
 } from "@material-ui/core";
 
