@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@atlaskit/datetime-picker": "^9.1.0",
+    "@atlaskit/inline-edit": "^10.0.23",
+    "@atlaskit/textfield": "^3.1.2",
+    "@atlaskit/theme": "^9.2.5",
     "@material-ui/core": "^4.1.3",
     "@material-ui/icons": "^4.2.1",
     "base-64": "^0.1.0",
@@ -19,7 +23,8 @@
     "react-select": "^2.4.3",
     "react-simple-tree-menu": "^1.1.3",
     "react-spinners": "^0.6.1",
-    "reactstrap": "^8.0.0"
+    "reactstrap": "^8.0.0",
+    "styled-components": "^4.4.0"
   },
   "scripts": {
     "start": "react-scripts start",
