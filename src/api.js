@@ -15,6 +15,17 @@ export default {
                 action(response);
             });
     },
+    fetchDelete: (opt, action) => {
+        fetch(opt.path, {
+            method: opt.method,
+            body: opt.body,
+            headers: opt.headers,
+            credentials: 'include'
+        })
+            .then(response => {
+                action(response);
+            });
+    },
     endpoints: {
         getAllCategories: () => ({
             path: url(`categories`),

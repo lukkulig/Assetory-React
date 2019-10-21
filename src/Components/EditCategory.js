@@ -203,7 +203,7 @@ class EditCategory extends React.Component {
 
     handleDeleteConfirmButton = () => {
         if (this.state.deleteWithContent === true) {
-            api.fetch(api.endpoints.deleteCategoryWithContent(this.state.category.id), () => {
+            api.fetchDelete(api.endpoints.deleteCategoryWithContent(this.state.category.id), () => {
                 this.setState({
                     deleteDialogOpen: false,
                     deleteWithContent: false,
@@ -213,10 +213,11 @@ class EditCategory extends React.Component {
                     newAttributeRequired: false,
                     supercategoryAttributes: [],
                     category: undefined,
-                })
+                });
+                this.fetchAndSetCategories();
             })
         } else {
-            api.fetch(api.endpoints.deleteCategory(this.state.category.id), () => {
+            api.fetchDelete(api.endpoints.deleteCategory(this.state.category.id), () => {
                 this.setState({
                     deleteDialogOpen: false,
                     deleteWithContent: false,
@@ -226,10 +227,10 @@ class EditCategory extends React.Component {
                     newAttributeRequired: false,
                     supercategoryAttributes: [],
                     category: undefined,
-                })
-            })
+                });
+                this.fetchAndSetCategories();
+            });
         }
-
     };
 
     render() {
