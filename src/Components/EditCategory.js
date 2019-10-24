@@ -51,6 +51,7 @@ class EditCategory extends React.Component {
         editedAttributeRequired: false,
         editAttributeDialogOpen: false,
         editedAttributeNameError: false,
+        attributeChanges: new Map(),
     };
 
     componentDidMount() {
@@ -78,6 +79,7 @@ class EditCategory extends React.Component {
             attributes: newCategory.additionalAttributes,
             newAttributeName: '',
             newAttributeType: 'text',
+            attributeChanges: {},
             category: newCategory
         }, () => {
             if (this.state.category !== undefined && this.state.category.parentCategoryId !== null) {
@@ -164,6 +166,11 @@ class EditCategory extends React.Component {
             type: this.state.editedAttributeType,
             required: this.state.editedAttributeRequired,
         };
+        let newMap = this.state.attributeChanges;
+        newMap[this.state.oldEditedAttributeName] = this.state.editedAttributeName;
+        this.setState({
+            attributeChanges: newMap,
+        });
         let newAttributes = this.state.attributes.filter(a => a.name !== this.state.oldEditedAttributeName);
         newAttributes = newAttributes.concat([attribute]);
         this.setState({
@@ -179,8 +186,12 @@ class EditCategory extends React.Component {
 
     handleSaveCategoryButton = () => {
         let category = this.state.category;
+        let categoryUpdate = {
+            category: this.state.category,
+            attributeChanges: this.state.attributeChanges,
+        };
         category.additionalAttributes = this.state.attributes;
-        api.fetch(api.endpoints.updateCategory(category),
+        api.fetch(api.endpoints.updateCategory(categoryUpdate),
             () => {
                 this.setState({
                     attributes: [],
@@ -189,6 +200,7 @@ class EditCategory extends React.Component {
                     newAttributeRequired: false,
                     supercategoryAttributes: [],
                     category: undefined,
+                    attributeChanges: {},
                 })
             });
     };
