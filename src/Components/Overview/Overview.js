@@ -68,7 +68,7 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getAllAssets(),
             (response) => {
-                this.setState({filteredAssets: response.content});
+                this.setState({filteredAssets: response});
                 document.body.style.cursor = 'default';
             });
     };

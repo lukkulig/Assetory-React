@@ -48,14 +48,14 @@ class AddCategory extends React.Component {
         api.fetch(
             api.endpoints.getAllCategories(),
             (response) => {
-                this.props.mainCategoryChangeCallback(response.content);
+                this.props.mainCategoryChangeCallback(response);
                 this.setState({supercategory: this.props.categories.size === 0 ? undefined : this.props.categories.slice(-1)[0]},
                     () => {
                         if (this.state.supercategory !== undefined && this.state.supercategory !== null) {
                             api.fetch(
                                 api.endpoints.getCategoryAttributes(this.state.supercategory.id),
                                 (response) => {
-                                    this.setState({supercategoryAttributes: response.content})
+                                    this.setState({supercategoryAttributes: response})
                                 }
                             )
                         }

@@ -63,7 +63,7 @@ class EditCategory extends React.Component {
         api.fetch(
             api.endpoints.getAllCategories(),
             (response) => {
-                this.props.mainCategoryChangeCallback(response.content);
+                this.props.mainCategoryChangeCallback(response);
                 document.body.style.cursor = 'default';
             });
     }
