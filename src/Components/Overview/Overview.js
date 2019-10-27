@@ -27,7 +27,7 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getAllCategories(),
             (response) => {
-                let result = response.content.map(category => ({
+                let result = response.map(category => ({
                     id: category.id,
                     name: category.name
                 }));
