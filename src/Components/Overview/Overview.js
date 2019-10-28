@@ -94,7 +94,7 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getFilteredAssets(data),
             (assets) => {
-                this.setState({filteredAssets: assets.content});
+                this.setState({filteredAssets: assets});
             }
         );
     }
