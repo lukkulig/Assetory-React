@@ -1,6 +1,6 @@
 const host = "stormy-stream-15739.herokuapp.com";
 const port = "";
-const url = endpoint => `http://${host}:${port}/${endpoint}`;
+const url = endpoint => `https://${host}:${port}/${endpoint}`;
 
 export default {
     fetch: (opt, action) => {
