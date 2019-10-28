@@ -1,5 +1,5 @@
-const host = "localhost";
-const port = 5444;
+const host = "stormy-stream-15739.herokuapp.com";
+const port = "";
 const url = endpoint => `http://${host}:${port}/${endpoint}`;
 
 export default {
