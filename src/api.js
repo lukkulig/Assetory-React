@@ -4,7 +4,7 @@ const url = endpoint => `http://${host}:${port}/${endpoint}`;
 
 export default {
     fetch: (opt, action) => {
-        fetch(opt.path, {
+        return fetch(opt.path, {
             method: opt.method,
             body: opt.body,
             headers: opt.headers,
@@ -15,30 +15,16 @@ export default {
                 action(response);
             });
     },
-    // fetchString: (opt, action) => {
-    //     fetch(opt.path, {
-    //         method: opt.method,
-    //         body: opt.body,
-    //         headers: opt.headers,
-    //         credentials: 'include'
-    //     })
-    //         .then(res => res.text())
-    //         .then(response => {
-    //             action(response);
-    //         });
-    // },
-    fetchHandleError: (opt, action, errorCallback) => {
+    fetchDelete: (opt, action) => {
         fetch(opt.path, {
             method: opt.method,
             body: opt.body,
             headers: opt.headers,
             credentials: 'include'
         })
-            .then(res => res.json())
             .then(response => {
                 action(response);
-            })
-            .catch(errorCallback);
+            });
     },
     endpoints: {
         getAllCategories: () => ({
@@ -58,10 +44,16 @@ export default {
             method: "GET"
         }),
 
-        getCategoryAttributesValues: (categoryId) => ({
-            path: url(`categories/${categoryId}/attributes/values`),
-            method: "GET"
-        }),
+        getCategoryAttributesValues: (categoryId, withSubcategories) => {
+            let path = new URL(url(`categories/${categoryId}/attributes/values`));
+            if (withSubcategories) {
+                path.searchParams.append("withSubcategories", withSubcategories);
+            }
+            return {
+                path: path,
+                method: "GET"
+            }
+        },
 
         getCategoryTrees: () => ({
             path: url(`categories/trees`),
@@ -114,5 +106,9 @@ export default {
             path: url(`categories/${categoryId}/with-content`),
             method: "DELETE"
         }),
+        deleteAsset: (assetId) => ({
+            path: url(`assets/${assetId}`),
+            method: "DELETE"
+        })
     }
 }

@@ -11,6 +11,7 @@ const styles = ({
     },
     textField: {
         width: '100%',
+        marginTop: '10px'
     },
 });
 
@@ -84,6 +85,7 @@ class CategoryFieldsList extends React.Component {
         console.log(aaa);
         this.props.categoryAttributes.forEach((val) => {
             const name = val.name;
+            const isDate = (val.type === 'date');
             textFields.push(<TextField
                 style={styles.textField}
                 label={name}
@@ -91,7 +93,7 @@ class CategoryFieldsList extends React.Component {
                 name={name}
                 type={val.type}
                 InputLabelProps={{
-                    shrink: true,
+                    shrink: isDate,
                 }}
                 onChange={attributeValuesChangeCallback}
             />);
@@ -109,32 +111,32 @@ class CategoryFieldsList extends React.Component {
                         label={"Asset Name"}
                         type={"text"}
                         InputLabelProps={{
-                            shrink: true,
+                            shrink: false,
                         }}
                         onChange={assetNameChangeCallback}
                         onBlur={validateAssertNameCallback}
                     />
                     {textFields}
                 </form>
-                <form className={classes.container} noValidate autoComplete="off">
-                    <TextField
-                        id="related-asset"
-                        select
-                        label="Related Asset"
-                        className={classes.textField}
-                        onChange={handleChange('currency')}
-                        SelectProps={{
-                            native: true,
-                            MenuProps: {
-                                className: classes.menu,
-                            },
-                        }}
-                        helperText="Please select related asset"
-                        margin="normal"
-                        variant="outlined"
-                    >
-                    </TextField>
-                </form>
+                {/*<form className={classes.container} noValidate autoComplete="off">*/}
+                {/*    <TextField*/}
+                {/*        id="related-asset"*/}
+                {/*        select*/}
+                {/*        label="Related Asset"*/}
+                {/*        className={classes.textField}*/}
+                {/*        onChange={handleChange('currency')}*/}
+                {/*        SelectProps={{*/}
+                {/*            native: true,*/}
+                {/*            MenuProps: {*/}
+                {/*                className: classes.menu,*/}
+                {/*            },*/}
+                {/*        }}*/}
+                {/*        helperText="Please select related asset"*/}
+                {/*        margin="normal"*/}
+                {/*        variant="outlined"*/}
+                {/*    >*/}
+                {/*    </TextField>*/}
+                {/*</form>*/}
             </div>
         );
     }

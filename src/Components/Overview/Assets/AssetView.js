@@ -93,7 +93,7 @@ class AssetView extends React.Component {
                 </ExpansionPanelDetails>
                 <Divider/>
                 <ExpansionPanelActions>
-                    <Button size="small" color="secondary" variant="contained">
+                    <Button size="small" color="secondary" variant="outlined">
                         Delete
                     </Button>
                 </ExpansionPanelActions>

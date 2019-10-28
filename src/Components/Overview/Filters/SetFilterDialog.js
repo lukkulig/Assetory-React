@@ -98,6 +98,12 @@ class SetFilterDialog extends React.Component {
         this.setState({filters: this.props.filters})
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.filters !== this.props.filters) {
+            this.setState({filters: this.props.filters})
+        }
+    }
+
     handleClickOpen = () => {
         this.setState({open: true});
     };
@@ -127,10 +133,8 @@ class SetFilterDialog extends React.Component {
     render() {
         const {classes, attribute} = this.props;
 
-        let collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
-        let attributeValues = attribute.values.sort((a, b) => {
-            return collator.compare(a.label, b.label);
-        });
+        console.log(attribute.values);
+
         return (
             <div>
                 <Fab className={classes.filterFab}
@@ -153,7 +157,7 @@ class SetFilterDialog extends React.Component {
                         <NoSsr>
                             <Select
                                 classes={classes}
-                                options={attributeValues}
+                                options={attribute.values}
                                 components={components}
                                 value={this.state.selectedFilters}
                                 maxMenuHeight={150}
