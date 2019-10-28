@@ -28,7 +28,7 @@ class Overview extends React.Component {
             api.endpoints.getAllCategories(),
             (response) => {
                 if (response.status !== 500) {
-                    let result = response.content.map(category => ({
+                    let result = response.map(category => ({
                         id: category.id,
                         name: category.name
                     }));
@@ -72,7 +72,7 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getAllAssets(),
             (response) => {
-                this.setState({filteredAssets: response.content});
+                this.setState({filteredAssets: response});
                 document.body.style.cursor = 'default';
             });
     };

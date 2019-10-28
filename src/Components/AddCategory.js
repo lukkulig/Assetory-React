@@ -22,15 +22,21 @@ const styles = ({
 
 class AddCategory extends React.Component {
     state = {
-        categories: [],
         attributes: [],
         newAttributeName: '',
         newAttributeType: 'text',
+        newAttributeRequired: false,
         supercategory: '',
         supercategoryAttributes: [],
         categoryName: '',
         categoryNameError: false,
         attributeNameError: false,
+        oldEditedAttributeName: '',
+        editedAttributeName: '',
+        editedAttributeType: 'text',
+        editedAttributeRequired: false,
+        editAttributeDialogOpen: false,
+        editedAttributeNameError: false,
     };
 
     componentDidMount() {
@@ -42,14 +48,14 @@ class AddCategory extends React.Component {
         api.fetch(
             api.endpoints.getAllCategories(),
             (response) => {
-                this.setState({categories: response.content});
-                this.setState({supercategory: this.state.categories.size === 0 ? undefined : this.state.categories.slice(-1)[0]},
+                this.props.mainCategoryChangeCallback(response);
+                this.setState({supercategory: this.props.categories.size === 0 ? undefined : this.props.categories.slice(-1)[0]},
                     () => {
                         if (this.state.supercategory !== undefined && this.state.supercategory !== null) {
                             api.fetch(
                                 api.endpoints.getCategoryAttributes(this.state.supercategory.id),
                                 (response) => {
-                                    this.setState({supercategoryAttributes: response.content})
+                                    this.setState({supercategoryAttributes: response})
                                 }
                             )
                         }
@@ -59,7 +65,7 @@ class AddCategory extends React.Component {
     }
 
     findCategory = (categoryId) => {
-        const foundCategory = this.state.categories.find(category => category.id === categoryId);
+        const foundCategory = this.props.categories.find(category => category.id === categoryId);
         return foundCategory === undefined ? null : foundCategory;
     };
 
@@ -78,17 +84,19 @@ class AddCategory extends React.Component {
     };
 
     handleCategoryNameChange = (event) => {
-        if (this.state.categories.map(category => category.name).includes(event.target.value) && this.state.categoryNameError === false) {
+        if (this.props.categories.map(category => category.name).includes(event.target.value) && this.state.categoryNameError === false) {
             this.setState({categoryNameError: true})
         } else if (this.state.categoryNameError === true) {
             this.setState({categoryNameError: false})
         }
-        this.setState({categoryName: event.target.value})
+        this.setState({categoryName: event.target.value});
     };
 
     handleAttributeNameChange = (event) => {
         let allAttributes = this.state.attributes;
-        allAttributes = allAttributes.concat(this.state.supercategoryAttributes);
+        if (this.state.supercategoryAttributes !== undefined) {
+            allAttributes = allAttributes.concat(this.state.supercategoryAttributes);
+        }
         if (allAttributes.map(attribute => attribute.name).includes(event.target.value) && this.state.attributeNameError === false) {
             this.setState({attributeNameError: true})
         } else if (this.state.attributeNameError === true) {
@@ -101,6 +109,10 @@ class AddCategory extends React.Component {
         this.setState({newAttributeType: event.target.value})
     };
 
+    handleAttributeRequiredChange = (event) => {
+        this.setState({newAttributeRequired: !this.state.newAttributeRequired})
+    };
+
     handleDeleteAttributeButton = (removedAttributeName) => {
         this.setState({attributes: this.state.attributes.filter(attribute => attribute.name !== removedAttributeName)})
     };
@@ -108,32 +120,89 @@ class AddCategory extends React.Component {
     handleSaveAttributeButton = () => {
         const attribute = {
             name: this.state.newAttributeName,
-            type: this.state.newAttributeType
+            type: this.state.newAttributeType,
+            required: this.state.newAttributeRequired,
         };
-        this.setState({attributes: this.state.attributes.concat([attribute])});
-        this.setState({newAttributeName: '', newAttributeType: 'text'})
+        this.setState({
+            attributes: this.state.attributes.concat([attribute]),
+            newAttributeName: '',
+            newAttributeType: 'text',
+            newAttributeRequired: false
+        });
+    };
+
+    handleEditedAttributeNameChange = (event) => {
+        let allAttributes = this.state.attributes;
+        if (this.state.supercategoryAttributes !== undefined) {
+            allAttributes = allAttributes.concat(this.state.supercategoryAttributes);
+        }
+        if (allAttributes.map(attribute => attribute.name).includes(event.target.value) && this.state.editedAttributeNameError === false) {
+            this.setState({editedAttributeNameError: true})
+        } else if (this.state.editedAttributeNameError === true) {
+            this.setState({editedAttributeNameError: false})
+        }
+        this.setState({editedAttributeName: event.target.value})
+    };
+
+    handleEditedAttributeTypeChange = (event) => {
+        this.setState({editedAttributeType: event.target.value})
+    };
+
+    handleEditedAttributeRequiredChange = (event) => {
+        this.setState({editedAttributeRequired: !this.state.editedAttributeRequired})
+    };
+
+    handleEditAttributeButton = (attributeName) => {
+        const foundAttribute = this.state.attributes.find(attribute => attribute.name === attributeName);
+        this.setState({
+            oldEditedAttributeName: foundAttribute.name,
+            editedAttributeName: foundAttribute.name,
+            editedAttributeType: foundAttribute.type,
+            editedAttributeRequired: foundAttribute.required,
+            editAttributeDialogOpen: true,
+        })
+    };
+
+    handleSaveEditedAttributeButton = () => {
+        let attribute = {
+            name: this.state.editedAttributeName,
+            type: this.state.editedAttributeType,
+            required: this.state.editedAttributeRequired,
+        };
+        let newAttributes = this.state.attributes.filter(a => a.name !== this.state.oldEditedAttributeName);
+        newAttributes = newAttributes.concat([attribute]);
+        this.setState({
+            attributes: newAttributes,
+            oldEditedAttributeName: '',
+            editedAttributeName: '',
+            editedAttributeType: 'text',
+            editedAttributeRequired: false,
+            editAttributeDialogOpen: false,
+            editedAttributeNameError: false,
+        });
     };
 
     handleAddCategoryButton = () => {
         const category = {
             additionalAttributes: this.state.attributes,
             name: this.state.categoryName,
-            parentCategoryId: this.state.supercategory.id
+            parentCategoryId: this.state.supercategory !== undefined ? this.state.supercategory.id : null
         };
         api.fetch(api.endpoints.addCategory(category),
             (category) => {
                 let supercategory = this.state.supercategory;
-                supercategory.subcategoryIds = supercategory.subcategoryIds.concat([category.id]);
-                api.fetch(api.endpoints.updateCategory(supercategory), () => null);
-                this.setState({
-                    attributes: [],
-                    newAttributeName: '',
-                    newAttributeType: 'text',
-                    supercategory: undefined,
-                    supercategoryAttributes: [],
-                    categoryName: '',
-
-                });
+                if (supercategory !== undefined) {
+                    supercategory.subcategoryIds = supercategory.subcategoryIds.concat([category.id]);
+                    api.fetch(api.endpoints.updateCategory(supercategory), () => null);
+                    this.setState({
+                        attributes: [],
+                        newAttributeName: '',
+                        newAttributeType: 'text',
+                        supercategory: undefined,
+                        supercategoryAttributes: [],
+                        categoryName: '',
+                    });
+                }
                 this.fetchAndSetCategories();
             });
     };
@@ -150,7 +219,7 @@ class AddCategory extends React.Component {
                             value={this.state.supercategory === undefined ? '' : this.state.supercategory.name}
                             onChange={this.handleSupercategoryChange}
                         >
-                            {this.state.categories.map(category => <MenuItem
+                            {this.props.categories.map(category => <MenuItem
                                 value={category.id}>{category.name}</MenuItem>)}
                         </Select>
                     </div>
@@ -172,11 +241,22 @@ class AddCategory extends React.Component {
                             supercategoryAttributes={this.state.supercategoryAttributes}
                             newAttributeName={this.state.newAttributeName}
                             newAttributeType={this.state.newAttributeType}
+                            newAttributeRequired={this.state.newAttributeRequired}
                             attributeNameChangeCallback={this.handleAttributeNameChange}
                             attributeTypeChangeCallback={this.handleAttributeTypeChange}
+                            attributeRequiredChangeCallback={this.handleAttributeRequiredChange}
                             saveAttributeCallback={this.handleSaveAttributeButton}
                             deleteAttributeCallback={this.handleDeleteAttributeButton}
                             attributeNameError={this.state.attributeNameError}
+                            editedAttributeName={this.state.editedAttributeName}
+                            editedAttributeType={this.state.editedAttributeType}
+                            editedAttributeRequired={this.state.newAttributeRequired}
+                            editedAttributeNameChangeCallback={this.handleEditedAttributeNameChange}
+                            editedAttributeTypeChangeCallback={this.handleEditedAttributeTypeChange}
+                            editedAttributeRequiredChangeCallback={this.handleEditedAttributeRequiredChange}
+                            saveEditedAttributeCallback={this.handleSaveEditedAttributeButton}
+                            editAttributeCallback={this.handleEditAttributeButton}
+                            editAttributeDialogOpen={this.state.editAttributeDialogOpen}
                         />
                     </div>
                     <div className={classes.content}>
@@ -196,6 +276,18 @@ class AddCategory extends React.Component {
 }
 
 AddCategory.propTypes = {
+    mainCategoryChangeCallback: PropTypes.func.isRequired,
+    categories: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        parentCategoryId: PropTypes.string.isRequired,
+        subCategoryId: PropTypes.arrayOf(PropTypes.string).isRequired,
+        additionalAttributes: PropTypes.arrayOf(PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            type: PropTypes.string.isRequired,
+            required: PropTypes.string.isRequired,
+        })).isRequired,
+    })).isRequired,
     classes: PropTypes.object.isRequired,
 };
 
