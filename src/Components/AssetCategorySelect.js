@@ -192,7 +192,7 @@ class AssetCategorySelect extends React.Component {
     };
 
     render() {
-        const {classes, categories} = this.props;
+        const {classes, selectedCategoryId, categories} = this.props;
 
         return (
             <div className={classes.root}>
@@ -201,7 +201,7 @@ class AssetCategorySelect extends React.Component {
                         classes={classes}
                         options={getSortedCategories(categories)}
                         components={components}
-                        selectedCategoryId={this.findCategory}
+                        selectedCategoryId={selectedCategoryId}
                         onChange={this.handleChange}
                         placeholder="Start typing category name..."
                         isClearable

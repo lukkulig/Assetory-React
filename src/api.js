@@ -58,6 +58,11 @@ export default {
             method: "GET"
         }),
 
+        getCategoryAttributesValues: (categoryId) => ({
+            path: url(`categories/${categoryId}/attributes/values`),
+            method: "GET"
+        }),
+
         getCategoryTrees: () => ({
             path: url(`categories/trees`),
             method: "GET"
@@ -69,9 +74,8 @@ export default {
         }),
 
         getAssetByName: (name) => ({
-            path: url(`assets/name`),
-            body: name,
-            method: "POST"
+            path: url(`assets/name/${name}`),
+            method: "GET"
         }),
 
         getFilteredAssets: (assetsFilter) => ({

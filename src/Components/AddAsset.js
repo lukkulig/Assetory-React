@@ -34,6 +34,7 @@ class AddAsset extends React.Component {
         categoryName: undefined,
         assetName: '',
         categoryAttributes: [],
+        categoryAttributesValues: {},
         attributesValues: {},
         isNotValidate: true,
         isAssetNameUnique: true,
@@ -44,6 +45,19 @@ class AddAsset extends React.Component {
         return {
             categoryId: searchParams.get('category') || undefined,
         };
+    }
+
+    cleanStateWithoutCategories() {
+        this.setState({
+            categoryId: undefined,
+            categoryName: undefined,
+            assetName: '',
+            categoryAttributes: [],
+            categoryAttributesValues: {},
+            attributesValues: {},
+            isNotValidate: true,
+            isAssetNameUnique: true,
+        });
     }
 
     fetchAndSetCategories() {
@@ -67,6 +81,9 @@ class AddAsset extends React.Component {
                     } else {
                         this.setState({isAssetNameUnique: true});
                     }
+                },
+                (error) => {
+                    console.log(error);
                 });
         } else {
             this.setState({isAssetNameUnique: true});
@@ -83,6 +100,16 @@ class AddAsset extends React.Component {
         }
     };
 
+    fetchAndSetValuesCategoryAttributes(selectedCategoryId) {
+        document.body.style.cursor = 'wait';
+        api.fetch(
+            api.endpoints.getCategoryAttributesValues(selectedCategoryId),
+            (response) => {
+                this.setState({categoryAttributesValues: response});
+                document.body.style.cursor = 'default';
+            });
+    }
+
     fetchAndSetCategoryAttributes(selectedCategoryId) {
         document.body.style.cursor = 'wait';
         api.fetch(
@@ -91,6 +118,7 @@ class AddAsset extends React.Component {
                 this.setState({categoryAttributes: response});
                 document.body.style.cursor = 'default';
             });
+        this.fetchAndSetValuesCategoryAttributes(selectedCategoryId);
     }
 
     addNewAttribute = (name, type, value) => {
@@ -119,13 +147,8 @@ class AddAsset extends React.Component {
         console.log(JSON.stringify(asset));
         api.fetch(
             api.endpoints.addAsset(asset), () => {
-                this.setState({
-                    categoryId: undefined,
-                    assetName: '',
-                    categoryAttributes: [],
-                    attributesValues: {},
-                    isNotValidate: true
-                })
+                this.cleanStateWithoutCategories();
+                this.forceUpdate();
             }
         );
     };
@@ -159,7 +182,7 @@ class AddAsset extends React.Component {
                 }
             });
         });
-        this.setState( {isNotValidate: !isValid});
+        this.setState({isNotValidate: !isValid});
     };
 
     componentDidMount() {
@@ -201,6 +224,7 @@ class AddAsset extends React.Component {
                     <CategoryFieldsList
                         category={this.getActiveCategory()}
                         categoryAttributes={this.state.categoryAttributes}
+                        categoryAttributesValues={this.state.categoryAttributesValues}
                         assetNameChangeCallback={this.handleAssetNameChange}
                         validateAssertNameCallback={this.validateAssertName}
                         attributeValuesChangeCallback={this.handleAttributeValuesChangeCallback}
