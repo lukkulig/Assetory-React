@@ -193,7 +193,11 @@ class AddCategory extends React.Component {
                 let supercategory = this.state.supercategory;
                 if (supercategory !== undefined) {
                     supercategory.subcategoryIds = supercategory.subcategoryIds.concat([category.id]);
-                    api.fetch(api.endpoints.updateCategory(supercategory), () => null);
+                    let categoryUpdate = {
+                        category: supercategory,
+                        attributeChanges: [],
+                    };
+                    api.fetch(api.endpoints.updateCategory(categoryUpdate), () => null);
                     this.setState({
                         attributes: [],
                         newAttributeName: '',
