@@ -133,8 +133,6 @@ class SetFilterDialog extends React.Component {
     render() {
         const {classes, attribute} = this.props;
 
-        console.log(attribute.values);
-
         return (
             <div>
                 <Fab className={classes.filterFab}
