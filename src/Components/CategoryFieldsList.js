@@ -93,7 +93,7 @@ class CategoryFieldsList extends React.Component {
                 name={name}
                 type={val.type}
                 InputLabelProps={{
-                    shrink: isDate,
+                    shrink: true,
                 }}
                 onChange={attributeValuesChangeCallback}
             />);
@@ -111,7 +111,7 @@ class CategoryFieldsList extends React.Component {
                         label={"Asset Name"}
                         type={"text"}
                         InputLabelProps={{
-                            shrink: false,
+                            shrink: true,
                         }}
                         onChange={assetNameChangeCallback}
                         onBlur={validateAssertNameCallback}
