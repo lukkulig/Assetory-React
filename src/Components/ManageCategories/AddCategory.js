@@ -104,6 +104,8 @@ class AddCategory extends React.Component {
                 id: category.category.id,
                 name: category.category.name,
                 subcategoryIds: category.category.subcategoryIds,
+                parentCategoryId: category.category.parentCategoryId,
+                additionalAttributes: category.category.additionalAttributes,
                 paddingLeft: paddingLeft
             });
             let subCategoriesIds = this.prepareCategories(category.subCategories, (paddingLeft + 20));
@@ -139,7 +141,7 @@ class AddCategory extends React.Component {
     handleCategoryNameChange = (event) => {
         if (this.state.categories.map(category => category.name).includes(event.target.value) && this.state.categoryNameError === false) {
             this.setState({categoryNameError: true})
-        } else if (!this.state.categories.map(category => category.name).includes(event.target.value) &&  this.state.categoryNameError === true) {
+        } else if (!this.state.categories.map(category => category.name).includes(event.target.value) && this.state.categoryNameError === true) {
             this.setState({categoryNameError: false})
         }
         this.setState({categoryName: event.target.value});
@@ -233,6 +235,10 @@ class AddCategory extends React.Component {
         });
     };
 
+    sleep = (milliseconds) => {
+        return new Promise(resolve => setTimeout(resolve, milliseconds))
+    };
+
     handleAddCategoryButton = () => {
         const category = {
             additionalAttributes: this.state.attributes,
@@ -240,29 +246,21 @@ class AddCategory extends React.Component {
             parentCategoryId: this.state.superCategory !== undefined ? this.state.superCategory.id : null
         };
         api.fetch(api.endpoints.addCategory(category),
-            (category) => {
-                let superCategory = this.state.superCategory;
-                if (superCategory !== undefined) {
-                    superCategory.subcategoryIds = superCategory.subcategoryIds.concat([category.id]);
-                    let categoryUpdate = {
-                        category: superCategory,
-                        attributeChanges: [],
-                    };
-                    api.fetch(api.endpoints.updateCategory(categoryUpdate), () => {
-                    });
-                    this.setState({
-                        attributes: [],
-                        newAttributeName: '',
-                        newAttributeType: 'text',
-                        categories: null,
-                        superCategory: null,
-                        superCategoryAttributes: null,
-                        categoryName: '',
-                    });
-                }
+            () => {
+                this.setState({
+                    attributes: [],
+                    newAttributeName: '',
+                    newAttributeType: 'text',
+                    categories: null,
+                    superCategory: null,
+                    superCategoryAttributes: null,
+                    categoryName: '',
+                });
+                this.sleep(1000).then(() => {
+                    this.fetchAndSetCategories()
+                        .then(() => this.fetchAndSetSuperCategoryAttributes());
+                })
             })
-            .then(() => this.fetchAndSetCategories())
-            .then(() => this.fetchAndSetSuperCategoryAttributes());
     };
 
     render() {
