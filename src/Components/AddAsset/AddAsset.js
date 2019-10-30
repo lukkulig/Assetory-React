@@ -1,7 +1,7 @@
 import React from "react";
 import * as PropTypes from "prop-types";
 import {Button, Typography, withStyles} from "@material-ui/core"
-import api from "../api";
+import api from "../../api";
 import AssetCategorySelect from "./AssetCategorySelect.js";
 import CategoryFieldsList from "./CategoryFieldsList.js"
 
