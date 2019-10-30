@@ -5,25 +5,22 @@ import Tabs from 'react-bootstrap/Tabs'
 import Tab from 'react-bootstrap/Tab'
 import AddCategory from './AddCategory'
 import EditCategory from './EditCategory';
-import api from "../api";
 
 const styles = theme => ({
     root: {},
     content: {
         textAlign: 'center',
-        padding: theme.spacing.unit * 3,
+        padding: theme.spacing(3),
     }
 });
 
 class ManageCategories extends React.Component {
     state = {
-        categories: [],
+        value: 0,
     };
 
-    setCategories = (categories) => {
-        this.setState({
-            categories: categories,
-        })
+    handleChange = (event) => {
+        this.setState({value: event});
     };
 
     render() {
@@ -31,18 +28,12 @@ class ManageCategories extends React.Component {
         return (
             <div className={classes.root}>
                 <div className={classes.content}>
-                    <Tabs defaultActiveKey="editCategory" id="categoryActions">
+                    <Tabs value={this.state.value} onSelect={this.handleChange} defaultActiveKey="addCategory" id="categoryActions" >
                         <Tab eventKey="addCategory" title="Add Category">
-                            <AddCategory
-                                mainCategoryChangeCallback={this.setCategories}
-                                categories={this.state.categories}
-                            />
+                            <AddCategory/>
                         </Tab>
                         <Tab eventKey="editCategory" title="Edit Category">
-                            <EditCategory
-                                mainCategoryChangeCallback={this.setCategories}
-                                categories={this.state.categories}
-                            />
+                            <EditCategory/>
                         </Tab>
                     </Tabs>
                 </div>

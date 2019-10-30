@@ -1,29 +1,32 @@
 import React from "react";
 import * as PropTypes from "prop-types";
 import {
-    withStyles,
+    Button,
+    Checkbox,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControlLabel,
     List,
     ListItem,
-    Paper,
-    Button,
-    TextField,
-    Select,
     MenuItem,
-    Checkbox,
-    FormControlLabel,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions
+    Paper,
+    Select,
+    TextField,
+    withStyles
 } from "@material-ui/core";
 
 const styles = ({
+    root: {},
+    content: {},
+    select: {},
     attributesListBox: {
         maxHeight: 280,
         overflow: 'auto',
     },
     textField: {
-        width: 720,
+        width: 400,
     },
     attributeContent: {
         float: 'left',
@@ -84,7 +87,7 @@ const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCal
                         onClick={saveAttributeCallback}
                         disabled={nameError}
                     >
-                        Save attribute
+                        Add attribute
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -143,9 +146,10 @@ class CategoryAttributes extends React.Component {
             saveAttribute: this.props.saveEditedAttributeCallback,
         };
         let i = 0;
+        // console.log(this.props.superCategoryAttributes);
         const attributesList = [];
-        if (this.props.supercategoryAttributes !== undefined) {
-            this.props.supercategoryAttributes.forEach((attribute) => {
+        if (this.props.superCategoryAttributes !== undefined) {
+            this.props.superCategoryAttributes.forEach((attribute) => {
                 attributesList.push(
                     <div key={i}>
                         {AttributeListItem(attribute.name, attribute.type, attribute.required, this.props.attributeRequiredChangeCallback, true, i.toString(), this.props.editAttributeCallback, editAttributeDialogProps)}
@@ -175,51 +179,52 @@ class CategoryAttributes extends React.Component {
 
         return (
             <div>
-                <div className={classes.attributeContent}>
-                    <TextField
-                        error={this.props.attributeNameError}
-                        className={classes.textField}
-                        label={"Additional attribute"}
-                        value={this.props.newAttributeName}
-                        onChange={this.props.attributeNameChangeCallback}
-                        variant="outlined"
-                        helperText={this.props.attributeNameError === true ? 'There is already attribute with that name in this category' : 'Attribute required for all assets in this category'}
-                    />
+                <div style={{float: 'left'}}>
+                    <div className={classes.attributeContent}>
+                        <TextField
+                            error={this.props.attributeNameError}
+                            className={classes.textField}
+                            label={"Additional attribute"}
+                            value={this.props.newAttributeName}
+                            onChange={this.props.attributeNameChangeCallback}
+                            helperText={this.props.attributeNameError === true ? 'There is already attribute with that name in this category' : 'Attribute for all assets in this category'}
+                        />
+                    </div>
+                    <div className={classes.attributeContent}>
+                        <Select
+                            className={classes.select}
+                            value={this.props.newAttributeType}
+                            onChange={this.props.attributeTypeChangeCallback}
+                        >
+                            <MenuItem value={"text"}>Text</MenuItem>
+                            <MenuItem value={"number"}>Number</MenuItem>
+                            <MenuItem value={"date"}>Date</MenuItem>
+                        </Select>
+                    </div>
+                    <div className={classes.attributeContent}>
+                        <FormControlLabel
+                            control={<Checkbox
+                                id={"new"}
+                                checked={this.props.newAttributeRequired}
+                                onChange={this.props.attributeRequiredChangeCallback}
+                                value="required"
+                                color="primary"/>}
+                            label="Required"
+                            labelPlacement="start"
+                        />
+                    </div>
+                    <div className={classes.attributeContent}>
+                        <Button variant="outlined"
+                                color="primary"
+                                className={classes.button}
+                                onClick={this.props.saveAttributeCallback}
+                                disabled={this.props.attributeNameError}
+                        >
+                            Save attribute
+                        </Button>
+                    </div>
                 </div>
-                <div className={classes.attributeContent}>
-                    <Select
-                        className={classes.select}
-                        value={this.props.newAttributeType}
-                        onChange={this.props.attributeTypeChangeCallback}
-                    >
-                        <MenuItem value={"text"}>Text</MenuItem>
-                        <MenuItem value={"number"}>Number</MenuItem>
-                        <MenuItem value={"date"}>Date</MenuItem>
-                    </Select>
-                </div>
-                <div className={classes.attributeContent}>
-                    <FormControlLabel
-                        control={<Checkbox
-                            id={"new"}
-                            checked={this.props.newAttributeRequired}
-                            onChange={this.props.attributeRequiredChangeCallback}
-                            value="required"
-                            color="primary"/>}
-                        label="Required"
-                        labelPlacement="start"
-                    />
-                </div>
-                <div className={classes.attributeContent}>
-                    <Button variant="outlined"
-                            color="primary"
-                            className={classes.button}
-                            onClick={this.props.saveAttributeCallback}
-                            disabled={this.props.attributeNameError}
-                    >
-                        Save attribute
-                    </Button>
-                </div>
-                <Paper className={classes.attributesListBox} style={{clear: "both"}}>
+                <Paper className={classes.attributesListBox} elevation={4} style={{clear: "both"}}>
                     <List component={"ul"}>
                         {attributesList}
                     </List>
@@ -234,12 +239,12 @@ CategoryAttributes.propTypes = {
     attributes: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired,
         type: PropTypes.string.isRequired,
-        required: PropTypes.string.isRequired,
+        required: PropTypes.bool.isRequired,
     })).isRequired,
-    supercategoryAttributes: PropTypes.arrayOf(PropTypes.shape({
+    superCategoryAttributes: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired,
         type: PropTypes.string.isRequired,
-        required: PropTypes.string.isRequired,
+        required: PropTypes.bool.isRequired,
     })).isRequired,
     newAttributeName: PropTypes.string.isRequired,
     newAttributeType: PropTypes.string.isRequired,
