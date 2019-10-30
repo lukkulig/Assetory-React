@@ -2,8 +2,8 @@ import React from 'react';
 import {Redirect, Route, Switch} from "react-router-dom";
 import AssetoryAppBar from './AssetoryAppBar';
 import Overview from './Overview/Overview';
-import ManageCategories from "./ManageCategories";
-import AddAsset from "./AddAsset";
+import ManageCategories from "./ManageCategories/ManageCategories";
+import AddAsset from "./AddAsset/AddAsset";
 
 const RootRouter = () => {
   return (
