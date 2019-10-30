@@ -121,7 +121,7 @@ class Overview extends React.Component {
         return (
             <div className={classes.content}>
                 <div className={classes.sideBarSection}>
-                    <Paper className={classes.paper} elevation={4}>
+                    <Paper className={classes.sideBarPaper} elevation={4}>
                         <div className={classes.categoryTreeSection}>
                             <CategoriesTree
                                 categories={this.state.categories !== null ? this.state.categories.map(c => ({
@@ -147,7 +147,7 @@ class Overview extends React.Component {
                     </Paper>
                 </div>
                 <div className={classes.assetsSection}>
-                    <Paper className={classes.paper} elevation={4}>
+                    <Paper className={classes.assetsPaper} elevation={4}>
                         <Assets
                             assets={this.state.filteredAssets}
                             allCategories={this.state.allCategories}

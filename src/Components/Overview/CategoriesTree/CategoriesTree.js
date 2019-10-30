@@ -11,6 +11,7 @@ import {BeatLoader} from "react-spinners";
 
 const styles = ({
     root: {
+        height: "100%",
         display: 'grid',
         gridTemplateRows: '40px 10px auto',
         gridTemplateAreas: `'header'
@@ -30,6 +31,8 @@ const styles = ({
     },
     treeSection: {
         gridArea: 'content',
+        overflow: 'auto',
+        scrollPaddingRight: 10,
         marginLeft: 10,
         marginRight: 10,
     },
