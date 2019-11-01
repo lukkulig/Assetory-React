@@ -102,33 +102,33 @@ class AssetView extends React.Component {
         this.state.attributes.forEach((attr, i) => {
             let {value, textColor} = AssetView.getAttributeValuesWithColor(attr);
             attributesEditable.push(
-                <div className={classes.inlineEdit}>
-                    <InlineEdit key={i}
-                                defaultValue={attr.value}
-                                label={attr.attribute.name}
-                                isRequired={attr.attribute.required}
-                                editView={fieldProps => (attr.attribute.type !== "date") ?
-                                    <Textfield {...fieldProps} className={classes.field} type={attr.attribute.type}
-                                               autoFocus/>
-                                    :
-                                    <DatePicker {...fieldProps} className={classes.field} locale={language} autoFocus/>
-                                }
-                                readView={() => (
-                                    <div className={classes.readViewContainer}
-                                         style={{color: textColor}}>
-                                        {value}
-                                    </div>
-                                )}
-                                onConfirm={value => {
-                                    console.log(value);
-                                    this.setState(prevState => ({
-                                        attributes: prevState.attributes.map(
-                                            el => el.attribute === attr.attribute ? {...el, value: value} : el
-                                        )
-                                    }))
-                                }}
-                                readViewFitContainerWidth
-                                keepEditViewOpenOnBlur
+                <div className={classes.inlineEdit} key={i}>
+                    <InlineEdit
+                        defaultValue={attr.value}
+                        label={attr.attribute.name}
+                        isRequired={attr.attribute.required}
+                        editView={fieldProps => (attr.attribute.type !== "date") ?
+                            <Textfield {...fieldProps} className={classes.field} type={attr.attribute.type}
+                                       autoFocus/>
+                            :
+                            <DatePicker {...fieldProps} className={classes.field} locale={language} autoFocus/>
+                        }
+                        readView={() => (
+                            <div className={classes.readViewContainer}
+                                 style={{color: textColor}}>
+                                {value}
+                            </div>
+                        )}
+                        onConfirm={value => {
+                            console.log(value);
+                            this.setState(prevState => ({
+                                attributes: prevState.attributes.map(
+                                    el => el.attribute === attr.attribute ? {...el, value: value} : el
+                                )
+                            }))
+                        }}
+                        readViewFitContainerWidth
+                        keepEditViewOpenOnBlur
                     />
                 </div>
             );
