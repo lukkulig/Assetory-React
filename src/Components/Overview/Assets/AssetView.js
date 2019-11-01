@@ -13,9 +13,7 @@ import ExpansionPanelActions from "@material-ui/core/ExpansionPanelActions";
 import InlineEdit from '@atlaskit/inline-edit';
 import Textfield from '@atlaskit/textfield';
 import {DatePicker} from '@atlaskit/datetime-picker';
-import styled from 'styled-components';
-import {fontSize, gridSize} from '@atlaskit/theme';
-
+import Paper from "@material-ui/core/Paper";
 
 const styles = ({
     title: {
@@ -28,20 +26,50 @@ const styles = ({
     grid: {
         float: "left",
     },
+    expansionPanelDetails: {
+        padding: '25px 50px',
+        display: 'grid',
+        gridTemplateColumns: '200px auto',
+        gridTemplateAreas: `'form rest'`,
+        gridColumnGap: 50
+    },
+    form: {
+        gridArea: 'form'
+    },
+    inlineEdit: {
+        paddingBottom: 10,
+    },
     field: {
         width: '200px'
+    },
+    readViewContainer: {
+        display: 'flex',
+        fontSize: '14px',
+        lineHeight: '1.5',
+        maxWidth: '100%',
+        minHeight: '40px',
+        padding: '8px 6px',
+        wordBreak: 'break-word',
+        boxSizing: 'border-box',
+        backgroundColor: 'transparent',
+        borderColor: 'whitesmoke',
+        borderRadius: '3px',
+        borderWidth: '2px',
+        borderStyle: 'solid',
+    },
+    rest: {
+        gridArea: 'rest',
+        backgroundColor: 'whitesmoke',
+        textAlign: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    expansionPanelActions: {
+        float: 'left',
+        paddingLeft: 20
     }
 });
-
-const ReadViewContainer = styled.div`
-  display: flex;
-  font-size: ${fontSize()}px;
-  line-height: ${(gridSize() * 2.5) / fontSize()};
-  max-width: 100%;
-  min-height: ${(gridSize() * 2.5) / fontSize()}em;
-  padding: ${gridSize()}px ${gridSize() - 2}px;
-  word-break: break-word;
-`;
 
 class AssetView extends React.Component {
 
@@ -54,41 +82,56 @@ class AssetView extends React.Component {
         this.setState({attributes: this.props.asset.attributes})
     }
 
+    static getAttributeValuesWithColor(attr) {
+        if (attr.value) {
+            if (attr.attribute.type !== "date") {
+                return {value: attr.value, textColor: 'default'};
+            } else {
+                return {value: new Date(attr.value).toLocaleDateString(), textColor: 'default'};
+            }
+        } else if (attr.attribute.required) {
+            return {value: 'Please fill in this field', textColor: 'red'};
+        }
+        return {value: '', textColor: 'default'};
+    }
+
     render() {
         const {classes, asset} = this.props;
-
-        let i = 0;
+        const language = navigator.language;
         const attributesEditable = [];
-        let pattern = /(\d{2})-(\d{2})-(\d{4})/;
-        this.state.attributes.forEach((attr) => {
-            if (attr.attribute.type === "date") {
-                console.log(attr.value);
-                console.log(attr.value.replace(pattern, '$3-$2-$1'));
-            }
+        this.state.attributes.forEach((attr, i) => {
+            let {value, textColor} = AssetView.getAttributeValuesWithColor(attr);
             attributesEditable.push(
-                <InlineEdit className={classes.field} key={i}
-                            defaultValue={(attr.attribute.type !== "date") ? attr.value : attr.value.replace(pattern, '$3-$2-$1')}
-                            label={attr.attribute.name}
-                            editView={fieldProps => (attr.attribute.type !== "date") ?
-                                <Textfield {...fieldProps} type={attr.attribute.type} autoFocus/>
-                                :
-                                <DatePicker {...fieldProps} autoFocus/>
-                            }
-                            readView={() => (
-                                <ReadViewContainer>
-                                    {((attr.attribute.type !== "date") ? attr.value : attr.value.replace(pattern, '$3-$2-$1')) || 'Click to enter value'}
-                                </ReadViewContainer>
-                            )}
-                            onConfirm={value => this.setState(prevState => ({
-                                attributes: prevState.attributes.map(
-                                    el => el.attribute === attr.attribute ? {...el, value: value} : el
-                                )
-                            }))}
-                            readViewFitContainerWidth
-                            keepEditViewOpenOnBlur
-                />
+                <div className={classes.inlineEdit}>
+                    <InlineEdit key={i}
+                                defaultValue={attr.value}
+                                label={attr.attribute.name}
+                                isRequired={attr.attribute.required}
+                                editView={fieldProps => (attr.attribute.type !== "date") ?
+                                    <Textfield {...fieldProps} className={classes.field} type={attr.attribute.type}
+                                               autoFocus/>
+                                    :
+                                    <DatePicker {...fieldProps} className={classes.field} locale={language} autoFocus/>
+                                }
+                                readView={() => (
+                                    <div className={classes.readViewContainer}
+                                         style={{color: textColor}}>
+                                        {value}
+                                    </div>
+                                )}
+                                onConfirm={value => {
+                                    console.log(value);
+                                    this.setState(prevState => ({
+                                        attributes: prevState.attributes.map(
+                                            el => el.attribute === attr.attribute ? {...el, value: value} : el
+                                        )
+                                    }))
+                                }}
+                                readViewFitContainerWidth
+                                keepEditViewOpenOnBlur
+                    />
+                </div>
             );
-            i++;
         });
 
         return (
@@ -106,14 +149,17 @@ class AssetView extends React.Component {
                     </Typography>
                 </ExpansionPanelSummary>
                 <Divider/>
-                <ExpansionPanelDetails>
-                    <List dense component={"ul"}>
+                <ExpansionPanelDetails className={classes.expansionPanelDetails}>
+                    <List className={classes.form} dense component={"ul"}>
                         {attributesEditable}
                     </List>
+                    <Paper className={classes.rest}>
+                        Tu mogłoby coś być, ale jeszcze nie ma :(
+                    </Paper>
                 </ExpansionPanelDetails>
                 <Divider/>
-                <ExpansionPanelActions>
-                    <Button size="small" color="secondary" variant="outlined">
+                <ExpansionPanelActions className={classes.expansionPanelActions}>
+                    <Button size="small" color="secondary" variant="contained">
                         Delete
                     </Button>
                 </ExpansionPanelActions>

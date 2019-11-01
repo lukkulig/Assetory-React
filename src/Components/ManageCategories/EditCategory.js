@@ -248,7 +248,6 @@ class EditCategory extends React.Component {
             category: category,
             attributeChanges: this.state.attributeChanges,
         };
-        console.log(categoryUpdate);
         api.fetch(api.endpoints.updateCategory(categoryUpdate),
             () => {
                 this.setState({

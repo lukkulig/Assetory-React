@@ -23,8 +23,7 @@
     "react-select": "^2.4.3",
     "react-simple-tree-menu": "^1.1.3",
     "react-spinners": "^0.6.1",
-    "reactstrap": "^8.0.0",
-    "styled-components": "^4.4.0"
+    "reactstrap": "^8.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
