@@ -6,7 +6,7 @@ import api from "../../api";
 import {BeatLoader} from "react-spinners";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
-import {sleep} from "./ManageCategories";
+import {sleep} from "../Overview/Overview";
 
 const styles = ({
     root: {},

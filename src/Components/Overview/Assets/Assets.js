@@ -53,7 +53,11 @@ const styles = ({
 class Assets extends React.Component {
 
     handleFiltersChange = () => {
-        this.props.overviewCallback();
+        this.props.overviewFiltersCallback();
+    };
+
+    handleAssetDelete = () => {
+        this.props.overviewAssetsCallback();
     };
 
     isLoading() {
@@ -76,10 +80,12 @@ class Assets extends React.Component {
                         <AssetView
                             key={i}
                             asset={({
+                                id: asset.id,
                                 name: asset.name,
                                 category: allCategories.find(c => c.id === asset.categoryId).name,
                                 attributes: asset.attributes
                             })}
+                            assetsCallback={this.handleAssetDelete}
                         />
                     )
                 });
@@ -139,7 +145,8 @@ Assets.propTypes = {
     allCategories: PropTypes.array,
     filters: PropTypes.object.isRequired,
     categoryAttributes: PropTypes.array,
-    overviewCallback: PropTypes.func,
+    overviewFiltersCallback: PropTypes.func,
+    overviewAssetsCallback: PropTypes.func,
 };
 
 export default withStyles(styles)(Assets)

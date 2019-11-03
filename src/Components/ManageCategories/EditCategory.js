@@ -19,7 +19,7 @@ import CategoryAttributes from "./CategoryAttributes"
 import api from "../../api";
 import InputLabel from "@material-ui/core/InputLabel";
 import {BeatLoader} from "react-spinners";
-import {sleep} from "./ManageCategories";
+import {sleep} from "../Overview/Overview";
 
 const styles = ({
     root: {},

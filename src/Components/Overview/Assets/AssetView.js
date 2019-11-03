@@ -8,12 +8,12 @@ import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import Divider from "@material-ui/core/Divider";
 import List from "@material-ui/core/List";
-import Button from "@material-ui/core/Button";
 import ExpansionPanelActions from "@material-ui/core/ExpansionPanelActions";
 import InlineEdit from '@atlaskit/inline-edit';
 import Textfield from '@atlaskit/textfield';
 import {DatePicker} from '@atlaskit/datetime-picker';
 import Paper from "@material-ui/core/Paper";
+import DeleteAssetDialog from "./DeleteAssetDialog";
 
 const styles = ({
     title: {
@@ -74,7 +74,6 @@ const styles = ({
 class AssetView extends React.Component {
 
     state = {
-        editValue: "2018-01-02",
         attributes: []
     };
 
@@ -94,6 +93,10 @@ class AssetView extends React.Component {
         }
         return {value: '', textColor: 'default'};
     }
+
+    handleAssetDelete = () => {
+        this.props.assetsCallback();
+    };
 
     render() {
         const {classes, asset} = this.props;
@@ -159,9 +162,11 @@ class AssetView extends React.Component {
                 </ExpansionPanelDetails>
                 <Divider/>
                 <ExpansionPanelActions className={classes.expansionPanelActions}>
-                    <Button size="small" color="secondary" variant="contained">
-                        Delete
-                    </Button>
+                    <DeleteAssetDialog
+                        assetId={asset.id}
+                        assetName={asset.name}
+                        assetViewCallback={this.handleAssetDelete}
+                    />
                 </ExpansionPanelActions>
             </ExpansionPanel>
         );
@@ -171,10 +176,12 @@ class AssetView extends React.Component {
 AssetView.propTypes = {
     classes: PropTypes.object.isRequired,
     asset: PropTypes.shape({
+        id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
         category: PropTypes.string.isRequired,
         attributes: PropTypes.array.isRequired,
     }).isRequired,
+    assetsCallback: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(AssetView)
