@@ -56,7 +56,7 @@ class AddCategory extends React.Component {
             .then(() => this.fetchAndSetSuperCategoryAttributes());
     }
 
-    componentWillUpdate(prevProps, prevState, snapshot) {
+    componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps !== this.props) {
             this.setState({
                 categories: null,
