@@ -370,11 +370,11 @@ class EditCategory extends React.Component {
                                         </form>
                                     </DialogContent>
                                     <DialogActions>
-                                        <Button color="secondary"
+                                        <Button color="default"
                                                 onClick={() => this.setState({deleteDialogOpen: false})}>
                                             Cancel
                                         </Button>
-                                        <Button onClick={this.handleDeleteConfirmButton} color="primary">
+                                        <Button onClick={this.handleDeleteConfirmButton} color="secondary">
                                             Delete
                                             category {this.state.category === undefined ? "" : this.state.category.name}
                                         </Button>

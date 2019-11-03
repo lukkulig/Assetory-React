@@ -91,10 +91,10 @@ class DeleteFilterDialog extends React.Component {
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.handleClose} color="primary">
+                        <Button onClick={this.handleClose} color="default">
                             Cancel
                         </Button>
-                        <Button onClick={this.deleteFilter} color="primary">
+                        <Button onClick={this.deleteFilter} color="secondary">
                             Delete filter
                         </Button>
                     </DialogActions>

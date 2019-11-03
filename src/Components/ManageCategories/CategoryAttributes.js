@@ -87,7 +87,7 @@ const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCal
                         onClick={saveAttributeCallback}
                         disabled={nameError}
                     >
-                        Add attribute
+                        Save attribute
                     </Button>
                 </DialogActions>
             </Dialog>
