@@ -14,6 +14,10 @@ const styles = theme => ({
     }
 });
 
+export function sleep(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
 class ManageCategories extends React.Component {
     state = {
         value: 0,

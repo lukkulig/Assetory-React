@@ -6,6 +6,7 @@ import api from "../../api";
 import {BeatLoader} from "react-spinners";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
+import {sleep} from "./ManageCategories";
 
 const styles = ({
     root: {},
@@ -235,10 +236,6 @@ class AddCategory extends React.Component {
         });
     };
 
-    sleep = (milliseconds) => {
-        return new Promise(resolve => setTimeout(resolve, milliseconds))
-    };
-
     handleAddCategoryButton = () => {
         const category = {
             additionalAttributes: this.state.attributes,
@@ -256,7 +253,7 @@ class AddCategory extends React.Component {
                     superCategoryAttributes: null,
                     categoryName: '',
                 });
-                this.sleep(1000).then(() => {
+                sleep(1000).then(() => {
                     this.fetchAndSetCategories()
                         .then(() => this.fetchAndSetSuperCategoryAttributes());
                 })
