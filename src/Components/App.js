@@ -3,7 +3,7 @@ import {Redirect, Route, Switch} from "react-router-dom";
 import AssetoryAppBar from './AssetoryAppBar';
 import Overview from './Overview/Overview';
 import ManageCategories from "./ManageCategories/ManageCategories";
-import AddAsset from "./AddAsset/AddAsset";
+import AddAssetNew from "./AddAsset/AddAssetNew";
 
 const RootRouter = () => {
   return (
@@ -24,7 +24,7 @@ const InnerRouter = (props) => {
           <Route exact strict path='/' component={RootRouter} />
           <Route exact strict path='/overview' component={Overview}/>
           <Route exact strict path='/manage-categories' component={ManageCategories}/>*/
-          <Route exact strict path='/add-asset' component={AddAsset}/>*/
+          <Route exact strict path='/add-asset' component={AddAssetNew}/>*/
           <Route exact strict path='*' render={() => "Page not found: 404"}/>
         </Switch>
       </div>
