@@ -56,8 +56,12 @@ class Assets extends React.Component {
         this.props.overviewFiltersCallback();
     };
 
+    handleUpdateAsset = (updatedAttribute) => {
+        this.props.overviewUpdateAssetCallback(updatedAttribute);
+    };
+
     handleDeleteAsset = () => {
-        this.props.overviewAssetsCallback();
+        this.props.overviewDeleteAssetCallback();
     };
 
     isLoading() {
@@ -85,7 +89,8 @@ class Assets extends React.Component {
                                 category: allCategories.find(c => c.id === asset.categoryId).name,
                                 attributes: asset.attributes
                             })}
-                            assetsCallback={this.handleDeleteAsset}
+                            assetsUpdateCallback={this.handleUpdateAsset}
+                            assetsDeleteCallback={this.handleDeleteAsset}
                         />
                     )
                 });
@@ -146,7 +151,8 @@ Assets.propTypes = {
     filters: PropTypes.object.isRequired,
     categoryAttributes: PropTypes.array,
     overviewFiltersCallback: PropTypes.func,
-    overviewAssetsCallback: PropTypes.func,
+    overviewUpdateAssetCallback: PropTypes.func,
+    overviewDeleteAssetCallback: PropTypes.func
 };
 
 export default withStyles(styles)(Assets)

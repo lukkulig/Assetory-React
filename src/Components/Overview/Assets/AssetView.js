@@ -109,13 +109,15 @@ class AssetView extends React.Component {
         }));
 
         api.fetch(
-            api.endpoints.updateAssetAttributes(attributesUpdate), () => {}
+            api.endpoints.updateAssetAttributes(attributesUpdate), () => {
+                this.props.assetsUpdateCallback(attributesUpdate.attributes);
+            }
         );
 
     };
 
     handleDeleteAsset = () => {
-        this.props.assetsCallback();
+        this.props.assetsDeleteCallback();
     };
 
     render() {
@@ -194,7 +196,8 @@ AssetView.propTypes = {
         category: PropTypes.string.isRequired,
         attributes: PropTypes.array.isRequired,
     }).isRequired,
-    assetsCallback: PropTypes.func.isRequired
+    assetsUpdateCallback: PropTypes.func.isRequired,
+    assetsDeleteCallback: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(AssetView)

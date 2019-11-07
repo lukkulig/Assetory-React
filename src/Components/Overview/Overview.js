@@ -8,6 +8,7 @@ import CategoriesTree from "./CategoriesTree/CategoriesTree";
 import Paper from "@material-ui/core/Paper";
 import Assets from "./Assets/Assets";
 import * as Constants from "../../Constants/Constants";
+import {CATEGORY_KEY, NAME_KEY} from "../../Constants/Constants";
 
 export function sleep(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
@@ -107,19 +108,69 @@ class Overview extends React.Component {
         this.fetchAndSetFilteredAssets();
     };
 
+    handleUpdateAsset = (updatedAttribute) => {
+        let attributeName = Object.keys(updatedAttribute)[0];
+        let newAttributeValue = {
+            id: updatedAttribute[attributeName],
+            label: updatedAttribute[attributeName]
+        };
+        this.setState({selectedCategoryAttributesValues: null});
+        sleep(1000).then(() => {
+            this.fetchAndSetCategoryAttributesValues().then(() => {
+                let filters = this.state.filters;
+                if (Object.keys(filters).length !== 0) {
+                    const filterAllowedValues = this.state.selectedCategoryAttributesValues[attributeName];
+
+                    const isNewValueInFiltersAlready = filters[attributeName].some((value) => {
+                            return JSON.stringify(value) === JSON.stringify(newAttributeValue)
+                        }
+                    );
+
+                    const isOldValueValid = !filters[attributeName].some((value) => {
+                            return !filterAllowedValues.includes(value.label)
+                        }
+                    );
+
+                    if (!isNewValueInFiltersAlready) {
+                        if (!isOldValueValid) {
+                            const valueToChange = filters[attributeName].find((value) =>
+                                !filterAllowedValues.includes(value.label)
+                            );
+                            const indexToChange = filters[attributeName].indexOf(valueToChange);
+                            filters[attributeName][indexToChange] = newAttributeValue
+                        } else {
+                            filters[attributeName].push(newAttributeValue)
+                        }
+                    } else {
+                        if (!isOldValueValid) {
+                            const valueToChange = filters[attributeName].find((value) =>
+                                !filterAllowedValues.includes(value.label)
+                            );
+                            const indexToChange = filters[attributeName].indexOf(valueToChange);
+                            filters[attributeName].splice(indexToChange, 1);
+                            if (filters[attributeName].length === 0) {
+                                delete filters[attributeName];
+                            }
+                        }
+                    }
+                }
+                this.setState({filters: filters});
+            });
+        });
+    };
+
     handleDeleteAsset = () => {
-        console.log("deleting asset");
         this.setState({filteredAssets: null, selectedCategoryAttributesValues: null});
         sleep(1000).then(() => {
             this.fetchAndSetCategoryAttributesValues().then(() => {
                 let filters = this.state.filters;
                 if (Object.keys(filters).length !== 0) {
-                    Object.keys(filters).filter(key => key !== "categoryId")
+                    Object.keys(filters).filter(key => key !== CATEGORY_KEY && key !== NAME_KEY)
                         .forEach(key => {
-                            let filter_values = this.state.selectedCategoryAttributesValues[key];
+                            let filterAllowedValues = this.state.selectedCategoryAttributesValues[key];
                             let valuesToDelete = Object.keys(filters[key])
                                 .filter((value) =>
-                                    !filter_values.includes(filters[key][value].label)
+                                    !filterAllowedValues.includes(filters[key][value].label)
                                 );
                             valuesToDelete.forEach(value => {
                                 filters[key].splice(value, 1);
@@ -186,7 +237,8 @@ class Overview extends React.Component {
                                 : null
                             }
                             overviewFiltersCallback={this.handleFiltersChange}
-                            overviewAssetsCallback={this.handleDeleteAsset}
+                            overviewUpdateAssetCallback={this.handleUpdateAsset}
+                            overviewDeleteAssetCallback={this.handleDeleteAsset}
                         />
                     </Paper>
                 </div>
