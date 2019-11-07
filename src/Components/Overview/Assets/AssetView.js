@@ -96,24 +96,20 @@ class AssetView extends React.Component {
     }
 
     handleUpdateAssetAttributes = (attr, value) => {
-        console.log(attr);
-        console.log(this.props.asset.id);
         let attributesUpdate = {
             id: this.props.asset.id,
             attributes: {}
         };
         attributesUpdate.attributes[attr.name] = value;
 
-        api.fetchDelete(
-            api.endpoints.updateAssetAttributes(attributesUpdate),(res) => {
-                if (res.ok) {
-                    this.setState(prevState => ({
-                        attributes: prevState.attributes.map(
-                            el => el.attribute === attr ? {...el, value: value} : el
-                        )
-                    }));
-                }
-            }
+        this.setState(prevState => ({
+            attributes: prevState.attributes.map(
+                el => el.attribute === attr ? {...el, value: value} : el
+            )
+        }));
+
+        api.fetch(
+            api.endpoints.updateAssetAttributes(attributesUpdate), () => {}
         );
 
     };
