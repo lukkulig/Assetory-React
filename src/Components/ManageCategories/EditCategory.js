@@ -45,6 +45,7 @@ class EditCategory extends React.Component {
         newAttributeName: '',
         newAttributeType: 'text',
         newAttributeRequired: false,
+        newAttributesNames: [],
         deleteDialogOpen: false,
         deleteWithContent: "without-content",
         attributeNameError: false,
@@ -137,6 +138,7 @@ class EditCategory extends React.Component {
             attributes: newCategory.additionalAttributes,
             newAttributeName: '',
             newAttributeType: 'text',
+            newAttributesNames: [],
             attributeChanges: {},
             category: newCategory
         }, () => {
@@ -171,6 +173,9 @@ class EditCategory extends React.Component {
     };
 
     handleDeleteAttributeButton = (removedAttributeName) => {
+        if (this.state.newAttributesNames.some(removedAttributeName)) {
+            this.setState({newAttributesNames: this.state.newAttributesNames.filter(attr => attr !== removedAttributeName)})
+        }
         this.setState({attributes: this.state.attributes.filter(attribute => attribute.name !== removedAttributeName)})
     };
 
@@ -182,6 +187,7 @@ class EditCategory extends React.Component {
         };
         this.setState({
             attributes: this.state.attributes.concat([attribute]),
+            newAttributesNames: this.state.newAttributesNames.concat([attribute.name]),
             newAttributeName: '',
             newAttributeType: 'text',
             newAttributeRequired: false,
@@ -226,11 +232,20 @@ class EditCategory extends React.Component {
         };
         let newMap = this.state.attributeChanges;
         newMap[this.state.oldEditedAttributeName] = this.state.editedAttributeName;
-        this.setState({
-            attributeChanges: newMap,
-        });
+        if (this.state.newAttributesNames.some(name => name === this.state.oldEditedAttributeName)) {
+            this.setState({
+                newAttributesNames: this.state.newAttributesNames
+                    .filter(name => name !== this.state.oldEditedAttributeName)
+                    .concat([attribute.name]),
+            })
+        } else {
+            this.setState({
+                attributeChanges: newMap,
+            });
+        }
+        let index = this.state.attributes.indexOf(this.state.oldEditedAttributeName);
         let newAttributes = this.state.attributes.filter(a => a.name !== this.state.oldEditedAttributeName);
-        newAttributes = newAttributes.concat([attribute]);
+        newAttributes.splice(index, 0, attribute);
         this.setState({
             attributes: newAttributes,
             oldEditedAttributeName: '',
@@ -256,6 +271,7 @@ class EditCategory extends React.Component {
                     newAttributeName: '',
                     newAttributeType: 'text',
                     newAttributeRequired: false,
+                    newAttributesNames: [],
                     attributeChanges: {},
                     categories: null,
                     category: null,
@@ -285,6 +301,7 @@ class EditCategory extends React.Component {
                     newAttributeName: '',
                     newAttributeType: 'text',
                     newAttributeRequired: false,
+                    newAttributesNames: [],
                     categories: null,
                     category: null,
                     superCategoryAttributes: null
@@ -301,6 +318,7 @@ class EditCategory extends React.Component {
                     newAttributeName: '',
                     newAttributeType: 'text',
                     newAttributeRequired: false,
+                    newAttributesNames: [],
                     categories: null,
                     category: null,
                     superCategoryAttributes: null
