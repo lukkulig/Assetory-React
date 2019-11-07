@@ -14,6 +14,7 @@ import Textfield from '@atlaskit/textfield';
 import {DatePicker} from '@atlaskit/datetime-picker';
 import Paper from "@material-ui/core/Paper";
 import DeleteAssetDialog from "./DeleteAssetDialog";
+import api from "../../../api";
 
 const styles = ({
     title: {
@@ -94,7 +95,30 @@ class AssetView extends React.Component {
         return {value: '', textColor: 'default'};
     }
 
-    handleAssetDelete = () => {
+    handleUpdateAssetAttributes = (attr, value) => {
+        console.log(attr);
+        console.log(this.props.asset.id);
+        let attributesUpdate = {
+            id: this.props.asset.id,
+            attributes: {}
+        };
+        attributesUpdate.attributes[attr.name] = value;
+
+        api.fetchDelete(
+            api.endpoints.updateAssetAttributes(attributesUpdate),(res) => {
+                if (res.ok) {
+                    this.setState(prevState => ({
+                        attributes: prevState.attributes.map(
+                            el => el.attribute === attr ? {...el, value: value} : el
+                        )
+                    }));
+                }
+            }
+        );
+
+    };
+
+    handleDeleteAsset = () => {
         this.props.assetsCallback();
     };
 
@@ -122,14 +146,7 @@ class AssetView extends React.Component {
                                 {value}
                             </div>
                         )}
-                        onConfirm={value => {
-                            console.log(value);
-                            this.setState(prevState => ({
-                                attributes: prevState.attributes.map(
-                                    el => el.attribute === attr.attribute ? {...el, value: value} : el
-                                )
-                            }))
-                        }}
+                        onConfirm={(value) => this.handleUpdateAssetAttributes(attr.attribute, value)}
                         readViewFitContainerWidth
                         keepEditViewOpenOnBlur
                     />
@@ -165,7 +182,7 @@ class AssetView extends React.Component {
                     <DeleteAssetDialog
                         assetId={asset.id}
                         assetName={asset.name}
-                        assetViewCallback={this.handleAssetDelete}
+                        assetViewCallback={this.handleDeleteAsset}
                     />
                 </ExpansionPanelActions>
             </ExpansionPanel>

@@ -56,7 +56,7 @@ class Assets extends React.Component {
         this.props.overviewFiltersCallback();
     };
 
-    handleAssetDelete = () => {
+    handleDeleteAsset = () => {
         this.props.overviewAssetsCallback();
     };
 
@@ -85,7 +85,7 @@ class Assets extends React.Component {
                                 category: allCategories.find(c => c.id === asset.categoryId).name,
                                 attributes: asset.attributes
                             })}
-                            assetsCallback={this.handleAssetDelete}
+                            assetsCallback={this.handleDeleteAsset}
                         />
                     )
                 });

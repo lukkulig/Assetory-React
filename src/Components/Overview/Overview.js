@@ -107,7 +107,7 @@ class Overview extends React.Component {
         this.fetchAndSetFilteredAssets();
     };
 
-    handleAssetDelete = () => {
+    handleDeleteAsset = () => {
         console.log("deleting asset");
         this.setState({filteredAssets: null, selectedCategoryAttributesValues: null});
         sleep(1000).then(() => {
@@ -186,7 +186,7 @@ class Overview extends React.Component {
                                 : null
                             }
                             overviewFiltersCallback={this.handleFiltersChange}
-                            overviewAssetsCallback={this.handleAssetDelete}
+                            overviewAssetsCallback={this.handleDeleteAsset}
                         />
                     </Paper>
                 </div>

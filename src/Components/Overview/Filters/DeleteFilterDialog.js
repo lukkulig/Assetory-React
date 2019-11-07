@@ -60,7 +60,7 @@ class DeleteFilterDialog extends React.Component {
     };
 
     render() {
-        const {classes, filterKey, filterLabel, attribute, filters} = this.props;
+        const {classes, filterKey, filterLabel, attribute} = this.props;
 
         let contentText;
         if (filterKey !== undefined) {
