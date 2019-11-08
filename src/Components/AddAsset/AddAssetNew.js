@@ -6,6 +6,10 @@ import {BeatLoader} from "react-spinners";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import CreatableSelect from "react-select/lib/Creatable";
+import SnackBarContent from "@material-ui/core/SnackBarContent"
+import SnackBar from "@material-ui/core/SnackBar"
+import IconButton from "@material-ui/core/IconButton"
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 
 const styles = ({
     root: {},
@@ -36,6 +40,8 @@ class AddAssetNew extends React.Component {
         assetNameError: false,
         assetNameEmpty: true,
         attributesError: true,
+        snackOpen: false,
+        snackMsg: '',
         options: []
     };
 
@@ -88,7 +94,7 @@ class AddAssetNew extends React.Component {
                 this.setState({selectedCategoryAttributes: response});
                 let attributes = {};
                 response.forEach((attribute) => {
-                    attributes[attribute.name] = undefined;
+                    attributes[attribute.name] = "";
                 });
                 this.setState({attributesValues: attributes});
                 document.body.style.cursor = 'default';
@@ -152,7 +158,6 @@ class AddAssetNew extends React.Component {
     };
 
     handleAssetNameChange = (event) => {
-        console.log(event.target.value === "");
         if (this.state.categoryAttributesValues.name.includes(event.target.value) && this.state.assetNameError === false) {
             this.setState({assetNameError: true})
         } else if (!this.state.categoryAttributesValues.name.includes(event.target.value) && this.state.assetNameError === true) {
@@ -160,6 +165,7 @@ class AddAssetNew extends React.Component {
         }
         this.setState({assetNameEmpty: event.target.value === ""});
         this.setState({assetName: event.target.value});
+        this.isValid();
     };
 
     sleep = (milliseconds) => {
@@ -181,7 +187,11 @@ class AddAssetNew extends React.Component {
     handleAddAssetButton = () => {
         const attributes = [];
         this.state.selectedCategoryAttributes.forEach((attribute) => {
-            attributes.push(this.addNewAttribute(attribute.name, attribute.type, attribute.required, this.state.attributesValues[attribute.name]))
+            attributes.push(this.addNewAttribute(
+                attribute.name,
+                attribute.type,
+                attribute.required,
+                (this.state.attributesValues[attribute.name] === "" || this.state.attributesValues[attribute.name] === undefined) ? "" : this.state.attributesValues[attribute.name]))
         });
         const relatedAssetsIds = [];
         const asset = {
@@ -191,19 +201,23 @@ class AddAssetNew extends React.Component {
             relatedAssetsIds: relatedAssetsIds,
         };
         api.fetch(api.endpoints.addAsset(asset),
-            () => {
+            (response) => {
                 this.setState({
                     categories: null,
                     selectedCategory: null,
                     selectedCategoryAttributes: null,
                     categoryAttributesValues: {},
                     assetName: '',
+                    assetNameError: false,
+                    assetNameEmpty: true,
+                    attributesError: true,
                 });
+                this.handleSnackbarOpen(response.name);
                 this.sleep(1000).then(() => {
                     this.fetchAndSetCategories()
                         .then(() => this.fetchAndSetSelectedCategoryAttributes());
                 })
-            })
+            });
     };
 
     prepareOptions = (attributes) => {
@@ -247,11 +261,21 @@ class AddAssetNew extends React.Component {
         this.isValid();
     };
 
+    handleSnackbarClose = () => {
+        this.setState({snackOpen: false});
+    };
+
+    handleSnackbarOpen = (name) => {
+        this.setState({snackOpen: true});
+        this.setState({snackMsg: "Asset " + name + " was created!"})
+    };
+
     isValid() {
         let validation = true;
         Object.keys(this.state.attributesValues).forEach(key => {
             if (this.state.attributesValues.hasOwnProperty(key)) {
-                if (this.state.attributesValues[key] === undefined || this.state.attributesValues[key] === "") {
+                if (this.state.selectedCategoryAttributes.find(attribute => attribute.name === key).required
+                    && (this.state.attributesValues[key] === undefined || this.state.attributesValues[key] === "")) {
                     validation = false;
                 }
             }
@@ -290,6 +314,9 @@ class AddAssetNew extends React.Component {
                                 className={classes.select}
                                 onChange={this.handleAttributeValuesChangeCallback}
                                 required={attribute.required}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
                             />
                         </div>
                     );
@@ -299,6 +326,22 @@ class AddAssetNew extends React.Component {
         }
         return (
             <div className={classes.root}>
+                <SnackBar open={this.state.snackOpen}
+                          anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+                          autoHideDuration={300000} onClose={this.handleSnackbarClose}>
+                    <SnackBarContent
+                        style={{backgroundColor: 'green'}}
+                        message={
+                            <span id="message-id">
+                            <CheckCircleIcon style={{padding:4}}/>
+                                {this.state.snackMsg}
+                                    </span>
+                        }
+                        action={[<IconButton key="close" aria-label="Close" color="inherit"
+                                             onClick={this.handleSnackbarClose}>
+                            x
+                        </IconButton>]}/>
+                </SnackBar>
                 {!this.isLoading() ? (
                     <form className={classes.content} noValidate>
                         <div className={classes.content}>
