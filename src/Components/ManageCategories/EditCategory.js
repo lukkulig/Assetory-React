@@ -173,7 +173,7 @@ class EditCategory extends React.Component {
     };
 
     handleDeleteAttributeButton = (removedAttributeName) => {
-        if (this.state.newAttributesNames.some(removedAttributeName)) {
+        if (this.state.newAttributesNames.some(name => name === removedAttributeName)) {
             this.setState({newAttributesNames: this.state.newAttributesNames.filter(attr => attr !== removedAttributeName)})
         }
         this.setState({attributes: this.state.attributes.filter(attribute => attribute.name !== removedAttributeName)})
@@ -243,7 +243,7 @@ class EditCategory extends React.Component {
                 attributeChanges: newMap,
             });
         }
-        let index = this.state.attributes.indexOf(this.state.oldEditedAttributeName);
+        let index = this.state.attributes.map(attribute => attribute.name).indexOf(this.state.oldEditedAttributeName);
         let newAttributes = this.state.attributes.filter(a => a.name !== this.state.oldEditedAttributeName);
         newAttributes.splice(index, 0, attribute);
         this.setState({

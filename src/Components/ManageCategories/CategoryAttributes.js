@@ -146,7 +146,6 @@ class CategoryAttributes extends React.Component {
             saveAttribute: this.props.saveEditedAttributeCallback,
         };
         let i = 0;
-        // console.log(this.props.superCategoryAttributes);
         const attributesList = [];
         if (this.props.superCategoryAttributes !== undefined) {
             this.props.superCategoryAttributes.forEach((attribute) => {
