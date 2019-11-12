@@ -31,6 +31,10 @@ export default {
             path: url(`categories`),
             method: "GET"
         }),
+        getAssetsByCategory: (categoryId) => ({
+            path: url(`assets/category/${categoryId}`),
+            method: "GET"
+        }),
         addAsset: (asset) => ({
             path: url(`assets`),
             method: "POST",
