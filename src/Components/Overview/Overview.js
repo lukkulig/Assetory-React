@@ -114,11 +114,10 @@ class Overview extends React.Component {
             id: updatedAttribute[attributeName],
             label: updatedAttribute[attributeName]
         };
-        this.setState({selectedCategoryAttributesValues: null});
         sleep(1000).then(() => {
             this.fetchAndSetCategoryAttributesValues().then(() => {
                 let filters = this.state.filters;
-                if (Object.keys(filters).length !== 0) {
+                if (Object.keys(filters).length !== 0 && filters[attributeName]) {
                     const filterAllowedValues = this.state.selectedCategoryAttributesValues[attributeName];
 
                     const isNewValueInFiltersAlready = filters[attributeName].some((value) => {
@@ -126,23 +125,13 @@ class Overview extends React.Component {
                         }
                     );
 
-                    const isOldValueValid = !filters[attributeName].some((value) => {
+                    const isOldValueInvalid = filters[attributeName].some((value) => {
                             return !filterAllowedValues.includes(value.label)
                         }
                     );
 
-                    if (!isNewValueInFiltersAlready) {
-                        if (!isOldValueValid) {
-                            const valueToChange = filters[attributeName].find((value) =>
-                                !filterAllowedValues.includes(value.label)
-                            );
-                            const indexToChange = filters[attributeName].indexOf(valueToChange);
-                            filters[attributeName][indexToChange] = newAttributeValue
-                        } else {
-                            filters[attributeName].push(newAttributeValue)
-                        }
-                    } else {
-                        if (!isOldValueValid) {
+                    if (isNewValueInFiltersAlready) {
+                        if (isOldValueInvalid) {
                             const valueToChange = filters[attributeName].find((value) =>
                                 !filterAllowedValues.includes(value.label)
                             );
@@ -152,6 +141,16 @@ class Overview extends React.Component {
                                 delete filters[attributeName];
                             }
                         }
+                    } else {
+                        if (isOldValueInvalid) {
+                            const valueToChange = filters[attributeName].find((value) =>
+                                !filterAllowedValues.includes(value.label)
+                            );
+                            const indexToChange = filters[attributeName].indexOf(valueToChange);
+                            filters[attributeName][indexToChange] = newAttributeValue
+                        } else {
+                            filters[attributeName].push(newAttributeValue)
+                        }
                     }
                 }
                 this.setState({filters: filters});
@@ -160,7 +159,7 @@ class Overview extends React.Component {
     };
 
     handleDeleteAsset = () => {
-        this.setState({filteredAssets: null, selectedCategoryAttributesValues: null});
+        this.setState({filteredAssets: null});
         sleep(1000).then(() => {
             this.fetchAndSetCategoryAttributesValues().then(() => {
                 let filters = this.state.filters;
