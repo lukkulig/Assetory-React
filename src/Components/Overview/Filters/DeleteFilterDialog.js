@@ -28,8 +28,7 @@ const styles = theme => ({
 class DeleteFilterDialog extends React.Component {
 
     state = {
-        open: false,
-        value: "",
+        open: false
     };
 
     handleClickOpen = () => {
@@ -61,7 +60,7 @@ class DeleteFilterDialog extends React.Component {
     };
 
     render() {
-        const {classes, filterKey, filterLabel, attribute, filters} = this.props;
+        const {classes, filterKey, filterLabel, attribute} = this.props;
 
         let contentText;
         if (filterKey !== undefined) {
@@ -74,7 +73,6 @@ class DeleteFilterDialog extends React.Component {
             <div>
                 <Fab className={classes.filterFab}
                      variant="extended"
-                     filters={filters}
                      onClick={this.handleClickOpen}>
                     {attribute.label}
                     <HighlightOffIcon fontSize='small' className={classes.icon}/>
@@ -91,10 +89,10 @@ class DeleteFilterDialog extends React.Component {
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.handleClose} color="primary">
+                        <Button onClick={this.handleClose} color="default">
                             Cancel
                         </Button>
-                        <Button onClick={this.deleteFilter} color="primary">
+                        <Button onClick={this.deleteFilter} color="secondary">
                             Delete filter
                         </Button>
                     </DialogActions>
@@ -111,7 +109,7 @@ DeleteFilterDialog.propTypes = {
     filterLabel: PropTypes.string.isRequired,
     attribute: PropTypes.object.isRequired,
     filters: PropTypes.object.isRequired,
-    activeFiltersCallback: PropTypes.func
+    activeFiltersCallback: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(DeleteFilterDialog);

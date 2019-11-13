@@ -8,6 +8,11 @@ import CategoriesTree from "./CategoriesTree/CategoriesTree";
 import Paper from "@material-ui/core/Paper";
 import Assets from "./Assets/Assets";
 import * as Constants from "../../Constants/Constants";
+import {CATEGORY_KEY, NAME_KEY} from "../../Constants/Constants";
+
+export function sleep(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
 
 class Overview extends React.Component {
 
@@ -27,12 +32,14 @@ class Overview extends React.Component {
         api.fetch(
             api.endpoints.getAllCategories(),
             (response) => {
-                let result = response.map(category => ({
-                    id: category.id,
-                    name: category.name
-                }));
-                this.setState({allCategories: result});
-                document.body.style.cursor = 'default';
+                if (response.status !== 500) {
+                    let result = response.map(category => ({
+                        id: category.id,
+                        name: category.name
+                    }));
+                    this.setState({allCategories: result});
+                    document.body.style.cursor = 'default';
+                }
             });
     };
 
@@ -41,34 +48,26 @@ class Overview extends React.Component {
         return api.fetch(
             api.endpoints.getCategoryTrees(),
             (response) => {
-                this.setState({categories: response});
-                document.body.style.cursor = 'default';
-                if (Array.isArray(response) && response.length) {
-                    let initialSelectedCategoryId = response[0].category.id;
-                    this.setState({
-                        selectedCategoryId: initialSelectedCategoryId,
-                        initialSelectedCategoryId: initialSelectedCategoryId
-                    });
+                if (response.status !== 500) {
+                    this.setState({categories: response});
+                    document.body.style.cursor = 'default';
+                    if (Array.isArray(response) && response.length) {
+                        let initialSelectedCategoryId = response[0].category.id;
+                        this.setState({
+                            selectedCategoryId: initialSelectedCategoryId,
+                            initialSelectedCategoryId: initialSelectedCategoryId
+                        });
+                    }
                 }
             });
     };
 
-    fetchAndSetCategoryAttributesValues() {
+    fetchAndSetCategoryAttributesValues = () => {
         document.body.style.cursor = 'wait';
-        api.fetch(
+        return api.fetch(
             api.endpoints.getCategoryAttributesValues(this.state.selectedCategoryId, true),
             (response) => {
                 this.setState({selectedCategoryAttributesValues: response});
-                document.body.style.cursor = 'default';
-            });
-    };
-
-    fetchAndSetAllAssets() {
-        document.body.style.cursor = 'wait';
-        api.fetch(
-            api.endpoints.getAllAssets(),
-            (response) => {
-                this.setState({filteredAssets: response});
                 document.body.style.cursor = 'default';
             });
     };
@@ -97,14 +96,93 @@ class Overview extends React.Component {
 
     componentDidMount() {
         this.fetchAndSetCategoryTrees()
-            .then(() => this.fetchAndSetCategoryAttributesValues());
-        this.fetchAndSetAllAssets();
+            .then(() => {
+                this.fetchAndSetCategoryAttributesValues();
+                this.fetchAndSetFilteredAssets();
+            });
         this.fetchAndSetAllCategories();
     }
 
     handleFiltersChange = () => {
         this.setState({filteredAssets: null});
-        this.fetchAndSetFilteredAssets(this.state.selectedCategoryId, this.state.filters);
+        this.fetchAndSetFilteredAssets();
+    };
+
+    handleUpdateAsset = (updatedAttribute) => {
+        let attributeName = Object.keys(updatedAttribute)[0];
+        let newAttributeValue = {
+            id: updatedAttribute[attributeName],
+            label: updatedAttribute[attributeName]
+        };
+        sleep(1000).then(() => {
+            this.fetchAndSetCategoryAttributesValues().then(() => {
+                let filters = this.state.filters;
+                if (Object.keys(filters).length !== 0 && filters[attributeName]) {
+                    const filterAllowedValues = this.state.selectedCategoryAttributesValues[attributeName];
+
+                    const isNewValueInFiltersAlready = filters[attributeName].some((value) => {
+                            return JSON.stringify(value) === JSON.stringify(newAttributeValue)
+                        }
+                    );
+
+                    const isOldValueInvalid = filters[attributeName].some((value) => {
+                            return !filterAllowedValues.includes(value.label)
+                        }
+                    );
+
+                    if (isNewValueInFiltersAlready) {
+                        if (isOldValueInvalid) {
+                            const valueToChange = filters[attributeName].find((value) =>
+                                !filterAllowedValues.includes(value.label)
+                            );
+                            const indexToChange = filters[attributeName].indexOf(valueToChange);
+                            filters[attributeName].splice(indexToChange, 1);
+                            if (filters[attributeName].length === 0) {
+                                delete filters[attributeName];
+                            }
+                        }
+                    } else {
+                        if (isOldValueInvalid) {
+                            const valueToChange = filters[attributeName].find((value) =>
+                                !filterAllowedValues.includes(value.label)
+                            );
+                            const indexToChange = filters[attributeName].indexOf(valueToChange);
+                            filters[attributeName][indexToChange] = newAttributeValue
+                        } else {
+                            filters[attributeName].push(newAttributeValue)
+                        }
+                    }
+                }
+                this.setState({filters: filters});
+            });
+        });
+    };
+
+    handleDeleteAsset = () => {
+        this.setState({filteredAssets: null});
+        sleep(1000).then(() => {
+            this.fetchAndSetCategoryAttributesValues().then(() => {
+                let filters = this.state.filters;
+                if (Object.keys(filters).length !== 0) {
+                    Object.keys(filters).filter(key => key !== CATEGORY_KEY && key !== NAME_KEY)
+                        .forEach(key => {
+                            let filterAllowedValues = this.state.selectedCategoryAttributesValues[key];
+                            let valuesToDelete = Object.keys(filters[key])
+                                .filter((value) =>
+                                    !filterAllowedValues.includes(filters[key][value].label)
+                                );
+                            valuesToDelete.forEach(value => {
+                                filters[key].splice(value, 1);
+                                if (filters[key].length === 0) {
+                                    delete filters[key];
+                                }
+                            });
+                        });
+                }
+                this.setState({filters: filters});
+            });
+            this.fetchAndSetFilteredAssets();
+        });
     };
 
     handleCategoryChange = (selectedCategoryId) => {
@@ -157,7 +235,9 @@ class Overview extends React.Component {
                                     .filter(attribute => attribute !== Constants.NAME_KEY)
                                 : null
                             }
-                            overviewCallback={this.handleFiltersChange}
+                            overviewFiltersCallback={this.handleFiltersChange}
+                            overviewUpdateAssetCallback={this.handleUpdateAsset}
+                            overviewDeleteAssetCallback={this.handleDeleteAsset}
                         />
                     </Paper>
                 </div>
