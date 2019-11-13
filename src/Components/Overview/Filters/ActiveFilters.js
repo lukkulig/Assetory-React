@@ -66,11 +66,10 @@ class ActiveFilters extends React.Component {
             }).forEach((key) => {
                 let filterLabel = ActiveFilters.getLabel(key);
                 filtersList.push(
-                    <Typography className={classes.text} key={i}>
+                    <Typography className={classes.text} key={i++}>
                         <b>{filterLabel}</b>:
                     </Typography>
                 );
-                i++;
                 Object.keys(filters[key]).forEach((attr_ind) => {
                     filtersList.push(
                         <DeleteFilterDialog
@@ -79,9 +78,8 @@ class ActiveFilters extends React.Component {
                             attribute={filters[key][attr_ind]}
                             filters={filters}
                             activeFiltersCallback={this.handleFiltersChange}
-                            key={i}
+                            key={i++}
                         />);
-                    i++;
                 })
             });
         }

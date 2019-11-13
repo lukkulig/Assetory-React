@@ -2,7 +2,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import {TextField} from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
+// import Typography from "@material-ui/core/Typography";
 
 const styles = ({
     root: {
@@ -15,57 +15,57 @@ const styles = ({
     },
 });
 
-function NoOptionsMessage(props) {
-    return (
-        <Typography
-            color="textSecondary"
-            className={props.selectProps.classes.noOptionsMessage}
-            {...props.innerProps}
-        >
-            {props.children}
-        </Typography>
-    );
-}
+// function NoOptionsMessage(props) {
+//     return (
+//         <Typography
+//             color="textSecondary"
+//             className={props.selectProps.classes.noOptionsMessage}
+//             {...props.innerProps}
+//         >
+//             {props.children}
+//         </Typography>
+//     );
+// }
 
-function Placeholder(props) {
-    return (
-        <Typography
-            color="textSecondary"
-            className={props.selectProps.classes.placeholder}
-            {...props.innerProps}
-        >
-            {props.children}
-        </Typography>
-    );
-}
+// function Placeholder(props) {
+//     return (
+//         <Typography
+//             color="textSecondary"
+//             className={props.selectProps.classes.placeholder}
+//             {...props.innerProps}
+//         >
+//             {props.children}
+//         </Typography>
+//     );
+// }
 
 
-const components = {
-    NoOptionsMessage,
-    Placeholder
-};
-
-const currencies = [
-    {
-        value: 'USD',
-        label: '$',
-    },
-    {
-        value: 'EUR',
-        label: '€',
-    },
-    {
-        value: 'BTC',
-        label: '฿',
-    },
-    {
-        value: 'JPY',
-        label: '¥',
-    },
-];
-
-const handleChange = name => event => {
-};
+// const components = {
+//     NoOptionsMessage,
+//     Placeholder
+// };
+//
+// const currencies = [
+//     {
+//         value: 'USD',
+//         label: '$',
+//     },
+//     {
+//         value: 'EUR',
+//         label: '€',
+//     },
+//     {
+//         value: 'BTC',
+//         label: '฿',
+//     },
+//     {
+//         value: 'JPY',
+//         label: '¥',
+//     },
+// ];
+//
+// const handleChange = name => event => {
+// };
 
 class CategoryFieldsList extends React.Component {
 
@@ -85,7 +85,7 @@ class CategoryFieldsList extends React.Component {
         console.log(aaa);
         this.props.categoryAttributes.forEach((val) => {
             const name = val.name;
-            const isDate = (val.type === 'date');
+            // const isDate = (val.type === 'date');
             textFields.push(<TextField
                 style={styles.textField}
                 label={name}

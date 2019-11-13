@@ -110,7 +110,7 @@ class Filters extends React.Component {
                         values: Array.from(new Set(categoryAttributesValues[categoryAttribute])).map(value => ({
                             id: value,
                             label: value
-                        })).filter((el) => !(filters[categoryAttribute.name] || []).map(filter => filter.id).includes(el.id))
+                        })).filter((el) => !(filters[categoryAttribute] || []).map(filter => filter.id).includes(el.id))
                     })
                 }
             });

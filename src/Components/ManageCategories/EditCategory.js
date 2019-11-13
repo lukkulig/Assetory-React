@@ -19,6 +19,7 @@ import CategoryAttributes from "./CategoryAttributes"
 import api from "../../api";
 import InputLabel from "@material-ui/core/InputLabel";
 import {BeatLoader} from "react-spinners";
+import {sleep} from "../Overview/Overview";
 
 const styles = ({
     root: {},
@@ -46,7 +47,7 @@ class EditCategory extends React.Component {
         newAttributeRequired: false,
         newAttributesNames: [],
         deleteDialogOpen: false,
-        deleteWithContent: false,
+        deleteWithContent: "without-content",
         attributeNameError: false,
         oldEditedAttributeName: '',
         editedAttributeName: '',
@@ -68,7 +69,7 @@ class EditCategory extends React.Component {
             .then(() => this.fetchAndSetSuperCategoryAttributes());
     }
 
-    componentWillUpdate(prevProps, prevState, snapshot) {
+    componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps !== this.props) {
             this.setState({
                 categories: null,
@@ -172,7 +173,7 @@ class EditCategory extends React.Component {
     };
 
     handleDeleteAttributeButton = (removedAttributeName) => {
-        if (this.state.newAttributesNames.some(removedAttributeName)) {
+        if (this.state.newAttributesNames.some(name => name === removedAttributeName)) {
             this.setState({newAttributesNames: this.state.newAttributesNames.filter(attr => attr !== removedAttributeName)})
         }
         this.setState({attributes: this.state.attributes.filter(attribute => attribute.name !== removedAttributeName)})
@@ -242,7 +243,7 @@ class EditCategory extends React.Component {
                 attributeChanges: newMap,
             });
         }
-        let index = this.state.attributes.indexOf(this.state.oldEditedAttributeName);
+        let index = this.state.attributes.map(attribute => attribute.name).indexOf(this.state.oldEditedAttributeName);
         let newAttributes = this.state.attributes.filter(a => a.name !== this.state.oldEditedAttributeName);
         newAttributes.splice(index, 0, attribute);
         this.setState({
@@ -263,7 +264,6 @@ class EditCategory extends React.Component {
             category: category,
             attributeChanges: this.state.attributeChanges,
         };
-        console.log(categoryUpdate);
         api.fetch(api.endpoints.updateCategory(categoryUpdate),
             () => {
                 this.setState({
@@ -287,15 +287,16 @@ class EditCategory extends React.Component {
     };
 
     handleDeleteOptionChange = (event) => {
-        this.setState({deleteWithContent: event.target.value === "with-content"});
+        console.log(event.target.value);
+        this.setState({deleteWithContent: event.target.value});
     };
 
     handleDeleteConfirmButton = () => {
-        if (this.state.deleteWithContent === true) {
+        if (this.state.deleteWithContent === "with-content") {
             api.fetchDelete(api.endpoints.deleteCategoryWithContent(this.state.category.id), () => {
                 this.setState({
                     deleteDialogOpen: false,
-                    deleteWithContent: false,
+                    deleteWithContent: "without-content",
                     attributes: [],
                     newAttributeName: '',
                     newAttributeType: 'text',
@@ -312,7 +313,7 @@ class EditCategory extends React.Component {
             api.fetchDelete(api.endpoints.deleteCategory(this.state.category.id), () => {
                 this.setState({
                     deleteDialogOpen: false,
-                    deleteWithContent: false,
+                    deleteWithContent: "without-content",
                     attributes: [],
                     newAttributeName: '',
                     newAttributeType: 'text',
@@ -323,8 +324,10 @@ class EditCategory extends React.Component {
                     superCategoryAttributes: null
 
                 });
-                this.fetchAndSetCategories()
-                    .then(() => this.fetchAndSetSuperCategoryAttributes());
+                sleep(1000).then(() => {
+                    this.fetchAndSetCategories()
+                        .then(() => this.fetchAndSetSuperCategoryAttributes());
+                });
             });
         }
     };
@@ -374,7 +377,7 @@ class EditCategory extends React.Component {
                                         </DialogContentText>
                                         <form className={classes.form} noValidate>
                                             <FormControl>
-                                                <RadioGroup name="delete-options"
+                                                <RadioGroup name="delete-options" value={this.state.deleteWithContent}
                                                             onChange={this.handleDeleteOptionChange}>
                                                     <FormControlLabel value="with-content" control={<Radio/>}
                                                                       label="Category with all its assets and subcategories"/>
@@ -385,13 +388,13 @@ class EditCategory extends React.Component {
                                         </form>
                                     </DialogContent>
                                     <DialogActions>
-                                        <Button onClick={this.handleDeleteConfirmButton} color="primary">
-                                            Delete
-                                            category {this.state.category === undefined ? "" : this.state.category.name}
-                                        </Button>
-                                        <Button color="secondary"
+                                        <Button color="default"
                                                 onClick={() => this.setState({deleteDialogOpen: false})}>
                                             Cancel
+                                        </Button>
+                                        <Button onClick={this.handleDeleteConfirmButton} color="secondary">
+                                            Delete
+                                            category {this.state.category === undefined ? "" : this.state.category.name}
                                         </Button>
                                     </DialogActions>
                                 </Dialog>
