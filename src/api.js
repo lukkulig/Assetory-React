@@ -81,8 +81,8 @@ export default {
                 "Content-Type": "application/json"
             }
         }),
-        getAssetByName: (name) => ({
-            path: url(`assets/name/${name}`),
+        getAssetsByCategory: (categoryId) => ({
+            path: url(`assets/category/${categoryId}`),
             method: "GET"
         }),
         addAsset: (asset) => ({
