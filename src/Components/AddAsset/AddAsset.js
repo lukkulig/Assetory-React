@@ -6,8 +6,8 @@ import {BeatLoader} from "react-spinners";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import CreatableSelect from "react-select/lib/Creatable";
-import SnackBarContent from "@material-ui/core/SnackBarContent"
-import SnackBar from "@material-ui/core/SnackBar"
+import SnackbarContent from "@material-ui/core/SnackbarContent"
+import Snackbar from "@material-ui/core/Snackbar"
 import IconButton from "@material-ui/core/IconButton"
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -430,10 +430,10 @@ class AddAsset extends React.Component {
         }
         return (
             <div className={classes.root}>
-                <SnackBar open={this.state.snackOpen}
+                <Snackbar open={this.state.snackOpen}
                           anchorOrigin={{vertical: 'top', horizontal: 'right'}}
                           autoHideDuration={10000} onClose={this.handleSnackbarClose}>
-                    <SnackBarContent
+                    <SnackbarContent
                         style={{backgroundColor: 'green'}}
                         message={
                             <span id="message-id">
@@ -445,7 +445,7 @@ class AddAsset extends React.Component {
                                              onClick={this.handleSnackbarClose}>
                             x
                         </IconButton>]}/>
-                </SnackBar>
+                </Snackbar>
                 {!this.isLoading() ? (
                     <form className={classes.content} noValidate>
                         <div className={classes.content}>
