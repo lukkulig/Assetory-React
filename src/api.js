@@ -31,19 +31,14 @@ export default {
             path: url(`categories`),
             method: "GET"
         }),
-        addAsset: (asset) => ({
-            path: url(`assets`),
-            method: "POST",
-            body: JSON.stringify(asset),
-            headers: {
-                "Content-Type": "application/json"
-            }
+        getCategoryTrees: () => ({
+            path: url(`categories/trees`),
+            method: "GET"
         }),
         getCategoryAttributes: (categoryId) => ({
             path: url(`categories/${categoryId}/attributes`),
             method: "GET"
         }),
-
         getCategoryAttributesValues: (categoryId, withSubcategories) => {
             let path = new URL(url(`categories/${categoryId}/attributes/values`));
             if (withSubcategories) {
@@ -54,31 +49,6 @@ export default {
                 method: "GET"
             }
         },
-
-        getCategoryTrees: () => ({
-            path: url(`categories/trees`),
-            method: "GET"
-        }),
-
-        getAllAssets: () => ({
-            path: url(`assets`),
-            method: "GET"
-        }),
-
-        getAssetByName: (name) => ({
-            path: url(`assets/name/${name}`),
-            method: "GET"
-        }),
-
-        getFilteredAssets: (assetsFilter) => ({
-            path: url(`assets/filter`),
-            method: "POST",
-            body: JSON.stringify(assetsFilter),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }),
-
         addCategory: (category) => ({
             path: url(`categories`),
             method: "POST",
@@ -87,7 +57,6 @@ export default {
                 "Content-Type": "application/json"
             }
         }),
-
         updateCategory: (category) => ({
             path: url(`categories`),
             method: "PUT",
@@ -96,15 +65,41 @@ export default {
                 "Content-Type": "application/json"
             }
         }),
-
         deleteCategory: (categoryId) => ({
             path: url(`categories/${categoryId}`),
             method: "DELETE"
         }),
-
         deleteCategoryWithContent: (categoryId) => ({
             path: url(`categories/${categoryId}/with-content`),
             method: "DELETE"
+        }),
+        getFilteredAssets: (assetsFilter) => ({
+            path: url(`assets/filter`),
+            method: "POST",
+            body: JSON.stringify(assetsFilter),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }),
+        getAssetsByCategory: (categoryId) => ({
+            path: url(`assets/category/${categoryId}`),
+            method: "GET"
+        }),
+        addAsset: (asset) => ({
+            path: url(`assets`),
+            method: "POST",
+            body: JSON.stringify(asset),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }),
+        updateAssetAttributes: (attributesUpdate) => ({
+            path: url(`assets/attributes`),
+            method: "PUT",
+            body: JSON.stringify(attributesUpdate),
+            headers: {
+                "Content-Type": "application/json"
+            }
         }),
         deleteAsset: (assetId) => ({
             path: url(`assets/${assetId}`),
