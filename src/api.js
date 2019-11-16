@@ -104,6 +104,22 @@ export default {
         deleteAsset: (assetId) => ({
             path: url(`assets/${assetId}`),
             method: "DELETE"
-        })
+        }),
+        getReportByComputerIdAndDate: (computerId, date) => ({
+            path: url(`info/${computerId}/${date}`),
+            method: "GET",
+        }),
+        getRegisteredComputers: () => ({
+            path: url(`info/registered/identifiers`),
+            method: "GET",
+        }),
+        registerComputer: (assetId, computerIdentifier) => ({
+            path: url(`assets/${assetId}/register/computer`),
+            method: "PUT",
+            body: JSON.stringify(computerIdentifier),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }),
     }
 }
