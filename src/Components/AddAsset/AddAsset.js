@@ -6,20 +6,23 @@ import {BeatLoader} from "react-spinners";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import CreatableSelect from "react-select/lib/Creatable";
-import SnackBarContent from "@material-ui/core/SnackBarContent"
-import SnackBar from "@material-ui/core/SnackBar"
+import SnackbarContent from "@material-ui/core/SnackbarContent"
+import Snackbar from "@material-ui/core/Snackbar"
 import IconButton from "@material-ui/core/IconButton"
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import DeleteIcon from '@material-ui/icons/Delete';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Input from "@material-ui/core/Input";
 import Chip from "@material-ui/core/Chip";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
 import ListItem from "@material-ui/core/ListItem";
 import Grid from "@material-ui/core/Grid";
 import List from "@material-ui/core/List";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText";
+import Card from "@material-ui/core/Card";
+import CardHeader from "@material-ui/core/CardHeader";
+import CardContent from "@material-ui/core/CardContent";
+import Collapse from "@material-ui/core/Collapse";
 
 const styles = ({
     root: {
@@ -35,12 +38,23 @@ const styles = ({
         marginRight: 10,
     },
     textField: {
-        width: 400,
+        textAlign: 'left',
+        paddingLeft: 10,
+        width: 500,
+    },
+    card: {
+        width: 600
     },
     select: {
         textAlign: 'left',
         paddingLeft: 10,
-        width: 400,
+        width: 500,
+        fontWeight: 1000
+    },
+    creatableSelect: {
+        textAlign: 'left',
+        paddingLeft: 10,
+        width: 500,
     },
     selectAssets: {
         textAlign: 'left',
@@ -56,10 +70,10 @@ const styles = ({
     chips: {
         display: 'flex',
         flexWrap: 'wrap',
-        maxWidth: 300,
     },
     chip: {
         margin: 2,
+        minWidth: 200
     },
     contentWithButton: {
         maxWidth: 400,
@@ -76,6 +90,9 @@ const styles = ({
         margin: 2,
         paddingBottom: 10,
         width: 250,
+    },
+    formControl: {
+        padding: 20
     }
 });
 
@@ -92,12 +109,16 @@ class AddAsset extends React.Component {
         attributesError: true,
         snackOpen: false,
         snackMsg: '',
-        selectedCategoryRelated: '',
+        selectedCategoryRelated: {
+            id: '',
+            name: '',
+        },
         selectedCategoryRelatedAssets: [],
         isSelected: false,
         selectedAssets: [],
         relatedAssets: [],
-        options: []
+        options: [],
+        expanded: false
     };
 
     isLoading() {
@@ -109,10 +130,9 @@ class AddAsset extends React.Component {
     componentDidMount() {
         this.fetchAndSetCategories()
             .then(() => this.fetchAndSetSelectedCategoryAttributes());
-            // .then(() => this.setState({selectedCategoryRelated: this.state.selectedCategory}));
     }
 
-    componentWillUpdate(prevProps, prevState, snapshot) {
+    componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps !== this.props) {
             this.setState({
                 categories: null,
@@ -228,6 +248,7 @@ class AddAsset extends React.Component {
             } else {
                 this.setState({isSelected: false})
             }
+            this.setState({selectedAssets: []})
         });
     };
 
@@ -288,6 +309,7 @@ class AddAsset extends React.Component {
                     attributesError: true,
                     relatedAssets: [],
                     isSelected: false,
+                    expanded: false
                 });
                 this.handleSnackbarOpen(response.name);
                 this.sleep(1000).then(() => {
@@ -378,13 +400,31 @@ class AddAsset extends React.Component {
 
     handleSaveAttributes = () => {
         let related = this.state.relatedAssets;
-        related = [...new Set(related.concat(this.state.selectedAssets))];
+        let selected = [];
+        this.state.selectedAssets.forEach(asset => {
+                let duplicated = false;
+                this.state.relatedAssets.forEach(selected => {
+                    if (JSON.stringify(selected) === JSON.stringify(asset))
+                        duplicated = true;
+                });
+                if (!duplicated)
+                    selected.push(asset);
+            }
+        );
+        related = [...new Set(related.concat(selected))];
         this.setState({
-            selectedCategoryRelated: '',
             relatedAssets: related,
+            selectedCategoryRelated: {
+                id: '',
+                name: '',
+            },
             selectedAssets: [],
             isSelected: false
         });
+    };
+
+    handleExpandClick = () => {
+        this.setState({expanded: !this.state.expanded})
     };
 
     render() {
@@ -397,9 +437,10 @@ class AddAsset extends React.Component {
                     attributesList.push(
                         <div className={classes.content} key={i}>
                             <CreatableSelect
+                                formatCreateLabel={(inputValue) => `Add ${attribute.name} ${inputValue}`}
                                 id={attribute.name}
                                 name={attribute.name}
-                                className={classes.select}
+                                className={classes.creatableSelect}
                                 isClearable
                                 placeholder={"Select " + attribute.name}
                                 onChange={(newValue, action) => this.handleAttributeValuesChangeTextCallback(newValue, action, attribute.name)}
@@ -415,7 +456,7 @@ class AddAsset extends React.Component {
                                 name={attribute.name}
                                 type={attribute.type}
                                 label={attribute.name}
-                                className={classes.select}
+                                className={classes.textField}
                                 onChange={this.handleAttributeValuesChangeCallback}
                                 required={attribute.required}
                                 InputLabelProps={{
@@ -430,10 +471,10 @@ class AddAsset extends React.Component {
         }
         return (
             <div className={classes.root}>
-                <SnackBar open={this.state.snackOpen}
+                <Snackbar open={this.state.snackOpen}
                           anchorOrigin={{vertical: 'top', horizontal: 'right'}}
                           autoHideDuration={10000} onClose={this.handleSnackbarClose}>
-                    <SnackBarContent
+                    <SnackbarContent
                         style={{backgroundColor: 'green'}}
                         message={
                             <span id="message-id">
@@ -445,27 +486,26 @@ class AddAsset extends React.Component {
                                              onClick={this.handleSnackbarClose}>
                             x
                         </IconButton>]}/>
-                </SnackBar>
+                </Snackbar>
                 {!this.isLoading() ? (
                     <form className={classes.content} noValidate>
                         <div className={classes.content}>
-                            <FormControl>
-                                <InputLabel id="selected-category-select-label">Category</InputLabel>
-                                <Select className={classes.select}
-                                        id="selected-category-select"
-                                        labelId="selected-category-select-label"
-                                        value={this.state.selectedCategory.id}
-                                        onChange={this.handleSelectedCategoryChange}
-                                >
-                                    {this.state.categories.map(category =>
-                                        <MenuItem style={{paddingLeft: category.paddingLeft}}
-                                                  key={category.id}
-                                                  value={category.id}>
-                                            {category.name}
-                                        </MenuItem>
-                                    )}
-                                </Select>
-                            </FormControl>
+                            <InputLabel id="selected-category-select-label">Category</InputLabel>
+                            <Select className={classes.select}
+                                    id="selected-category-select"
+                                    labelId="selected-category-select-label"
+                                    value={this.state.selectedCategory.id}
+                                    onChange={this.handleSelectedCategoryChange}
+                                    disableUnderline
+                            >
+                                {this.state.categories.map(category =>
+                                    <MenuItem style={{paddingLeft: category.paddingLeft}}
+                                              key={category.id}
+                                              value={category.id}>
+                                        {category.name}
+                                    </MenuItem>
+                                )}
+                            </Select>
                         </div>
                         <div className={classes.content}>
                             <TextField
@@ -479,94 +519,108 @@ class AddAsset extends React.Component {
                             />
                         </div>
                         {attributesList}
-                        <div className={classes.content}>
-                            <FormControl>
-                                <InputLabel id="selected-category-select-label1">Category</InputLabel>
-                                <Select className={classes.selectCategory}
-                                        id="selected-category-select1"
-                                        labelId="selected-category-select-label1"
-                                        value={this.state.selectedCategoryRelated.id}
-                                        onChange={this.handleSelectedCategoryRelatedAssetChange}
-                                        disableUnderline
-                                >
-                                    {this.state.categories.map(category =>
-                                        <MenuItem style={{paddingLeft: category.paddingLeft}}
-                                                  key={category.id}
-                                                  value={category.id}>
-                                            {category.name}
-                                        </MenuItem>
-                                    )}
-                                </Select>
-                            </FormControl>
-                            {this.state.isSelected && (
+                        <Card className={classes.card}>
+                            <CardHeader subheader="Related assets"
+                                        action={
+                                            <IconButton
+                                                onClick={this.handleExpandClick}
+                                                aria-label="show more"
+                                            >
+                                                <ExpandMoreIcon/>
+                                            </IconButton>
+                                        }
+                            />
+                            <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
+                                <CardContent>
+                                    <div className={classes.content}>
+                                        <FormControl>
+                                            <InputLabel id="selected-category-select-label1">Category</InputLabel>
+                                            <Select className={classes.selectCategory}
+                                                    id="selected-category-select1"
+                                                    labelId="selected-category-select-label1"
+                                                    value={this.state.selectedCategoryRelated.id}
+                                                    onChange={this.handleSelectedCategoryRelatedAssetChange}
+                                                // disableUnderline
+                                            >
+                                                {this.state.categories.map(category =>
+                                                    <MenuItem style={{paddingLeft: category.paddingLeft}}
+                                                              key={category.id}
+                                                              value={category.id}>
+                                                        {category.name}
+                                                    </MenuItem>
+                                                )}
+                                            </Select>
+                                        </FormControl>
+                                        {this.state.isSelected && (
 
-                                <FormControl style={{alignItems: 'center'}}>
-                                    <InputLabel id="selected-asset-select-label">Assets</InputLabel>
-                                    <Select className={classes.selectAssets}
-                                            multiple
-                                            id="selected-asset-select"
-                                            labelId="selected-asset-select-label"
-                                            value={this.state.selectedAssets}
-                                            onChange={this.handleSelectedAssetsChange}
-                                            disableUnderline
-                                            input={<Input id="select-multiple-chip"/>}
-                                            renderValue={selected => (
-                                                <div className={classes.chips}>
-                                                    {selected.map(value => (
-                                                        <Chip key={value.name} label={value.name}
-                                                              className={classes.chip}
-                                                              onDelete={() => this.handleDeleteChip(value.name)}/>
-                                                    ))}
-                                                </div>
-                                            )}
-                                    >
-                                        {this.state.selectedCategoryRelatedAssets.map(asset =>
-                                            <MenuItem
-                                                key={asset.id}
-                                                value={asset}>
-                                                {asset.name}
-                                            </MenuItem>
-                                        )}
-                                    </Select>
-                                </FormControl>)}
-                        </div>
-                        <div className={classes.contentWithButton}>
-                            {this.state.isSelected &&
-                            <Button variant="contained"
-                                    color="primary"
-                                    className={classes.addRelatedAssetButton}
-                                    onClick={this.handleSaveAttributes}
-                                    disabled={this.state.selectedAssets.length === 0}
-                            >
-                                Save selected assets
-                            </Button>
-                            }
-                        </div>
-                        {this.state.relatedAssets.length !== 0 &&
-                        <Paper className={classes.content}>
-                            <Grid item xs={12} md={10}>
-                                <Typography variant="h5" className={classes.title}>
-                                    Related Assets
-                                </Typography>
-                                <div className={classes.content}>
-                                    <List dense={true}>
-                                        {this.state.relatedAssets.map(value => (
-                                            <ListItem>
-                                                <ListItemText
-                                                    primary={value.name}
-                                                />
-                                                <ListItemSecondaryAction>
-                                                    <IconButton edge="end" aria-label="delete"
-                                                                onClick={() => this.handleDeleteRelatedAssets(value.name)}>
-                                                        <DeleteIcon/>
-                                                    </IconButton>
-                                                </ListItemSecondaryAction>
-                                            </ListItem>))}
-                                    </List>
-                                </div>
-                            </Grid>
-                        </Paper>
-                        }
+                                            <FormControl className={classes.formControl}>
+                                                <InputLabel style={{paddingLeft: 30}}
+                                                            id="selected-asset-select-label">Assets</InputLabel>
+                                                <Select className={classes.selectAssets}
+                                                        multiple
+                                                        id="selected-asset-select"
+                                                        labelId="selected-asset-select-label"
+                                                        value={this.state.selectedAssets}
+                                                        onChange={this.handleSelectedAssetsChange}
+                                                        disableUnderline
+                                                        input={<Input id="select-multiple-chip"/>}
+                                                        renderValue={selected => (
+                                                            <div className={classes.chips}>
+                                                                {selected.map(value => (
+                                                                    <Chip key={value.name} label={value.name}
+                                                                          className={classes.chip}
+                                                                          color="primary"
+                                                                          onDelete={() => this.handleDeleteChip(value.name)}/>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                >
+                                                    {this.state.selectedCategoryRelatedAssets.map(asset =>
+                                                        <MenuItem
+                                                            key={asset.id}
+                                                            value={asset}>
+                                                            {asset.name}
+                                                        </MenuItem>
+                                                    )}
+                                                </Select>
+                                            </FormControl>)}
+                                    </div>
+                                    <div className={classes.contentWithButton}>
+                                        {this.state.isSelected &&
+                                        <Button variant="contained"
+                                                color="primary"
+                                                className={classes.addRelatedAssetButton}
+                                                onClick={this.handleSaveAttributes}
+                                                disabled={this.state.selectedAssets.length === 0}
+                                        >
+                                            Save selected assets
+                                        </Button>
+                                        }
+                                    </div>
+                                    {this.state.relatedAssets.length !== 0 &&
+                                    <Grid item xs={12} md={10}>
+                                        <div className={classes.content}>
+                                            <List dense={true}>
+                                                {this.state.relatedAssets.map(value => (
+                                                    <ListItem key={value.id}>
+                                                        <ListItemText
+                                                            primary={value.name}
+                                                        />
+                                                        <ListItemSecondaryAction>
+                                                            <IconButton edge="end" aria-label="delete"
+                                                                        onClick={() => this.handleDeleteRelatedAssets(value.name)}>
+                                                                <DeleteIcon/>
+                                                            </IconButton>
+                                                        </ListItemSecondaryAction>
+                                                    </ListItem>))}
+                                            </List>
+                                        </div>
+                                    </Grid>
+                                    }
+                                </CardContent>
+                            </Collapse>
+                        </Card>
+
                         < div className={classes.contentWithButton}>
                             < Button variant="contained"
                                      color="primary"
