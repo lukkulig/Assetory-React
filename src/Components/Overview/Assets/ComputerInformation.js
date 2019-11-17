@@ -8,14 +8,13 @@ import {
     FormControl,
     FormControlLabel,
     Radio,
-    RadioGroup,
+    RadioGroup, TextField,
     withStyles
 } from "@material-ui/core";
-import styles from "../Overview.styles";
 import React from 'react';
 import api from "../../../api";
+import styles from "../Overview.styles";
 import TreeMenu from 'react-simple-tree-menu';
-
 
 class ComputerInformation extends React.Component {
 
@@ -78,7 +77,15 @@ class ComputerInformation extends React.Component {
         return records.map(record => {
             return {
                 key: record.name + record.version + record.installDate,
-                label: "Name: " + record.name + ", version: " + record.version + ", install date: " + record.installDate,
+                label: record.name,
+                nodes: [{
+                    key: "Version" + record.name + record.version + record.installDate,
+                    label: "Version: " + record.version
+                },
+                    {
+                        key: "InstallDate" + record.name + record.version + record.installDate,
+                        label: "Install date: " + record.installDate,
+                    }]
             };
         })
     }
@@ -113,25 +120,28 @@ class ComputerInformation extends React.Component {
         )
     };
 
-    getTodayDate = () => {
-        let date = new Date();
-        return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    handleReportDateChange = (event) => {
+        this.setState({
+            reportDate: event.target.value,
+        }, () => {
+            this.getReport();
+        })
     };
 
-    getReport = (date) => {
-        if (date !== this.state.reportDate) {
-            this.setState({reportDate: date},
-                () => {
-                    api.fetch(
-                        api.endpoints.getReportByComputerIdAndDate(this.props.computerId.slice(1, -1), date),
-                        (response) => {
-                            this.setState({
-                                report: response,
-                            })
-                        }
-                    )
+    getReport = () => {
+        api.fetch(
+            api.endpoints.getReportByComputerIdAndDate(this.props.computerId.slice(1, -1), this.state.reportDate),
+            (response) => {
+                this.setState({
+                    report: response,
                 })
-        }
+            }
+        ).catch((error) => {
+            console.log("Report not found");
+            this.setState({
+                report: undefined,
+            })
+        })
     };
 
     render() {
@@ -178,12 +188,36 @@ class ComputerInformation extends React.Component {
                 </div>
             )
         } else {
-            this.getReport(this.getTodayDate());
             return (
                 <div>
-                    Computer identifier: {this.state.report === undefined ? "" : this.state.report.computerId} <br/>
-                    Report date: {this.state.report === undefined ? "" : this.state.report.date} <br/>
-                    Report time: {this.state.report === undefined ? "" : this.state.report.time} <br/>
+                    <TextField
+                        id='reportDate'
+                        type='date'
+                        label='Choose report date'
+                        InputLabelProps={{shrink: true}}
+                        onChange={this.handleReportDateChange}
+                    /> <br/>
+                    <TextField
+                        id='computerIdentifier'
+                        label='Computer identifier'
+                        value={this.state.report === undefined ? "" : this.state.report.computerId}
+                        readOnly
+                        InputLabelProps={{shrink: true}}
+                    /><br/>
+                    <TextField
+                        id='reportDate'
+                        label='Report date'
+                        value={this.state.report === undefined ? "" : this.state.report.date}
+                        readOnly
+                        InputLabelProps={{shrink: true}}
+                    /><br/>
+                    <TextField
+                        id='reportTime'
+                        label='Report time'
+                        value={this.state.report === undefined ? "" : this.state.report.time}
+                        readOnly
+                        InputLabelProps={{shrink: true}}
+                    /><br/>
                     <TreeMenu
                         data={this.mapReportToData(this.state.report)}
                         hasSearch={true}
