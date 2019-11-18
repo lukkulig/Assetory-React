@@ -32,8 +32,8 @@ const styles = ({
         alignItems: 'center'
     },
     content: {
-        marginTop: 10,
-        marginBottom: 10,
+        marginTop: 25,
+        marginBottom: 25,
         marginLeft: 10,
         marginRight: 10,
     },
@@ -92,7 +92,7 @@ const styles = ({
         width: 250,
     },
     formControl: {
-        padding: 20
+        paddingLeft: 20
     }
 });
 
@@ -437,12 +437,23 @@ class AddAsset extends React.Component {
                     attributesList.push(
                         <div className={classes.content} key={i}>
                             <CreatableSelect
+                                styles={{
+                                    input: base => ({
+                                        ...base,
+                                       height: 50
+                                    }),
+                                    menu: base => ({
+                                        ...base,
+                                        zIndex: 999
+                                    }),
+
+                                }}
                                 formatCreateLabel={(inputValue) => `Add ${attribute.name} ${inputValue}`}
                                 id={attribute.name}
                                 name={attribute.name}
                                 className={classes.creatableSelect}
                                 isClearable
-                                placeholder={"Select " + attribute.name}
+                                placeholder={attribute.name + (attribute.required ? ' *' : '')}
                                 onChange={(newValue, action) => this.handleAttributeValuesChangeTextCallback(newValue, action, attribute.name)}
                                 options={this.state.options[attribute.name]}
                             />
@@ -459,6 +470,7 @@ class AddAsset extends React.Component {
                                 className={classes.textField}
                                 onChange={this.handleAttributeValuesChangeCallback}
                                 required={attribute.required}
+                                variant='outlined'
                                 InputLabelProps={{
                                     shrink: true,
                                 }}
@@ -515,6 +527,7 @@ class AddAsset extends React.Component {
                                 label={"Asset name"}
                                 value={this.state.assetName}
                                 onChange={this.handleAssetNameChange}
+                                variant='outlined'
                                 helperText={this.state.assetNameError === true ? 'Asset with that name already exists' : this.state.assetNameEmpty === true ? 'Asset name is required' : ''}
                             />
                         </div>
