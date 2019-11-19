@@ -15,6 +15,8 @@ import React from 'react';
 import api from "../../../api";
 import styles from "../Overview.styles";
 import TreeMenu from 'react-simple-tree-menu';
+import {ListGroup} from "reactstrap";
+import ListItem from "../CategoriesTree/ListItem";
 
 class ComputerInformation extends React.Component {
 
@@ -75,17 +77,23 @@ class ComputerInformation extends React.Component {
 
     mapSingleSoftwareRecordToData(records) {
         return records.map(record => {
+            let recordNodes = [];
+            if (record.version !== '' && record.version !== null) {
+                recordNodes = recordNodes.concat([{
+                    key: "Version" + record.name + record.version + record.installDate,
+                    label: "Version: " + record.version
+                }])
+            }
+            if (record.installDate !== '' && record.installDate !== null) {
+                recordNodes = recordNodes.concat([{
+                    key: "InstallDate" + record.name + record.version + record.installDate,
+                    label: "Install date: " + record.installDate,
+                }])
+            }
             return {
                 key: record.name + record.version + record.installDate,
                 label: record.name,
-                nodes: [{
-                    key: "Version" + record.name + record.version + record.installDate,
-                    label: "Version: " + record.version
-                },
-                    {
-                        key: "InstallDate" + record.name + record.version + record.installDate,
-                        label: "Install date: " + record.installDate,
-                    }]
+                nodes: recordNodes,
             };
         })
     }
@@ -189,39 +197,43 @@ class ComputerInformation extends React.Component {
             )
         } else {
             return (
-                <div>
+                <div style={{'text-align': 'left'}}>
+                    <h6 style={{
+                        'color': 'grey',
+                        'font-size': '11px',
+                    }}>Computer identifier</h6>
+                    <p>{this.props.computerId.slice(1, -1)}</p>
                     <TextField
                         id='reportDate'
                         type='date'
                         label='Choose report date'
                         InputLabelProps={{shrink: true}}
                         onChange={this.handleReportDateChange}
-                    /> <br/>
-                    <TextField
-                        id='computerIdentifier'
-                        label='Computer identifier'
-                        value={this.state.report === undefined ? "" : this.state.report.computerId}
-                        readOnly
-                        InputLabelProps={{shrink: true}}
-                    /><br/>
-                    <TextField
-                        id='reportDate'
-                        label='Report date'
-                        value={this.state.report === undefined ? "" : this.state.report.date}
-                        readOnly
-                        InputLabelProps={{shrink: true}}
-                    /><br/>
-                    <TextField
-                        id='reportTime'
-                        label='Report time'
-                        value={this.state.report === undefined ? "" : this.state.report.time}
-                        readOnly
-                        InputLabelProps={{shrink: true}}
-                    /><br/>
+                    /> <br/><br/>
+                    <h6 style={{
+                        'color': 'grey',
+                        'font-size': '11px',
+                    }}>{this.state.report === undefined ? '' : 'Report date'}</h6>
+                    <p>{this.state.report === undefined ? '' : this.state.report.date}</p>
+                    <h6 style={{
+                        'color': 'grey',
+                        'font-size': '11px',
+                    }}>{this.state.report === undefined ? '' : 'Report time'}</h6>
+                    <p>{this.state.report === undefined ? '' : this.state.report.time}</p>
                     <TreeMenu
                         data={this.mapReportToData(this.state.report)}
                         hasSearch={true}
-                    />
+                    >
+                        {({items}) => (
+                            <>
+                                <ListGroup>
+                                    {items.map(({...props}) => (
+                                        <ListItem {...props} />
+                                    ))}
+                                </ListGroup>
+                            </>
+                        )}
+                    </TreeMenu>
                 </div>
             )
         }
