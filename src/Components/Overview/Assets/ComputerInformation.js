@@ -128,6 +128,13 @@ class ComputerInformation extends React.Component {
         )
     };
 
+    handleDisconnectButton = () => {
+        api.fetchDelete(
+            api.endpoints.disconnectComputer(this.props.assetId), () => {
+            }
+        )
+    };
+
     handleReportDateChange = (event) => {
         this.setState({
             reportDate: event.target.value,
@@ -198,6 +205,11 @@ class ComputerInformation extends React.Component {
         } else {
             return (
                 <div style={{'text-align': 'left'}}>
+                    <Button color='secondary'
+                            variant='contained'
+                            onClick={this.handleDisconnectButton}>
+                        Disconnect
+                    </Button>
                     <h6 style={{
                         'color': 'grey',
                         'font-size': '11px',
@@ -220,6 +232,7 @@ class ComputerInformation extends React.Component {
                         'font-size': '11px',
                     }}>{this.state.report === undefined ? '' : 'Report time'}</h6>
                     <p>{this.state.report === undefined ? '' : this.state.report.time}</p>
+                    <p>{this.state.report === undefined ? 'No reports from this day' : ''}</p>
                     <TreeMenu
                         data={this.mapReportToData(this.state.report)}
                         hasSearch={true}

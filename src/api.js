@@ -114,12 +114,16 @@ export default {
             method: "GET",
         }),
         registerComputer: (assetId, computerIdentifier) => ({
-            path: url(`assets/${assetId}/register/computer`),
+            path: url(`assets/${assetId}/computer-info/register`),
             method: "PUT",
             body: JSON.stringify(computerIdentifier),
             headers: {
                 "Content-Type": "application/json"
             }
+        }),
+        disconnectComputer: (assetId) => ({
+            path: url(`assets/${assetId}/computer-info/register`),
+            method: "DELETE",
         }),
     }
 }
