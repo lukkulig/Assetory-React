@@ -23,6 +23,7 @@ import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import CardContent from "@material-ui/core/CardContent";
 import Collapse from "@material-ui/core/Collapse";
+import clsx from "clsx";
 
 const styles = ({
     root: {
@@ -39,8 +40,7 @@ const styles = ({
     },
     textField: {
         textAlign: 'left',
-        paddingLeft: 10,
-        width: 500,
+        width: 580,
     },
     card: {
         width: 600
@@ -93,7 +93,10 @@ const styles = ({
     },
     formControl: {
         paddingLeft: 20
-    }
+    },
+    expandOpen: {
+        transform: 'rotate(180deg)',
+    },
 });
 
 class AddAsset extends React.Component {
@@ -124,12 +127,10 @@ class AddAsset extends React.Component {
     isLoading() {
         return this.state.categories === null
             || this.state.selectedCategory === null
-            || this.state.selectedCategoryAttributes == null;
     }
 
     componentDidMount() {
         this.fetchAndSetCategories()
-            .then(() => this.fetchAndSetSelectedCategoryAttributes());
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -140,7 +141,6 @@ class AddAsset extends React.Component {
                 selectedCategoryAttributes: null
             });
             this.fetchAndSetCategories()
-                .then(() => this.fetchAndSetSelectedCategoryAttributes());
         }
     }
 
@@ -157,26 +157,14 @@ class AddAsset extends React.Component {
                 });
                 let categories = this.prepareCategories(result, 15);
                 this.setState({categories: categories});
-                this.setState({selectedCategory: categories[0]});
+                this.setState({
+                    selectedCategory: {
+                        id: '',
+                        name: '',
+                    },
+                });
                 document.body.style.cursor = 'default';
             });
-    }
-
-    fetchAndSetSelectedCategoryAttributes() {
-        document.body.style.cursor = 'wait';
-        api.fetch(
-            api.endpoints.getCategoryAttributes(this.state.selectedCategory.id),
-            (response) => {
-                this.setState({selectedCategoryAttributes: response});
-                let attributes = {};
-                response.forEach((attribute) => {
-                    attributes[attribute.name] = "";
-                });
-                this.setState({attributesValues: attributes});
-                document.body.style.cursor = 'default';
-            }
-        );
-        this.fetchAndSetValuesCategoryAttributes(this.state.selectedCategory.id);
     }
 
     fetchAndSetValuesCategoryAttributes(selectedCategoryId) {
@@ -216,7 +204,8 @@ class AddAsset extends React.Component {
         this.setState({
             selectedCategory: this.findCategory(event.target.value),
         }, () => {
-            if (this.state.selectedCategory !== null) {
+            if (this.state.selectedCategory !== null && this.state.selectedCategory.id !== '') {
+                this.setState({selectedCategoryAttributes: null});
                 api.fetch(
                     api.endpoints.getCategoryAttributes(this.state.selectedCategory.id),
                     (response) => {
@@ -225,7 +214,7 @@ class AddAsset extends React.Component {
                         response.forEach((attribute) => {
                             attributes[attribute.name] = undefined;
                         });
-                        this.setState({attributesValues: attributes});
+                        this.setState({attributesValues: attributes, assetName: '', assetNameEmpty: true});
                     }
                 );
                 this.fetchAndSetValuesCategoryAttributes(this.state.selectedCategory.id);
@@ -314,7 +303,6 @@ class AddAsset extends React.Component {
                 this.handleSnackbarOpen(response.name);
                 this.sleep(1000).then(() => {
                     this.fetchAndSetCategories()
-                        .then(() => this.fetchAndSetSelectedCategoryAttributes());
                 })
             });
     };
@@ -427,31 +415,30 @@ class AddAsset extends React.Component {
         this.setState({expanded: !this.state.expanded})
     };
 
-    render() {
-        const {classes} = this.props;
-        const attributesList = [];
+    showSelects() {
+        let attributesList = [];
         let i = 0;
         if (this.state.selectedCategoryAttributes !== null) {
             this.state.selectedCategoryAttributes.forEach((attribute) => {
                 if (attribute.type === "text") {
                     attributesList.push(
-                        <div className={classes.content} key={i}>
+                        <div style={styles.content} key={i}>
                             <CreatableSelect
                                 styles={{
                                     input: base => ({
                                         ...base,
-                                       height: 50
+                                        height: 50,
+                                        paddingTop: 10
                                     }),
                                     menu: base => ({
                                         ...base,
                                         zIndex: 999
                                     }),
-
                                 }}
                                 formatCreateLabel={(inputValue) => `Add ${attribute.name} ${inputValue}`}
                                 id={attribute.name}
                                 name={attribute.name}
-                                className={classes.creatableSelect}
+                                style={styles.creatableSelect}
                                 isClearable
                                 placeholder={attribute.name + (attribute.required ? ' *' : '')}
                                 onChange={(newValue, action) => this.handleAttributeValuesChangeTextCallback(newValue, action, attribute.name)}
@@ -461,13 +448,13 @@ class AddAsset extends React.Component {
                     );
                 } else {
                     attributesList.push(
-                        <div className={classes.content} key={i}>
+                        <div style={styles.content} key={i}>
                             <TextField
                                 id={attribute.name}
                                 name={attribute.name}
                                 type={attribute.type}
                                 label={attribute.name}
-                                className={classes.textField}
+                                style={styles.textField}
                                 onChange={this.handleAttributeValuesChangeCallback}
                                 required={attribute.required}
                                 variant='outlined'
@@ -480,7 +467,15 @@ class AddAsset extends React.Component {
                 }
                 i++;
             });
+        } else {
+            attributesList = []
         }
+        return attributesList
+    }
+
+    render() {
+        const {classes} = this.props;
+        const attributeList = this.showSelects();
         return (
             <div className={classes.root}>
                 <Snackbar open={this.state.snackOpen}
@@ -504,22 +499,33 @@ class AddAsset extends React.Component {
                         <div className={classes.content}>
                             <InputLabel id="selected-category-select-label">Category</InputLabel>
                             <Select className={classes.select}
+                                    displayEmpty
                                     id="selected-category-select"
                                     labelId="selected-category-select-label"
                                     value={this.state.selectedCategory.id}
                                     onChange={this.handleSelectedCategoryChange}
-                                    disableUnderline
                             >
-                                {this.state.categories.map(category =>
-                                    <MenuItem style={{paddingLeft: category.paddingLeft}}
-                                              key={category.id}
-                                              value={category.id}>
-                                        {category.name}
-                                    </MenuItem>
+                                {this.state.categories.map(category => {
+                                        if (category.name === "All") {
+                                            return <MenuItem style={{paddingLeft: category.paddingLeft}}
+                                                             key={category.id}
+                                                             disabled
+                                                             value={category.id}>
+                                                {category.name}
+                                            </MenuItem>
+                                        } else {
+                                            return <MenuItem style={{paddingLeft: category.paddingLeft}}
+                                                             key={category.id}
+                                                             value={category.id}>
+                                                {category.name}
+                                            </MenuItem>
+                                        }
+                                    }
                                 )}
                             </Select>
                         </div>
                         <div className={classes.content}>
+                            {this.state.selectedCategory.id !== "" &&
                             <TextField
                                 error={this.state.assetNameError || this.state.assetNameEmpty}
                                 required={true}
@@ -530,16 +536,22 @@ class AddAsset extends React.Component {
                                 variant='outlined'
                                 helperText={this.state.assetNameError === true ? 'Asset with that name already exists' : this.state.assetNameEmpty === true ? 'Asset name is required' : ''}
                             />
+                            }
                         </div>
-                        {attributesList}
+                        {attributeList}
+                        {this.state.selectedCategory.id !== "" &&
                         <Card className={classes.card}>
                             <CardHeader subheader="Related assets"
                                         action={
                                             <IconButton
+                                                className={clsx(classes.expand, {
+                                                    [classes.expandOpen]: this.state.expanded,
+                                                })}
                                                 onClick={this.handleExpandClick}
+                                                aria-expanded={this.state.expanded}
                                                 aria-label="show more"
                                             >
-                                                <ExpandMoreIcon/>
+                                                <ExpandMoreIcon />
                                             </IconButton>
                                         }
                             />
@@ -553,7 +565,6 @@ class AddAsset extends React.Component {
                                                     labelId="selected-category-select-label1"
                                                     value={this.state.selectedCategoryRelated.id}
                                                     onChange={this.handleSelectedCategoryRelatedAssetChange}
-                                                // disableUnderline
                                             >
                                                 {this.state.categories.map(category =>
                                                     <MenuItem style={{paddingLeft: category.paddingLeft}}
@@ -633,7 +644,7 @@ class AddAsset extends React.Component {
                                 </CardContent>
                             </Collapse>
                         </Card>
-
+                        }
                         < div className={classes.contentWithButton}>
                             < Button variant="contained"
                                      color="primary"
@@ -644,6 +655,7 @@ class AddAsset extends React.Component {
                                 Add Asset
                             </Button>
                         </div>
+
                     </form>
                 ) : (
                     <BeatLoader
