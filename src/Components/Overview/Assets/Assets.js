@@ -87,7 +87,8 @@ class Assets extends React.Component {
                                 id: asset.id,
                                 name: asset.name,
                                 category: allCategories.find(c => c.id === asset.categoryId).name,
-                                attributes: asset.attributes
+                                attributes: asset.attributes,
+                                connectedComputerId: asset.connectedComputerId
                             })}
                             assetsUpdateCallback={this.handleUpdateAsset}
                             assetsDeleteCallback={this.handleDeleteAsset}
@@ -144,7 +145,8 @@ Assets.propTypes = {
             id: PropTypes.string.isRequired,
             name: PropTypes.string.isRequired,
             categoryId: PropTypes.string.isRequired,
-            attributes: PropTypes.array.isRequired
+            attributes: PropTypes.array.isRequired,
+            connectedComputerId: PropTypes.string.isRequired,
         })
     ),
     allCategories: PropTypes.array,

@@ -15,6 +15,7 @@ import {DatePicker} from '@atlaskit/datetime-picker';
 import Paper from "@material-ui/core/Paper";
 import DeleteAssetDialog from "./DeleteAssetDialog";
 import api from "../../../api";
+import ComputerInformation from "./ComputerInformation";
 
 const styles = ({
     title: {
@@ -113,7 +114,6 @@ class AssetView extends React.Component {
                 this.props.assetsUpdateCallback(attributesUpdate.attributes);
             }
         );
-
     };
 
     handleDeleteAsset = () => {
@@ -172,7 +172,10 @@ class AssetView extends React.Component {
                         {attributesEditable}
                     </List>
                     <Paper className={classes.rest}>
-                        Tu mogłoby coś być, ale jeszcze nie ma :(
+                        <ComputerInformation
+                            assetId={asset.id}
+                            computerId={asset.connectedComputerId}
+                        />
                     </Paper>
                 </ExpansionPanelDetails>
                 <Divider/>
@@ -195,6 +198,7 @@ AssetView.propTypes = {
         name: PropTypes.string.isRequired,
         category: PropTypes.string.isRequired,
         attributes: PropTypes.array.isRequired,
+        connectedComputerId: PropTypes.string.isRequired,
     }).isRequired,
     assetsUpdateCallback: PropTypes.func.isRequired,
     assetsDeleteCallback: PropTypes.func.isRequired
