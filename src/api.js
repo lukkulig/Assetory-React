@@ -149,5 +149,9 @@ export default {
             path: url(`assets/${assetId}/computer-info/register`),
             method: "DELETE",
         }),
+        export: () => ({
+            path: url(`export-assets`),
+            method: "GET",
+        })
     }
 }

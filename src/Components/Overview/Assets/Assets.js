@@ -7,6 +7,8 @@ import List from "@material-ui/core/List";
 import AssetView from "./AssetView";
 import ActiveFilters from "../Filters/ActiveFilters";
 import {BeatLoader} from "react-spinners";
+import Button from "@material-ui/core/Button";
+import api from "../../../api";
 
 const styles = ({
     root: {
@@ -68,6 +70,12 @@ class Assets extends React.Component {
         this.props.overviewDeleteAssetCallback();
     };
 
+    handleExportButton = () => {
+        api.fetch(
+            api.endpoints.export()
+        )
+    };
+
     isLoading() {
         return this.props.allCategories === null
             || this.props.assets === null
@@ -111,6 +119,15 @@ class Assets extends React.Component {
                     <Typography className={classes.title} variant="h5">
                         Assets
                     </Typography>
+                    <div style={{'text-align': 'right'}}>
+                        <Button
+                            variant='contained'
+                            color='primary'
+                            onClick={this.handleExportButton}
+                        >
+                            Export assets to csv
+                        </Button>
+                    </div>
                 </div>
                 <Divider className={classes.divider}/>
                 {Object.keys(filters).length !== 0 &&
