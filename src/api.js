@@ -81,6 +81,14 @@ export default {
                 "Content-Type": "application/json"
             }
         }),
+        getAssetsByIds: (ids) => {
+            let path = new URL(url(`assets/ids`));
+            path.searchParams.append("ids", ids);
+            return {
+                path: path,
+                method: "GET"
+            }
+        },
         getAssetsByCategory: (categoryId) => ({
             path: url(`assets/category/${categoryId}`),
             method: "GET"
@@ -101,9 +109,45 @@ export default {
                 "Content-Type": "application/json"
             }
         }),
+        addRelatedAssets: (assetId, relatedAssetsIds) => {
+            let path = new URL(url(`assets/related-assets/${assetId}`));
+            path.searchParams.append("relatedAssetsIds", relatedAssetsIds);
+            return {
+                path: path,
+                method: "PUT"
+            }
+        },
+        deleteRelatedAssets: (assetId, relatedAssetsIds) => {
+            let path = new URL(url(`assets/related-assets/${assetId}`));
+            path.searchParams.append("relatedAssetsIds", relatedAssetsIds);
+            return {
+                path: path,
+                method: "DELETE"
+            }
+        },
         deleteAsset: (assetId) => ({
             path: url(`assets/${assetId}`),
             method: "DELETE"
-        })
+        }),
+        getReportByComputerIdAndDate: (computerId, date) => ({
+            path: url(`info/${computerId}/${date}`),
+            method: "GET",
+        }),
+        getRegisteredComputers: () => ({
+            path: url(`info/registered/identifiers`),
+            method: "GET",
+        }),
+        registerComputer: (assetId, computerIdentifier) => ({
+            path: url(`assets/${assetId}/computer-info/register`),
+            method: "PUT",
+            body: JSON.stringify(computerIdentifier),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }),
+        disconnectComputer: (assetId) => ({
+            path: url(`assets/${assetId}/computer-info/register`),
+            method: "DELETE",
+        }),
     }
 }
