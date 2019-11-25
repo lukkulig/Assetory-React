@@ -59,7 +59,7 @@ class ComputerInformation extends React.Component {
         });
     }
 
-    mapToFormControlLabel(computerName) {
+    static mapToFormControlLabel(computerName) {
         return (
             <FormControlLabel control={<Radio/>} label={computerName} value={computerName}/>
         )
@@ -70,12 +70,12 @@ class ComputerInformation extends React.Component {
             return {
                 key: record,
                 label: record,
-                nodes: this.mapSingleSoftwareRecordToData(softwareReport[record]),
+                nodes: ComputerInformation.mapSingleSoftwareRecordToData(softwareReport[record]),
             }
         });
     }
 
-    mapSingleSoftwareRecordToData(records) {
+    static mapSingleSoftwareRecordToData(records) {
         return records.map(record => {
             let recordNodes = [];
             if (record.version !== '' && record.version !== null) {
@@ -119,7 +119,7 @@ class ComputerInformation extends React.Component {
     handleConfirmConnectionButton = () => {
         api.fetch(
             api.endpoints.registerComputer(this.props.assetId, this.state.chosenComputer),
-            (response) => {
+            () => {
                 this.setState({
                     computerChoiceDialogOpen: false,
                     chosenComputer: undefined,
@@ -151,7 +151,7 @@ class ComputerInformation extends React.Component {
                     report: response,
                 })
             }
-        ).catch((error) => {
+        ).catch(() => {
             console.log("Report not found");
             this.setState({
                 report: undefined,
@@ -181,7 +181,7 @@ class ComputerInformation extends React.Component {
                                     <FormControl>
                                         <RadioGroup name="computers-choices" value={this.state.chosenComputer}
                                                     onChange={this.handleComputerChoiceChange}>
-                                            {this.state.registeredComputers.map(name => this.mapToFormControlLabel(name))}
+                                            {this.state.registeredComputers.map(name => ComputerInformation.mapToFormControlLabel(name))}
                                         </RadioGroup>
                                     </FormControl>
                                 </form>
@@ -256,7 +256,7 @@ class ComputerInformation extends React.Component {
 ComputerInformation.propTypes = {
     classes: PropTypes.object.isRequired,
     assetId: PropTypes.string.isRequired,
-    computerId: PropTypes.string.isRequired,
+    computerId: PropTypes.string,
 };
 
 export default withStyles(styles)(ComputerInformation)

@@ -35,7 +35,8 @@ class Overview extends React.Component {
                 if (response.status !== 500) {
                     let result = response.map(category => ({
                         id: category.id,
-                        name: category.name
+                        name: category.name,
+                        parentCategoryId: category.parentCategoryId
                     }));
                     this.setState({allCategories: result});
                     document.body.style.cursor = 'default';
@@ -82,6 +83,10 @@ class Overview extends React.Component {
                 return result
             }, {});
         }
+        this.fetchAndSetFilteredAssetsByFilters(filters);
+    }
+
+    fetchAndSetFilteredAssetsByFilters(filters) {
         const data = {
             mainCategoryId: this.state.selectedCategoryId,
             filters: filters
@@ -124,7 +129,6 @@ class Overview extends React.Component {
                             return JSON.stringify(value) === JSON.stringify(newAttributeValue)
                         }
                     );
-
                     const isOldValueInvalid = filters[attributeName].some((value) => {
                             return !filterAllowedValues.includes(value.label)
                         }
@@ -155,6 +159,17 @@ class Overview extends React.Component {
                 }
                 this.setState({filters: filters});
             });
+        });
+    };
+
+    handleRedirectToRelatedAsset = (categoryId, assetId) => {
+        this.setState({selectedCategoryAttributesValues: null, filteredAssets: null});
+        this.setState({selectedCategoryId: categoryId, initialSelectedCategoryId: categoryId, filters: {}}, () => {
+            this.fetchAndSetCategoryAttributesValues();
+            let filter = {
+                id: Array.of(assetId)
+            };
+            this.fetchAndSetFilteredAssetsByFilters(filter);
         });
     };
 
@@ -206,6 +221,8 @@ class Overview extends React.Component {
                                     category: c.category,
                                     subCategories: c.subCategories,
                                 })) : this.state.categories}
+                                selectedCategoryId={this.state.selectedCategoryId}
+                                allCategories={this.state.allCategories}
                                 categoryChangeCallback={this.handleCategoryChange}
                                 initialSelectedCategoryId={this.state.initialSelectedCategoryId}
                             />
@@ -228,6 +245,7 @@ class Overview extends React.Component {
                     <Paper className={classes.assetsPaper} elevation={4}>
                         <Assets
                             assets={this.state.filteredAssets}
+                            categories={this.state.categories}
                             allCategories={this.state.allCategories}
                             filters={this.state.filters}
                             categoryAttributes={this.state.selectedCategoryAttributesValues !== null ?
@@ -237,6 +255,7 @@ class Overview extends React.Component {
                             }
                             overviewFiltersCallback={this.handleFiltersChange}
                             overviewUpdateAssetCallback={this.handleUpdateAsset}
+                            overviewRedirectAssetCallback={this.handleRedirectToRelatedAsset}
                             overviewDeleteAssetCallback={this.handleDeleteAsset}
                         />
                     </Paper>
