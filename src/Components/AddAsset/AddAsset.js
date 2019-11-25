@@ -230,7 +230,9 @@ class AddAsset extends React.Component {
                 api.fetch(
                     api.endpoints.getAssetsByCategory(this.state.selectedCategoryRelated.id),
                     (response) => {
-                        this.setState({selectedCategoryRelatedAssets: response});
+                        let result = response.filter((el) =>
+                            !(this.state.relatedAssets || []).map(related => related.id).includes(el.id));
+                        this.setState({selectedCategoryRelatedAssets: result});
                     }
                 );
                 (this.setState({isSelected: true}));
