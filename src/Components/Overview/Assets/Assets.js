@@ -60,17 +60,22 @@ class Assets extends React.Component {
         this.props.overviewUpdateAssetCallback(updatedAttribute);
     };
 
+    handleRedirectToRelatedAsset = (categoryId, assetId) => {
+        this.props.overviewRedirectAssetCallback(categoryId, assetId);
+    };
+
     handleDeleteAsset = () => {
         this.props.overviewDeleteAssetCallback();
     };
 
     isLoading() {
         return this.props.allCategories === null
-            || this.props.assets === null;
+            || this.props.assets === null
+            || this.props.categories === null;
     }
 
     render() {
-        const {classes, assets, allCategories, filters, categoryAttributes} = this.props;
+        const {classes, assets, categories, allCategories, filters, categoryAttributes} = this.props;
 
         let cardList = [];
 
@@ -88,9 +93,13 @@ class Assets extends React.Component {
                                 name: asset.name,
                                 category: allCategories.find(c => c.id === asset.categoryId).name,
                                 attributes: asset.attributes,
+                                relatedAssetsIds: asset.relatedAssetsIds,
                                 connectedComputerId: asset.connectedComputerId
                             })}
+                            open={assets.length === 1}
+                            categories={categories}
                             assetsUpdateCallback={this.handleUpdateAsset}
+                            assetsRedirectCallback={this.handleRedirectToRelatedAsset}
                             assetsDeleteCallback={this.handleDeleteAsset}
                         />
                     )
@@ -146,7 +155,14 @@ Assets.propTypes = {
             name: PropTypes.string.isRequired,
             categoryId: PropTypes.string.isRequired,
             attributes: PropTypes.array.isRequired,
-            connectedComputerId: PropTypes.string.isRequired,
+            relatedAssetsIds: PropTypes.array.isRequired,
+            connectedComputerId: PropTypes.string,
+        })
+    ),
+    categories: PropTypes.arrayOf(
+        PropTypes.shape({
+            category: PropTypes.object,
+            subCategories: PropTypes.array
         })
     ),
     allCategories: PropTypes.array,
@@ -154,6 +170,7 @@ Assets.propTypes = {
     categoryAttributes: PropTypes.array,
     overviewFiltersCallback: PropTypes.func,
     overviewUpdateAssetCallback: PropTypes.func,
+    overviewRedirectAssetCallback: PropTypes.func,
     overviewDeleteAssetCallback: PropTypes.func
 };
 

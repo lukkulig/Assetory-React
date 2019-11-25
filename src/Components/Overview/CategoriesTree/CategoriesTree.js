@@ -45,6 +45,25 @@ const styles = ({
 
 class CategoriesTree extends React.Component {
 
+    state = {
+        selectedCategoryId: null
+    };
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps !== this.props && !this.isLoading()) {
+            this.setState({selectedCategoryId: this.getId(this.props.selectedCategoryId, this.props.allCategories)});
+        }
+    }
+
+    getId(categoryId, categories) {
+        let id = categoryId;
+        let category = categories.find(c => c.id === categoryId);
+        if (category.parentCategoryId !== null) {
+            id = this.getId(category.parentCategoryId, categories) +"/" + id;
+        }
+        return id;
+    }
+
     mapToData(categories) {
         return categories.map(c => ({
             key: c.category.id,
@@ -54,6 +73,7 @@ class CategoriesTree extends React.Component {
     }
 
     handleChange = key => {
+        this.setState({selectedCategoryId: key});
         const pattern = new RegExp("/?([^/]+$)");
         const categoryId = pattern.exec(key)[1];
         this.props.categoryChangeCallback(categoryId);
@@ -73,7 +93,9 @@ class CategoriesTree extends React.Component {
 
     isLoading() {
         return this.props.categories === null
-            || this.props.initialSelectedCategoryId === null;
+            || this.props.initialSelectedCategoryId === null
+            || this.props.selectedCategoryId === null
+            || this.props.allCategories === null;
     }
 
     render() {
@@ -97,6 +119,7 @@ class CategoriesTree extends React.Component {
                         <TreeMenu
                             data={this.mapToData(categories)}
                             hasSearch={false}
+                            activeKey={this.state.selectedCategoryId}
                             initialActiveKey={initialSelectedCategoryId}
                             initialOpenNodes={initialOpenCategories}
                             onClickItem={({key}) =>
@@ -128,6 +151,14 @@ class CategoriesTree extends React.Component {
 
 CategoriesTree.propTypes = {
     classes: PropTypes.object.isRequired,
+    selectedCategoryId: PropTypes.string,
+    allCategories: PropTypes.arrayOf(
+        PropTypes.shape({
+            category: PropTypes.object,
+            subCategories: PropTypes.array,
+            parentCategoryId: PropTypes.string
+        })
+    ),
     categories: PropTypes.arrayOf(
         PropTypes.shape({
             category: PropTypes.object,
