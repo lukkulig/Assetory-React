@@ -7,7 +7,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import {DeleteForever} from "@material-ui/icons";
 import api from "../../../api";
 
 const styles = ({
@@ -50,7 +50,7 @@ class DeleteAssetDialog extends React.Component {
                     variant="contained"
                     onClick={this.handleClickOpen}>
                     Delete
-                    <HighlightOffIcon fontSize='small' className={classes.icon}/>
+                    <DeleteForever fontSize='small' className={classes.icon}/>
                 </Button>
                 <Dialog
                     open={this.state.open}

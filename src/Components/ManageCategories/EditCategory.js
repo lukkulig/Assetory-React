@@ -287,7 +287,6 @@ class EditCategory extends React.Component {
     };
 
     handleDeleteOptionChange = (event) => {
-        console.log(event.target.value);
         this.setState({deleteWithContent: event.target.value});
     };
 
