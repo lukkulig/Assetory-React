@@ -15,6 +15,14 @@ export default {
                 action(response);
             });
     },
+    fetchFile: (opt) => {
+        return fetch(opt.path, {
+            method: opt.method,
+            body: opt.body,
+            headers: opt.headers,
+            credentials: 'include'
+        })
+    },
     fetchDelete: (opt, action) => {
         fetch(opt.path, {
             method: opt.method,
@@ -152,6 +160,9 @@ export default {
         export: () => ({
             path: url(`export-assets`),
             method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
         })
     }
 }

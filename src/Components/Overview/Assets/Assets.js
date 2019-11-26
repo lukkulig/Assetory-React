@@ -9,6 +9,7 @@ import ActiveFilters from "../Filters/ActiveFilters";
 import {BeatLoader} from "react-spinners";
 import Button from "@material-ui/core/Button";
 import api from "../../../api";
+import FileSaver from "file-saver";
 
 const styles = ({
     root: {
@@ -71,9 +72,13 @@ class Assets extends React.Component {
     };
 
     handleExportButton = () => {
-        api.fetch(
+        api.fetchFile(
             api.endpoints.export()
-        )
+        ).then(function (response) {
+            return response.blob();
+        }).then(function (blob) {
+            FileSaver.saveAs(blob, "assets.csv");
+        })
     };
 
     isLoading() {
