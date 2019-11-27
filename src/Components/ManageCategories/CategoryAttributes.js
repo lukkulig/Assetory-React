@@ -37,7 +37,7 @@ const styles = ({
     },
 });
 
-const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCallback, type, typeChangeCallback, required, requiredChangeCallback, saveAttributeCallback) => {
+const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCallback, type, typeChangeCallback, required, requiredChangeCallback, saveAttributeCallback, cancelEditCallback) => {
     return (
         <React.Fragment>
             <Dialog
@@ -81,11 +81,15 @@ const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCal
                     </div>
                 </DialogContent>
                 <DialogActions>
+                    <Button color="default"
+                            onClick={cancelEditCallback}>
+                        Cancel
+                    </Button>
                     <Button
                         color="primary"
                         className={classes.button}
                         onClick={saveAttributeCallback}
-                        disabled={nameError}
+                        disabled={nameError || name === ''}
                     >
                         Save attribute
                     </Button>
@@ -125,7 +129,8 @@ const AttributeListItem = (name, type, required, handleChange, fromSupercategory
                 editAttributeDialogProps.typeChangeCallback,
                 editAttributeDialogProps.required,
                 editAttributeDialogProps.requiredChangeCallback,
-                editAttributeDialogProps.saveAttribute)}
+                editAttributeDialogProps.saveAttribute,
+                editAttributeDialogProps.cancelEditCallback,)}
         </ListItem>
     )
 };
@@ -144,6 +149,7 @@ class CategoryAttributes extends React.Component {
             typeChangeCallback: this.props.editedAttributeTypeChangeCallback,
             nameError: this.props.editedAttributeNameError,
             saveAttribute: this.props.saveEditedAttributeCallback,
+            cancelEditCallback: this.props.cancelAttributeEditCallback,
         };
         let i = 0;
         const attributesList = [];
@@ -217,7 +223,7 @@ class CategoryAttributes extends React.Component {
                                 color="primary"
                                 className={classes.button}
                                 onClick={this.props.saveAttributeCallback}
-                                disabled={this.props.attributeNameError}
+                                disabled={this.props.attributeNameError || this.props.newAttributeName === ''}
                         >
                             Save attribute
                         </Button>
@@ -262,6 +268,7 @@ CategoryAttributes.propTypes = {
     editedAttributeRequiredChangeCallback: PropTypes.func.isRequired,
     editAttributeDialogOpen: PropTypes.bool.isRequired,
     editAttributeCallback: PropTypes.func.isRequired,
+    cancelAttributeEditCallback: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(CategoryAttributes)

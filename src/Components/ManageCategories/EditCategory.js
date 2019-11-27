@@ -272,6 +272,17 @@ class EditCategory extends React.Component {
         });
     };
 
+    handleCancelAttributeEdition = () => {
+        this.setState({
+            oldEditedAttributeName: '',
+            editedAttributeName: '',
+            editedAttributeType: 'text',
+            editedAttributeRequired: false,
+            editAttributeDialogOpen: false,
+            editedAttributeNameError: false,
+        })
+    };
+
     handleSaveCategoryButton = () => {
         let category = this.state.category;
         category.additionalAttributes = this.state.attributes;
@@ -436,6 +447,7 @@ class EditCategory extends React.Component {
                                 saveEditedAttributeCallback={this.handleSaveEditedAttributeButton}
                                 editAttributeCallback={this.handleEditAttributeButton}
                                 editAttributeDialogOpen={this.state.editAttributeDialogOpen}
+                                cancelAttributeEditCallback={this.handleCancelAttributeEdition}
                             />
                         </div>
                         <div className={classes.content}>
