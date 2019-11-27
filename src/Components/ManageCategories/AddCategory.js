@@ -325,7 +325,7 @@ class AddCategory extends React.Component {
                                     color="primary"
                                     className={classes.button}
                                     onClick={this.handleAddCategoryButton}
-                                    disabled={this.state.categoryNameError}
+                                    disabled={this.state.categoryNameError || this.state.categoryName === ''}
                             >
                                 Add category
                             </Button>
