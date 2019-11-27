@@ -381,13 +381,14 @@ class EditCategory extends React.Component {
                                     )}
                                 </Select>
                             </FormControl>
+                            {this.state.category !== this.state.categories[0] &&
                             <React.Fragment>
                                 <Button style={{float: "left"}}
                                         className={classes.button}
                                         variant="contained"
                                         color="secondary"
                                         onClick={this.handleDeleteCategoryButton}
-                                        disabled={this.state.category === undefined || this.state.category === null}
+                                        disabled={this.state.category === undefined}
                                 >
                                     Delete
                                 </Button>
@@ -423,6 +424,7 @@ class EditCategory extends React.Component {
                                     </DialogActions>
                                 </Dialog>
                             </React.Fragment>
+                            }
                         </div>
                         <div className={classes.content} style={{clear: "both"}}>
                             <CategoryAttributes
