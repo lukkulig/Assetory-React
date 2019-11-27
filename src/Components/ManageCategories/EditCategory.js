@@ -93,21 +93,34 @@ class EditCategory extends React.Component {
                     }
                 });
                 let categories = this.prepareCategories(result, 15);
-                this.setState({categories: categories});
-                this.setState({category: categories[0]});
+                this.setState({
+                    categories: categories,
+                    category: categories[0],
+                });
+                api.fetch(
+                    api.endpoints.getCategoryAttributes(this.state.category.id),
+                    (response) => {
+                        this.setState({attributes: response});
+                    }
+                );
                 document.body.style.cursor = 'default';
             });
     }
 
     fetchAndSetSuperCategoryAttributes() {
         document.body.style.cursor = 'wait';
-        api.fetch(
-            api.endpoints.getCategoryAttributes(this.state.category.id),
-            (response) => {
-                this.setState({superCategoryAttributes: response});
-                document.body.style.cursor = 'default';
-            }
-        )
+        if (this.state.category.parentCategoryId !== null) {
+            api.fetch(
+                api.endpoints.getCategoryAttributes(this.state.category.parentCategoryId),
+                (response) => {
+                    this.setState({superCategoryAttributes: response});
+                    document.body.style.cursor = 'default';
+                }
+            )
+        } else {
+            this.setState({superCategoryAttributes: []});
+            document.body.style.cursor = 'default';
+        }
     }
 
     prepareCategories(categories, paddingLeft) {
@@ -149,6 +162,8 @@ class EditCategory extends React.Component {
                         this.setState({superCategoryAttributes: response})
                     }
                 )
+            } else {
+                this.setState({superCategoryAttributes: []});
             }
         });
     };
@@ -275,7 +290,7 @@ class EditCategory extends React.Component {
                     attributeChanges: {},
                     categories: null,
                     category: null,
-                    superCategoryAttributes: null
+                    superCategoryAttributes: []
                 });
                 this.fetchAndSetCategories()
                     .then(() => this.fetchAndSetSuperCategoryAttributes());
@@ -303,7 +318,7 @@ class EditCategory extends React.Component {
                     newAttributesNames: [],
                     categories: null,
                     category: null,
-                    superCategoryAttributes: null
+                    superCategoryAttributes: []
                 });
                 this.fetchAndSetCategories()
                     .then(() => this.fetchAndSetSuperCategoryAttributes());
@@ -320,7 +335,7 @@ class EditCategory extends React.Component {
                     newAttributesNames: [],
                     categories: null,
                     category: null,
-                    superCategoryAttributes: null
+                    superCategoryAttributes: []
 
                 });
                 sleep(1000).then(() => {
@@ -333,7 +348,6 @@ class EditCategory extends React.Component {
 
     render() {
         const {classes} = this.props;
-
         return (
             <div className={classes.root}>
                 {!this.isLoading() ? (
