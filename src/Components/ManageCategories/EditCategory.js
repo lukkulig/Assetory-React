@@ -442,7 +442,7 @@ class EditCategory extends React.Component {
                                 attributeNameError={this.state.attributeNameError}
                                 editedAttributeName={this.state.editedAttributeName}
                                 editedAttributeType={this.state.editedAttributeType}
-                                editedAttributeRequired={this.state.newAttributeRequired}
+                                editedAttributeRequired={this.state.editedAttributeRequired}
                                 editedAttributeNameChangeCallback={this.handleEditedAttributeNameChange}
                                 editedAttributeTypeChangeCallback={this.handleEditedAttributeTypeChange}
                                 editedAttributeRequiredChangeCallback={this.handleEditedAttributeRequiredChange}
