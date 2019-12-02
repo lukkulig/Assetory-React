@@ -68,8 +68,8 @@ class Assets extends React.Component {
         this.props.overviewRedirectAssetCallback(categoryId, assetId);
     };
 
-    handleDeleteAsset = () => {
-        this.props.overviewDeleteAssetCallback();
+    handleDeleteAsset = (assetId, assetName) => {
+        this.props.overviewDeleteAssetCallback(assetId, assetName);
     };
 
     handleExportButton = () => {

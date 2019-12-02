@@ -210,8 +210,8 @@ class AssetView extends React.Component {
         );
     };
 
-    handleDeleteAsset = () => {
-        this.props.assetsDeleteCallback();
+    handleDeleteAsset = (assetId, assetName) => {
+        this.props.assetsDeleteCallback(assetId, assetName);
     };
 
     render() {

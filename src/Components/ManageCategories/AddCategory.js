@@ -7,6 +7,7 @@ import {BeatLoader} from "react-spinners";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import {sleep} from "../Overview/Overview";
+import SuccessSnackBar from "../SuccessSnackBar";
 
 const styles = ({
     root: {},
@@ -44,6 +45,8 @@ class AddCategory extends React.Component {
         editedAttributeRequired: false,
         editAttributeDialogOpen: false,
         editedAttributeNameError: false,
+        snackOpen: false,
+        snackMsg: ''
     };
 
     isLoading() {
@@ -264,6 +267,7 @@ class AddCategory extends React.Component {
                     superCategoryAttributes: null,
                     categoryName: '',
                 });
+                this.handleSnackbarOpen(category.name);
                 sleep(1000).then(() => {
                     this.fetchAndSetCategories()
                         .then(() => this.fetchAndSetSuperCategoryAttributes());
@@ -271,10 +275,23 @@ class AddCategory extends React.Component {
             })
     };
 
+    handleSnackbarClose = () => {
+        this.setState({snackOpen: false});
+    };
+
+    handleSnackbarOpen = (name) => {
+        this.setState({snackOpen: true, snackMsg: "Category " + name + " was created!"})
+    };
+
     render() {
         const {classes} = this.props;
         return (
             <div className={classes.root}>
+                <SuccessSnackBar
+                    open={this.state.snackOpen}
+                    message={this.state.snackMsg}
+                    callback={this.handleSnackbarClose}
+                />
                 {!this.isLoading() ? (
                     <form className={classes.content} noValidate>
                         <div className={classes.content}>

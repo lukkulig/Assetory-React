@@ -6,10 +6,7 @@ import {BeatLoader} from "react-spinners";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import CreatableSelect from "react-select/lib/Creatable";
-import SnackbarContent from "@material-ui/core/SnackbarContent"
-import Snackbar from "@material-ui/core/Snackbar"
 import IconButton from "@material-ui/core/IconButton"
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Input from "@material-ui/core/Input";
@@ -24,6 +21,7 @@ import CardHeader from "@material-ui/core/CardHeader";
 import CardContent from "@material-ui/core/CardContent";
 import Collapse from "@material-ui/core/Collapse";
 import clsx from "clsx";
+import SuccessSnackBar from "../SuccessSnackBar";
 
 const styles = ({
     root: {
@@ -355,8 +353,7 @@ class AddAsset extends React.Component {
     };
 
     handleSnackbarOpen = (name) => {
-        this.setState({snackOpen: true});
-        this.setState({snackMsg: "Asset " + name + " was created!"})
+        this.setState({snackOpen: true, snackMsg: "Asset " + name + " was created!"})
     };
 
     isValid() {
@@ -480,22 +477,11 @@ class AddAsset extends React.Component {
         const attributeList = this.showSelects();
         return (
             <div className={classes.root}>
-                <Snackbar open={this.state.snackOpen}
-                          anchorOrigin={{vertical: 'top', horizontal: 'right'}}
-                          autoHideDuration={10000} onClose={this.handleSnackbarClose}>
-                    <SnackbarContent
-                        style={{backgroundColor: 'green'}}
-                        message={
-                            <span id="message-id">
-                            <CheckCircleIcon style={{padding: 4}}/>
-                                {this.state.snackMsg}
-                                    </span>
-                        }
-                        action={[<IconButton key="close" aria-label="Close" color="inherit"
-                                             onClick={this.handleSnackbarClose}>
-                            x
-                        </IconButton>]}/>
-                </Snackbar>
+                <SuccessSnackBar
+                    open={this.state.snackOpen}
+                    message={this.state.snackMsg}
+                    callback={this.handleSnackbarClose}
+                />
                 {!this.isLoading() ? (
                     <form className={classes.content} noValidate>
                         <div className={classes.content}>

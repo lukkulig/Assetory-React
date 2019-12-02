@@ -20,6 +20,7 @@ import api from "../../api";
 import InputLabel from "@material-ui/core/InputLabel";
 import {BeatLoader} from "react-spinners";
 import {sleep} from "../Overview/Overview";
+import SuccessSnackBar from "../SuccessSnackBar";
 
 const styles = ({
     root: {},
@@ -56,6 +57,8 @@ class EditCategory extends React.Component {
         editAttributeDialogOpen: false,
         editedAttributeNameError: false,
         attributeChanges: new Map(),
+        snackOpen: false,
+        snackMsg: ''
     };
 
     isLoading() {
@@ -303,6 +306,7 @@ class EditCategory extends React.Component {
                     category: null,
                     superCategoryAttributes: []
                 });
+                this.handleSnackbarOpenAfterEdit(category.name);
                 this.fetchAndSetCategories()
                     .then(() => this.fetchAndSetSuperCategoryAttributes());
             });
@@ -319,6 +323,7 @@ class EditCategory extends React.Component {
     handleDeleteConfirmButton = () => {
         if (this.state.deleteWithContent === "with-content") {
             api.fetchDelete(api.endpoints.deleteCategoryWithContent(this.state.category.id), () => {
+                this.handleSnackbarOpenAfterDelete(this.state.category.name);
                 this.setState({
                     deleteDialogOpen: false,
                     deleteWithContent: "without-content",
@@ -336,6 +341,7 @@ class EditCategory extends React.Component {
             })
         } else {
             api.fetchDelete(api.endpoints.deleteCategory(this.state.category.id), () => {
+                this.handleSnackbarOpenAfterDelete(this.state.category.name);
                 this.setState({
                     deleteDialogOpen: false,
                     deleteWithContent: "without-content",
@@ -357,10 +363,27 @@ class EditCategory extends React.Component {
         }
     };
 
+    handleSnackbarClose = () => {
+        this.setState({snackOpen: false});
+    };
+
+    handleSnackbarOpenAfterEdit = (name) => {
+        this.setState({snackOpen: true, snackMsg: "Category " + name + " was edited!"})
+    };
+
+    handleSnackbarOpenAfterDelete = (name) => {
+        this.setState({snackOpen: true, snackMsg: "Category " + name + " was deleted!"})
+    };
+
     render() {
         const {classes} = this.props;
         return (
             <div className={classes.root}>
+                <SuccessSnackBar
+                    open={this.state.snackOpen}
+                    message={this.state.snackMsg}
+                    callback={this.handleSnackbarClose}
+                />
                 {!this.isLoading() ? (
                     <form className={classes.content} noValidate>
                         <div className={classes.content}>
