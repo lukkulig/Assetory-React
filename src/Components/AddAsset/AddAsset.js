@@ -46,24 +46,19 @@ const styles = ({
     select: {
         textAlign: 'left',
         paddingLeft: 10,
-        width: 500,
+        width: 580,
         fontWeight: 1000
-    },
-    creatableSelect: {
-        textAlign: 'left',
-        paddingLeft: 10,
-        width: 500,
     },
     selectAssets: {
         textAlign: 'left',
         paddingLeft: 10,
-        width: 250,
+        width: 270,
     },
     selectCategory: {
         textAlign: 'left',
         paddingRight: 10,
         paddingBottom: 10,
-        width: 200,
+        width: 250,
     },
     chips: {
         display: 'flex',
@@ -82,7 +77,7 @@ const styles = ({
     },
     addAssetButton: {
         margin: 2,
-        width: 200,
+        width: 580,
     },
     addRelatedAssetButton: {
         margin: 2,
@@ -95,6 +90,11 @@ const styles = ({
     expandOpen: {
         transform: 'rotate(180deg)',
     },
+    noContent: {
+        width: "100%",
+        textAlign: "center",
+        paddingTop: 10
+    }
 });
 
 class AddAsset extends React.Component {
@@ -539,7 +539,7 @@ class AddAsset extends React.Component {
                                                 aria-expanded={this.state.expanded}
                                                 aria-label="show more"
                                             >
-                                                <ExpandMoreIcon />
+                                                <ExpandMoreIcon/>
                                             </IconButton>
                                         }
                             />
@@ -633,8 +633,9 @@ class AddAsset extends React.Component {
                             </Collapse>
                         </Card>
                         }
-                        < div className={classes.contentWithButton}>
+                        <div className={classes.contentWithButton}>
                             < Button variant="contained"
+                                     size="large"
                                      color="primary"
                                      className={classes.addAssetButton}
                                      onClick={this.handleAddAssetButton}
@@ -646,10 +647,12 @@ class AddAsset extends React.Component {
 
                     </form>
                 ) : (
-                    <BeatLoader
-                        size={10}
-                        color={"#3f51b5"}
-                    />
+                    <div className={classes.noContent}>
+                        <BeatLoader
+                            size={10}
+                            color={"#3f51b5"}
+                        />
+                    </div>
                 )}
             </div>
         );
