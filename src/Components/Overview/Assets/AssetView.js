@@ -19,11 +19,11 @@ import ComputerInformation from "./ComputerInformation";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import IconButton from "@material-ui/core/IconButton";
-import {Delete, ExpandMore} from '@material-ui/icons';
+import {ExpandMore} from '@material-ui/icons';
 import {BeatLoader} from "react-spinners";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import Tooltip from "@material-ui/core/Tooltip";
+import DeleteRelatedAssetDialog from "./DeleteRelatedAssetDialog";
 
 const styles = ({
     title: {
@@ -118,6 +118,7 @@ const styles = ({
 });
 
 class AssetView extends React.Component {
+    _isMounted = false;
 
     state = {
         attributes: [],
@@ -129,8 +130,13 @@ class AssetView extends React.Component {
     }
 
     componentDidMount() {
+        this._isMounted = true;
         this.setState({attributes: this.props.asset.attributes});
         this.fetchAndSetRelatedAssets();
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
     }
 
     fetchAndSetRelatedAssets = () => {
@@ -142,7 +148,9 @@ class AssetView extends React.Component {
                     name: asset.name,
                     categoryId: asset.categoryId
                 }));
-                this.setState({relatedAssets: result});
+                if (this._isMounted) {
+                    this.setState({relatedAssets: result});
+                }
             }
         );
     };
@@ -194,11 +202,10 @@ class AssetView extends React.Component {
         );
     };
 
-    handleDeleteRelatedAsset = (relatedAsset) => {
-        let relatedAssets = this.state.relatedAssets;
+    handleDeleteRelatedAsset = (relatedAssetId) => {
         api.fetch(
-            api.endpoints.deleteRelatedAssets(this.props.asset.id, relatedAsset.id), () => {
-                this.setState({relatedAssets: relatedAssets.filter(asset => asset.id !== relatedAsset.id)});
+            api.endpoints.deleteRelatedAssets(this.props.asset.id, relatedAssetId), () => {
+                this.setState({relatedAssets: this.state.relatedAssets.filter(asset => asset.id !== relatedAssetId)});
             }
         );
     };
@@ -282,12 +289,10 @@ class AssetView extends React.Component {
                                                                   primary={value.name}
                                                     />
                                                     <ListItemSecondaryAction>
-                                                        <Tooltip title="Delete related asset">
-                                                            <IconButton edge="end"
-                                                                        onClick={() => this.handleDeleteRelatedAsset(value)}>
-                                                                <Delete/>
-                                                            </IconButton>
-                                                        </Tooltip>
+                                                        <DeleteRelatedAssetDialog
+                                                            relatedAsset={value}
+                                                            assetViewCallback={this.handleDeleteRelatedAsset}
+                                                        />
                                                     </ListItemSecondaryAction>
                                                 </ListItem>
                                             </Tooltip>

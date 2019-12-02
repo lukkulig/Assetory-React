@@ -5,7 +5,6 @@ import Grid from "@material-ui/core/Grid";
 import DeleteFilterDialog from "./DeleteFilterDialog";
 import Typography from "@material-ui/core/Typography";
 import * as Constants from "../../../Constants/Constants";
-import {BeatLoader} from "react-spinners";
 
 const styles = theme => ({
     root: {
@@ -88,17 +87,9 @@ class ActiveFilters extends React.Component {
 
             <div className={classes.root}>
                 <Grid className={classes.grid} container justify="flex-start">
-                    {!this.isLoading() ? (
+                    {!this.isLoading() &&
                         filtersList
-                    ) : (
-                        <div className={classes.noContent}>
-                            <BeatLoader
-                                size={10}
-                                color={"#3f51b5"}
-                            />
-                        </div>
-                    )}
-
+                    }
                 </Grid>
             </div>
         )

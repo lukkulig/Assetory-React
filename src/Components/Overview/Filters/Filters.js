@@ -82,8 +82,7 @@ class Filters extends React.Component {
         const {classes, categoryAttributesValues, filters, selectedCategoryId, allCategories} = this.props;
         let setFiltersList = [];
 
-        if (!this.isLoading()) {
-
+        if (!this.isLoading() && categoryAttributesValues !== undefined) {
             let subcategories = this.getSubcategories(allCategories.shift(), selectedCategoryId);
             let categoryValues = this.prepareCategoryFilters(subcategories, "");
 
@@ -96,7 +95,9 @@ class Filters extends React.Component {
                         })).filter((el) => !(filters[Constants.NAME_KEY] || []).map(filter => filter.id).includes(el.id))
                 },
                 {
-                    key: Constants.CATEGORY_KEY, label: Constants.CATEGORY_LABEL, values: categoryValues.filter((el) =>
+                    key: Constants.CATEGORY_KEY,
+                    label: Constants.CATEGORY_LABEL,
+                    values: categoryValues.filter((el) =>
                         !(filters[Constants.CATEGORY_KEY] || []).map(filter => filter.id).includes(el.id))
                 }
             ];
@@ -130,32 +131,36 @@ class Filters extends React.Component {
 
         return (
             <div className={classes.root}>
-                <div className={classes.header}>
-                    <Typography className={classes.title} variant="h5">
-                        Filters
-                    </Typography>
-                </div>
-                <Divider className={classes.divider}/>
-                <div className={classes.filtersSection}>
-                    <Grid container justify="flex-start">
-                        {!this.isLoading() ? (
-                            setFiltersList.length ? (
-                                setFiltersList
+                {categoryAttributesValues !== undefined &&
+                <>
+                    <div className={classes.header}>
+                        <Typography className={classes.title} variant="h5">
+                            Filters
+                        </Typography>
+                    </div>
+                    < Divider className={classes.divider}/>
+                    <div className={classes.filtersSection}>
+                        <Grid container justify="flex-start">
+                            {!this.isLoading() ? (
+                                setFiltersList.length ? (
+                                    setFiltersList
+                                ) : (
+                                    <Typography className={classes.noContent} color="textSecondary">
+                                        There's no filters
+                                    </Typography>
+                                )
                             ) : (
-                                <Typography className={classes.noContent} color="textSecondary">
-                                    There's no filters
-                                </Typography>
-                            )
-                        ) : (
-                            <div className={classes.noContent}>
-                                <BeatLoader
-                                    size={10}
-                                    color={"#3f51b5"}
-                                />
-                            </div>
-                        )}
-                    </Grid>
-                </div>
+                                <div className={classes.noContent}>
+                                    <BeatLoader
+                                        size={10}
+                                        color={"#3f51b5"}
+                                    />
+                                </div>
+                            )}
+                        </Grid>
+                    </div>
+                </>
+                }
             </div>
         );
     }

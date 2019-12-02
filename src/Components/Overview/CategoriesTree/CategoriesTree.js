@@ -49,9 +49,23 @@ class CategoriesTree extends React.Component {
         selectedCategoryId: null
     };
 
+    constructor(props) {
+        super(props);
+        this.treeRef = React.createRef();
+    }
+
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps !== this.props && !this.isLoading()) {
-            this.setState({selectedCategoryId: this.getId(this.props.selectedCategoryId, this.props.allCategories)});
+            this.setState({
+                selectedCategoryId:
+                    this.props.selectedCategoryId !== undefined
+                        ? this.getId(this.props.selectedCategoryId, this.props.allCategories)
+                        : undefined
+            }, () => {
+                if (this.state.selectedCategoryId === undefined) {
+                    this.treeRef.current.setState({activeKey: ""});
+                }
+            });
         }
     }
 
@@ -59,7 +73,7 @@ class CategoriesTree extends React.Component {
         let id = categoryId;
         let category = categories.find(c => c.id === categoryId);
         if (category.parentCategoryId !== null) {
-            id = this.getId(category.parentCategoryId, categories) +"/" + id;
+            id = this.getId(category.parentCategoryId, categories) + "/" + id;
         }
         return id;
     }
@@ -93,13 +107,12 @@ class CategoriesTree extends React.Component {
 
     isLoading() {
         return this.props.categories === null
-            || this.props.initialSelectedCategoryId === null
             || this.props.selectedCategoryId === null
             || this.props.allCategories === null;
     }
 
     render() {
-        const {classes, categories, initialSelectedCategoryId} = this.props;
+        const {classes, categories} = this.props;
 
         let initialOpenCategories = [];
         if (!this.isLoading()) {
@@ -117,10 +130,9 @@ class CategoriesTree extends React.Component {
                 <div className={classes.treeSection}>
                     {!this.isLoading() ? (
                         <TreeMenu
+                            ref={this.treeRef}
                             data={this.mapToData(categories)}
                             hasSearch={false}
-                            activeKey={this.state.selectedCategoryId}
-                            initialActiveKey={initialSelectedCategoryId}
                             initialOpenNodes={initialOpenCategories}
                             onClickItem={({key}) =>
                                 this.handleChange(key)
@@ -165,8 +177,7 @@ CategoriesTree.propTypes = {
             subCategories: PropTypes.array
         })
     ),
-    categoryChangeCallback: PropTypes.func,
-    initialSelectedCategoryId: PropTypes.string,
+    categoryChangeCallback: PropTypes.func
 };
 
 export default withStyles(styles)(CategoriesTree)
