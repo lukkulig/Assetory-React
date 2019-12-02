@@ -10,6 +10,7 @@ import {BeatLoader} from "react-spinners";
 import Button from "@material-ui/core/Button";
 import api from "../../../api";
 import FileSaver from "file-saver";
+import Tooltip from "@material-ui/core/Tooltip";
 
 const styles = ({
     root: {
@@ -124,14 +125,16 @@ class Assets extends React.Component {
                     <Typography className={classes.title} variant="h5">
                         Assets
                     </Typography>
-                    <div style={{'text-align': 'right'}}>
-                        <Button
-                            variant='contained'
-                            color='primary'
-                            onClick={this.handleExportButton}
-                        >
-                            Export assets to csv
-                        </Button>
+                    <div style={{'textAlign': 'right'}}>
+                        <Tooltip title="Download CSV file that contains data about all existing assets">
+                            <Button
+                                variant='contained'
+                                color='primary'
+                                onClick={this.handleExportButton}
+                            >
+                                Export assets to csv
+                            </Button>
+                        </Tooltip>
                     </div>
                 </div>
                 <Divider className={classes.divider}/>
