@@ -36,7 +36,7 @@ class DeleteAssetDialog extends React.Component {
     handleDeleteAsset = () => {
         this.handleClose();
         api.fetchDelete(api.endpoints.deleteAsset(this.props.assetId), () => {
-            this.props.assetViewCallback(this.props.assetId);
+            this.props.assetViewCallback(this.props.assetId, this.props.assetName);
         });
     };
 
