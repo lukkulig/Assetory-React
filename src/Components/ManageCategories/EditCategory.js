@@ -93,21 +93,34 @@ class EditCategory extends React.Component {
                     }
                 });
                 let categories = this.prepareCategories(result, 15);
-                this.setState({categories: categories});
-                this.setState({category: categories[0]});
+                this.setState({
+                    categories: categories,
+                    category: categories[0],
+                });
+                api.fetch(
+                    api.endpoints.getCategoryAttributes(this.state.category.id),
+                    (response) => {
+                        this.setState({attributes: response});
+                    }
+                );
                 document.body.style.cursor = 'default';
             });
     }
 
     fetchAndSetSuperCategoryAttributes() {
         document.body.style.cursor = 'wait';
-        api.fetch(
-            api.endpoints.getCategoryAttributes(this.state.category.id),
-            (response) => {
-                this.setState({superCategoryAttributes: response});
-                document.body.style.cursor = 'default';
-            }
-        )
+        if (this.state.category.parentCategoryId !== null) {
+            api.fetch(
+                api.endpoints.getCategoryAttributes(this.state.category.parentCategoryId),
+                (response) => {
+                    this.setState({superCategoryAttributes: response});
+                    document.body.style.cursor = 'default';
+                }
+            )
+        } else {
+            this.setState({superCategoryAttributes: []});
+            document.body.style.cursor = 'default';
+        }
     }
 
     prepareCategories(categories, paddingLeft) {
@@ -149,6 +162,8 @@ class EditCategory extends React.Component {
                         this.setState({superCategoryAttributes: response})
                     }
                 )
+            } else {
+                this.setState({superCategoryAttributes: []});
             }
         });
     };
@@ -257,6 +272,17 @@ class EditCategory extends React.Component {
         });
     };
 
+    handleCancelAttributeEdition = () => {
+        this.setState({
+            oldEditedAttributeName: '',
+            editedAttributeName: '',
+            editedAttributeType: 'text',
+            editedAttributeRequired: false,
+            editAttributeDialogOpen: false,
+            editedAttributeNameError: false,
+        })
+    };
+
     handleSaveCategoryButton = () => {
         let category = this.state.category;
         category.additionalAttributes = this.state.attributes;
@@ -275,7 +301,7 @@ class EditCategory extends React.Component {
                     attributeChanges: {},
                     categories: null,
                     category: null,
-                    superCategoryAttributes: null
+                    superCategoryAttributes: []
                 });
                 this.fetchAndSetCategories()
                     .then(() => this.fetchAndSetSuperCategoryAttributes());
@@ -303,7 +329,7 @@ class EditCategory extends React.Component {
                     newAttributesNames: [],
                     categories: null,
                     category: null,
-                    superCategoryAttributes: null
+                    superCategoryAttributes: []
                 });
                 this.fetchAndSetCategories()
                     .then(() => this.fetchAndSetSuperCategoryAttributes());
@@ -320,7 +346,7 @@ class EditCategory extends React.Component {
                     newAttributesNames: [],
                     categories: null,
                     category: null,
-                    superCategoryAttributes: null
+                    superCategoryAttributes: []
 
                 });
                 sleep(1000).then(() => {
@@ -333,7 +359,6 @@ class EditCategory extends React.Component {
 
     render() {
         const {classes} = this.props;
-
         return (
             <div className={classes.root}>
                 {!this.isLoading() ? (
@@ -356,13 +381,14 @@ class EditCategory extends React.Component {
                                     )}
                                 </Select>
                             </FormControl>
+                            {this.state.category !== this.state.categories[0] &&
                             <React.Fragment>
                                 <Button style={{float: "left"}}
                                         className={classes.button}
                                         variant="contained"
                                         color="secondary"
                                         onClick={this.handleDeleteCategoryButton}
-                                        disabled={this.state.category === undefined || this.state.category === null}
+                                        disabled={this.state.category === undefined}
                                 >
                                     Delete
                                 </Button>
@@ -398,6 +424,7 @@ class EditCategory extends React.Component {
                                     </DialogActions>
                                 </Dialog>
                             </React.Fragment>
+                            }
                         </div>
                         <div className={classes.content} style={{clear: "both"}}>
                             <CategoryAttributes
@@ -415,13 +442,14 @@ class EditCategory extends React.Component {
                                 attributeNameError={this.state.attributeNameError}
                                 editedAttributeName={this.state.editedAttributeName}
                                 editedAttributeType={this.state.editedAttributeType}
-                                editedAttributeRequired={this.state.newAttributeRequired}
+                                editedAttributeRequired={this.state.editedAttributeRequired}
                                 editedAttributeNameChangeCallback={this.handleEditedAttributeNameChange}
                                 editedAttributeTypeChangeCallback={this.handleEditedAttributeTypeChange}
                                 editedAttributeRequiredChangeCallback={this.handleEditedAttributeRequiredChange}
                                 saveEditedAttributeCallback={this.handleSaveEditedAttributeButton}
                                 editAttributeCallback={this.handleEditAttributeButton}
                                 editAttributeDialogOpen={this.state.editAttributeDialogOpen}
+                                cancelAttributeEditCallback={this.handleCancelAttributeEdition}
                             />
                         </div>
                         <div className={classes.content}>
