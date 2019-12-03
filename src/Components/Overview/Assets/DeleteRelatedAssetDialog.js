@@ -7,8 +7,9 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import {DeleteForever} from "@material-ui/icons";
-import api from "../../../api";
+import {Delete} from "@material-ui/icons";
+import Tooltip from "@material-ui/core/Tooltip";
+import IconButton from "@material-ui/core/IconButton";
 
 const styles = ({
     textField: {
@@ -19,7 +20,7 @@ const styles = ({
     },
 });
 
-class DeleteAssetDialog extends React.Component {
+class DeleteRelatedAssetDialog extends React.Component {
 
     state = {
         open: false
@@ -33,41 +34,37 @@ class DeleteAssetDialog extends React.Component {
         this.setState({open: false});
     };
 
-    handleDeleteAsset = () => {
+    handleDeleteRelatedAsset = () => {
         this.handleClose();
-        api.fetchDelete(api.endpoints.deleteAsset(this.props.assetId), () => {
-            this.props.assetViewCallback(this.props.assetId, this.props.assetName);
-        });
+        this.props.assetViewCallback(this.props.relatedAsset.id);
     };
 
     render() {
-        const {classes, assetName} = this.props;
+        const {relatedAsset} = this.props;
         return (
             <div>
-                <Button
-                    size="small"
-                    color="secondary"
-                    variant="contained"
-                    onClick={this.handleClickOpen}>
-                    Delete
-                    <DeleteForever fontSize='small' className={classes.icon}/>
-                </Button>
+                <Tooltip title="Delete related asset">
+                    <IconButton edge="end"
+                                onClick={this.handleClickOpen}>
+                        <Delete/>
+                    </IconButton>
+                </Tooltip>
                 <Dialog
                     open={this.state.open}
                     onClose={this.handleClose}
-                    aria-labelledby="delete-asset-form"
+                    aria-labelledby="delete-related-asset-form"
                 >
-                    <DialogTitle id="delete-asset-form">Delete Asset</DialogTitle>
+                    <DialogTitle id="delete-related-asset-form">Delete Related Asset</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            {"Are you sure you want to delete asset \"" + assetName + "\"?"}
+                            {"Are you sure you want to delete related asset \"" + relatedAsset.name + "\"?"}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={this.handleClose} color="default">
                             Cancel
                         </Button>
-                        <Button onClick={this.handleDeleteAsset} color="secondary">
+                        <Button onClick={this.handleDeleteRelatedAsset} color="secondary">
                             Delete
                         </Button>
                     </DialogActions>
@@ -78,11 +75,10 @@ class DeleteAssetDialog extends React.Component {
 
 }
 
-DeleteAssetDialog.propTypes = {
+DeleteRelatedAssetDialog.propTypes = {
     classes: PropTypes.object.isRequired,
-    assetId: PropTypes.string.isRequired,
-    assetName: PropTypes.string.isRequired,
+    relatedAsset: PropTypes.object.isRequired,
     assetViewCallback: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(DeleteAssetDialog);
+export default withStyles(styles)(DeleteRelatedAssetDialog);

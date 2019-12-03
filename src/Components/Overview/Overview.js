@@ -9,6 +9,7 @@ import Paper from "@material-ui/core/Paper";
 import Assets from "./Assets/Assets";
 import * as Constants from "../../Constants/Constants";
 import {CATEGORY_KEY, NAME_KEY} from "../../Constants/Constants";
+import SuccessSnackBar from "../SuccessSnackBar";
 
 export function sleep(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
@@ -21,10 +22,11 @@ class Overview extends React.Component {
         allCategories: null,
         categories: null,
         selectedCategoryId: null,
-        initialSelectedCategoryId: null,
         selectedCategoryAttributesValues: null,
         filteredAssets: null,
         filters: {},
+        snackOpen: false,
+        snackMsg: ''
     };
 
     fetchAndSetAllCategories() {
@@ -55,8 +57,7 @@ class Overview extends React.Component {
                     if (Array.isArray(response) && response.length) {
                         let initialSelectedCategoryId = response[0].category.id;
                         this.setState({
-                            selectedCategoryId: initialSelectedCategoryId,
-                            initialSelectedCategoryId: initialSelectedCategoryId
+                            selectedCategoryId: initialSelectedCategoryId
                         });
                     }
                 }
@@ -83,12 +84,12 @@ class Overview extends React.Component {
                 return result
             }, {});
         }
-        this.fetchAndSetFilteredAssetsByFilters(filters);
+        this.fetchAndSetFilteredAssetsByFilters(this.state.selectedCategoryId, filters);
     }
 
-    fetchAndSetFilteredAssetsByFilters(filters) {
+    fetchAndSetFilteredAssetsByFilters(mainCategoryId, filters) {
         const data = {
-            mainCategoryId: this.state.selectedCategoryId,
+            mainCategoryId: mainCategoryId,
             filters: filters
         };
         api.fetch(
@@ -163,19 +164,23 @@ class Overview extends React.Component {
     };
 
     handleRedirectToRelatedAsset = (categoryId, assetId) => {
-        this.setState({selectedCategoryAttributesValues: null, filteredAssets: null});
-        this.setState({selectedCategoryId: categoryId, initialSelectedCategoryId: categoryId, filters: {}}, () => {
-            this.fetchAndSetCategoryAttributesValues();
+        this.setState({
+            filteredAssets: null,
+            selectedCategoryAttributesValues: undefined,
+            selectedCategoryId: undefined,
+            filters: {}
+        }, () => {
             let filter = {
                 id: Array.of(assetId)
             };
-            this.fetchAndSetFilteredAssetsByFilters(filter);
+            this.fetchAndSetFilteredAssetsByFilters(this.state.categories[0].category.id, filter);
         });
     };
 
-    handleDeleteAsset = () => {
-        this.setState({filteredAssets: null});
+    handleDeleteAsset = (assetId, assetName) => {
         sleep(1000).then(() => {
+            this.setState({filteredAssets: this.state.filteredAssets.filter(asset => asset.id !== assetId)});
+            this.handleSnackbarOpenAfterAssetDelete(assetName);
             this.fetchAndSetCategoryAttributesValues().then(() => {
                 let filters = this.state.filters;
                 if (Object.keys(filters).length !== 0) {
@@ -196,7 +201,6 @@ class Overview extends React.Component {
                 }
                 this.setState({filters: filters});
             });
-            this.fetchAndSetFilteredAssets();
         });
     };
 
@@ -208,11 +212,24 @@ class Overview extends React.Component {
         });
     };
 
+    handleSnackbarClose = () => {
+        this.setState({snackOpen: false});
+    };
+
+    handleSnackbarOpenAfterAssetDelete = (name) => {
+        this.setState({snackOpen: true, snackMsg: "Asset " + name + " was deleted!"});
+    };
+
     render() {
         const {classes} = this.props;
 
         return (
             <div className={classes.content}>
+                <SuccessSnackBar
+                    open={this.state.snackOpen}
+                    message={this.state.snackMsg}
+                    callback={this.handleSnackbarClose}
+                />
                 <div className={classes.sideBarSection}>
                     <Paper className={classes.sideBarPaper} elevation={4}>
                         <div className={classes.categoryTreeSection}>
@@ -224,7 +241,6 @@ class Overview extends React.Component {
                                 selectedCategoryId={this.state.selectedCategoryId}
                                 allCategories={this.state.allCategories}
                                 categoryChangeCallback={this.handleCategoryChange}
-                                initialSelectedCategoryId={this.state.initialSelectedCategoryId}
                             />
                         </div>
                         <div className={classes.filtersSection}>
@@ -248,7 +264,8 @@ class Overview extends React.Component {
                             categories={this.state.categories}
                             allCategories={this.state.allCategories}
                             filters={this.state.filters}
-                            categoryAttributes={this.state.selectedCategoryAttributesValues !== null ?
+                            categoryAttributes={this.state.selectedCategoryAttributesValues !== null
+                            && this.state.selectedCategoryAttributesValues !== undefined ?
                                 Object.keys(this.state.selectedCategoryAttributesValues)
                                     .filter(attribute => attribute !== Constants.NAME_KEY)
                                 : null

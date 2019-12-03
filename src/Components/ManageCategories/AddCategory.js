@@ -7,6 +7,7 @@ import {BeatLoader} from "react-spinners";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import {sleep} from "../Overview/Overview";
+import SuccessSnackBar from "../SuccessSnackBar";
 
 const styles = ({
     root: {},
@@ -44,6 +45,8 @@ class AddCategory extends React.Component {
         editedAttributeRequired: false,
         editAttributeDialogOpen: false,
         editedAttributeNameError: false,
+        snackOpen: false,
+        snackMsg: ''
     };
 
     isLoading() {
@@ -236,6 +239,17 @@ class AddCategory extends React.Component {
         });
     };
 
+    handleCancelAttributeEdition = () => {
+        this.setState({
+            oldEditedAttributeName: '',
+            editedAttributeName: '',
+            editedAttributeType: 'text',
+            editedAttributeRequired: false,
+            editAttributeDialogOpen: false,
+            editedAttributeNameError: false,
+        })
+    };
+
     handleAddCategoryButton = () => {
         const category = {
             additionalAttributes: this.state.attributes,
@@ -253,6 +267,7 @@ class AddCategory extends React.Component {
                     superCategoryAttributes: null,
                     categoryName: '',
                 });
+                this.handleSnackbarOpen(category.name);
                 sleep(1000).then(() => {
                     this.fetchAndSetCategories()
                         .then(() => this.fetchAndSetSuperCategoryAttributes());
@@ -260,10 +275,23 @@ class AddCategory extends React.Component {
             })
     };
 
+    handleSnackbarClose = () => {
+        this.setState({snackOpen: false});
+    };
+
+    handleSnackbarOpen = (name) => {
+        this.setState({snackOpen: true, snackMsg: "Category " + name + " was created!"})
+    };
+
     render() {
         const {classes} = this.props;
         return (
             <div className={classes.root}>
+                <SuccessSnackBar
+                    open={this.state.snackOpen}
+                    message={this.state.snackMsg}
+                    callback={this.handleSnackbarClose}
+                />
                 {!this.isLoading() ? (
                     <form className={classes.content} noValidate>
                         <div className={classes.content}>
@@ -311,13 +339,14 @@ class AddCategory extends React.Component {
                                 attributeNameError={this.state.attributeNameError}
                                 editedAttributeName={this.state.editedAttributeName}
                                 editedAttributeType={this.state.editedAttributeType}
-                                editedAttributeRequired={this.state.newAttributeRequired}
+                                editedAttributeRequired={this.state.editedAttributeRequired}
                                 editedAttributeNameChangeCallback={this.handleEditedAttributeNameChange}
                                 editedAttributeTypeChangeCallback={this.handleEditedAttributeTypeChange}
                                 editedAttributeRequiredChangeCallback={this.handleEditedAttributeRequiredChange}
                                 saveEditedAttributeCallback={this.handleSaveEditedAttributeButton}
                                 editAttributeCallback={this.handleEditAttributeButton}
                                 editAttributeDialogOpen={this.state.editAttributeDialogOpen}
+                                cancelAttributeEditCallback={this.handleCancelAttributeEdition}
                             />
                         </div>
                         <div className={classes.content}>
@@ -325,7 +354,7 @@ class AddCategory extends React.Component {
                                     color="primary"
                                     className={classes.button}
                                     onClick={this.handleAddCategoryButton}
-                                    disabled={this.state.categoryNameError}
+                                    disabled={this.state.categoryNameError || this.state.categoryName === ''}
                             >
                                 Add category
                             </Button>

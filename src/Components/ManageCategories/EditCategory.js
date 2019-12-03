@@ -20,6 +20,7 @@ import api from "../../api";
 import InputLabel from "@material-ui/core/InputLabel";
 import {BeatLoader} from "react-spinners";
 import {sleep} from "../Overview/Overview";
+import SuccessSnackBar from "../SuccessSnackBar";
 
 const styles = ({
     root: {},
@@ -56,6 +57,8 @@ class EditCategory extends React.Component {
         editAttributeDialogOpen: false,
         editedAttributeNameError: false,
         attributeChanges: new Map(),
+        snackOpen: false,
+        snackMsg: ''
     };
 
     isLoading() {
@@ -93,21 +96,34 @@ class EditCategory extends React.Component {
                     }
                 });
                 let categories = this.prepareCategories(result, 15);
-                this.setState({categories: categories});
-                this.setState({category: categories[0]});
+                this.setState({
+                    categories: categories,
+                    category: categories[0],
+                });
+                api.fetch(
+                    api.endpoints.getCategoryAttributes(this.state.category.id),
+                    (response) => {
+                        this.setState({attributes: response});
+                    }
+                );
                 document.body.style.cursor = 'default';
             });
     }
 
     fetchAndSetSuperCategoryAttributes() {
         document.body.style.cursor = 'wait';
-        api.fetch(
-            api.endpoints.getCategoryAttributes(this.state.category.id),
-            (response) => {
-                this.setState({superCategoryAttributes: response});
-                document.body.style.cursor = 'default';
-            }
-        )
+        if (this.state.category.parentCategoryId !== null) {
+            api.fetch(
+                api.endpoints.getCategoryAttributes(this.state.category.parentCategoryId),
+                (response) => {
+                    this.setState({superCategoryAttributes: response});
+                    document.body.style.cursor = 'default';
+                }
+            )
+        } else {
+            this.setState({superCategoryAttributes: []});
+            document.body.style.cursor = 'default';
+        }
     }
 
     prepareCategories(categories, paddingLeft) {
@@ -149,6 +165,8 @@ class EditCategory extends React.Component {
                         this.setState({superCategoryAttributes: response})
                     }
                 )
+            } else {
+                this.setState({superCategoryAttributes: []});
             }
         });
     };
@@ -257,6 +275,17 @@ class EditCategory extends React.Component {
         });
     };
 
+    handleCancelAttributeEdition = () => {
+        this.setState({
+            oldEditedAttributeName: '',
+            editedAttributeName: '',
+            editedAttributeType: 'text',
+            editedAttributeRequired: false,
+            editAttributeDialogOpen: false,
+            editedAttributeNameError: false,
+        })
+    };
+
     handleSaveCategoryButton = () => {
         let category = this.state.category;
         category.additionalAttributes = this.state.attributes;
@@ -275,8 +304,9 @@ class EditCategory extends React.Component {
                     attributeChanges: {},
                     categories: null,
                     category: null,
-                    superCategoryAttributes: null
+                    superCategoryAttributes: []
                 });
+                this.handleSnackbarOpenAfterEdit(category.name);
                 this.fetchAndSetCategories()
                     .then(() => this.fetchAndSetSuperCategoryAttributes());
             });
@@ -293,6 +323,7 @@ class EditCategory extends React.Component {
     handleDeleteConfirmButton = () => {
         if (this.state.deleteWithContent === "with-content") {
             api.fetchDelete(api.endpoints.deleteCategoryWithContent(this.state.category.id), () => {
+                this.handleSnackbarOpenAfterDelete(this.state.category.name);
                 this.setState({
                     deleteDialogOpen: false,
                     deleteWithContent: "without-content",
@@ -303,13 +334,14 @@ class EditCategory extends React.Component {
                     newAttributesNames: [],
                     categories: null,
                     category: null,
-                    superCategoryAttributes: null
+                    superCategoryAttributes: []
                 });
                 this.fetchAndSetCategories()
                     .then(() => this.fetchAndSetSuperCategoryAttributes());
             })
         } else {
             api.fetchDelete(api.endpoints.deleteCategory(this.state.category.id), () => {
+                this.handleSnackbarOpenAfterDelete(this.state.category.name);
                 this.setState({
                     deleteDialogOpen: false,
                     deleteWithContent: "without-content",
@@ -320,7 +352,7 @@ class EditCategory extends React.Component {
                     newAttributesNames: [],
                     categories: null,
                     category: null,
-                    superCategoryAttributes: null
+                    superCategoryAttributes: []
 
                 });
                 sleep(1000).then(() => {
@@ -331,11 +363,27 @@ class EditCategory extends React.Component {
         }
     };
 
+    handleSnackbarClose = () => {
+        this.setState({snackOpen: false});
+    };
+
+    handleSnackbarOpenAfterEdit = (name) => {
+        this.setState({snackOpen: true, snackMsg: "Category " + name + " was edited!"})
+    };
+
+    handleSnackbarOpenAfterDelete = (name) => {
+        this.setState({snackOpen: true, snackMsg: "Category " + name + " was deleted!"})
+    };
+
     render() {
         const {classes} = this.props;
-
         return (
             <div className={classes.root}>
+                <SuccessSnackBar
+                    open={this.state.snackOpen}
+                    message={this.state.snackMsg}
+                    callback={this.handleSnackbarClose}
+                />
                 {!this.isLoading() ? (
                     <form className={classes.content} noValidate>
                         <div className={classes.content}>
@@ -356,13 +404,14 @@ class EditCategory extends React.Component {
                                     )}
                                 </Select>
                             </FormControl>
+                            {this.state.category !== this.state.categories[0] &&
                             <React.Fragment>
                                 <Button style={{float: "left"}}
                                         className={classes.button}
                                         variant="contained"
                                         color="secondary"
                                         onClick={this.handleDeleteCategoryButton}
-                                        disabled={this.state.category === undefined || this.state.category === null}
+                                        disabled={this.state.category === undefined}
                                 >
                                     Delete
                                 </Button>
@@ -398,6 +447,7 @@ class EditCategory extends React.Component {
                                     </DialogActions>
                                 </Dialog>
                             </React.Fragment>
+                            }
                         </div>
                         <div className={classes.content} style={{clear: "both"}}>
                             <CategoryAttributes
@@ -415,13 +465,14 @@ class EditCategory extends React.Component {
                                 attributeNameError={this.state.attributeNameError}
                                 editedAttributeName={this.state.editedAttributeName}
                                 editedAttributeType={this.state.editedAttributeType}
-                                editedAttributeRequired={this.state.newAttributeRequired}
+                                editedAttributeRequired={this.state.editedAttributeRequired}
                                 editedAttributeNameChangeCallback={this.handleEditedAttributeNameChange}
                                 editedAttributeTypeChangeCallback={this.handleEditedAttributeTypeChange}
                                 editedAttributeRequiredChangeCallback={this.handleEditedAttributeRequiredChange}
                                 saveEditedAttributeCallback={this.handleSaveEditedAttributeButton}
                                 editAttributeCallback={this.handleEditAttributeButton}
                                 editAttributeDialogOpen={this.state.editAttributeDialogOpen}
+                                cancelAttributeEditCallback={this.handleCancelAttributeEdition}
                             />
                         </div>
                         <div className={classes.content}>
