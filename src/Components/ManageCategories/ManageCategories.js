@@ -7,9 +7,16 @@ import AddCategory from './AddCategory'
 import EditCategory from './EditCategory';
 
 const styles = theme => ({
-    root: {},
+    root: {
+        height: 'calc(100vh - 64px)',
+        display: 'flex',
+        justifyContent: 'center',
+        minWidth: '900px',
+        scrollPaddingBottom: 10
+    },
     content: {
         textAlign: 'center',
+        height: "100%",
         padding: theme.spacing(3),
     }
 });

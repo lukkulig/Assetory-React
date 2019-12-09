@@ -18,23 +18,40 @@ import {
 } from "@material-ui/core";
 
 const styles = ({
-    root: {},
-    content: {},
-    select: {},
-    attributesListBox: {
-        maxHeight: 280,
-        overflow: 'auto',
+    root: {
+        height: "100%",
+        display: 'grid',
+        gridTemplateRows: 'max-content auto',
+        gridTemplateAreas: `'form'
+                             'attributes'`
     },
-    textField: {
-        width: 400,
+    form: {
+        gridArea: 'form',
+        float: 'left'
+    },
+    attributeTypeSelect: {
+        width: 150,
+        textAlign: 'left',
+
+    },
+    attributesListBox: {
+        gridArea: 'attributes',
+        overflow: 'auto',
+        scrollPaddingRight: 10
+    },
+    attributeNameTextField: {
+        width: 300
     },
     attributeContent: {
         float: 'left',
         marginTop: 10,
         marginBottom: 10,
         marginLeft: 10,
-        marginRight: 10,
+        marginRight: 10
     },
+    checkbox: {
+        marginTop: 7.5
+    }
 });
 
 const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCallback, type, typeChangeCallback, required, requiredChangeCallback, saveAttributeCallback, cancelEditCallback) => {
@@ -48,7 +65,7 @@ const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCal
                     <div className={classes.attributeContent}>
                         <TextField
                             error={nameError}
-                            className={classes.textField}
+                            className={classes.attributeNameTextField}
                             label={"Attribute name"}
                             value={name}
                             onChange={nameChangeCallback}
@@ -58,7 +75,7 @@ const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCal
                     </div>
                     <div className={classes.attributeContent}>
                         <Select
-                            className={classes.select}
+                            className={classes.attributeTypeSelect}
                             value={type}
                             onChange={typeChangeCallback}
                         >
@@ -87,7 +104,6 @@ const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCal
                     </Button>
                     <Button
                         color="primary"
-                        className={classes.button}
                         onClick={saveAttributeCallback}
                         disabled={nameError || name === ''}
                     >
@@ -99,7 +115,7 @@ const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCal
     )
 };
 
-const AttributeListItem = (name, type, required, handleChange, fromSupercategory, id, editAttributeCallback, editAttributeDialogProps) => {
+const AttributeListItem = (name, type, required, handleChange, fromSupercategory, id, editAttributeCallback, editAttributeDialogProps, withDelete, deleteAttributeCallback) => {
     return (
         <ListItem component={"li"} style={{float: "left"}}>
             {name + " (" + type + ")"}
@@ -114,12 +130,22 @@ const AttributeListItem = (name, type, required, handleChange, fromSupercategory
                 label="Required"
                 labelPlacement="start"
             />
+            {!fromSupercategory &&
             <Button variant="contained"
-                    disabled={fromSupercategory}
                     onClick={() => editAttributeCallback(name)}
             >
                 Edit
             </Button>
+            }
+            {!fromSupercategory && withDelete &&
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => deleteAttributeCallback(name)}
+                >
+                    Delete
+                </Button>
+            }
             {EditAttributeDialog(editAttributeDialogProps.classes,
                 editAttributeDialogProps.dialogOpen,
                 editAttributeDialogProps.nameError,
@@ -157,7 +183,7 @@ class CategoryAttributes extends React.Component {
             this.props.superCategoryAttributes.forEach((attribute) => {
                 attributesList.push(
                     <div key={i}>
-                        {AttributeListItem(attribute.name, attribute.type, attribute.required, this.props.attributeRequiredChangeCallback, true, i.toString(), this.props.editAttributeCallback, editAttributeDialogProps)}
+                        {AttributeListItem(attribute.name, attribute.type, attribute.required, this.props.attributeRequiredChangeCallback, true, i.toString(), this.props.editAttributeCallback, editAttributeDialogProps, false)}
                         <br/>
                     </div>
                 );
@@ -167,15 +193,7 @@ class CategoryAttributes extends React.Component {
         this.props.attributes.forEach((attribute) => {
             attributesList.push(
                 <div key={i}>
-                    {AttributeListItem(attribute.name, attribute.type, attribute.required, this.props.attributeRequiredChangeCallback, false, i.toString(), this.props.editAttributeCallback, editAttributeDialogProps)}
-                    <Button style={{float: "left"}}
-                            className={classes.button}
-                            variant="contained"
-                            color="secondary"
-                            onClick={() => this.props.deleteAttributeCallback(attribute.name)}
-                    >
-                        Delete
-                    </Button>
+                    {AttributeListItem(attribute.name, attribute.type, attribute.required, this.props.attributeRequiredChangeCallback, false, i.toString(), this.props.editAttributeCallback, editAttributeDialogProps,true, this.props.deleteAttributeCallback)}
                     <br/>
                 </div>
             );
@@ -183,22 +201,24 @@ class CategoryAttributes extends React.Component {
         });
 
         return (
-            <div>
-                <div style={{float: 'left'}}>
+            <div className={classes.root}>
+                <div className={classes.form}>
                     <div className={classes.attributeContent}>
                         <TextField
                             error={this.props.attributeNameError}
-                            className={classes.textField}
+                            className={classes.attributeNameTextField}
                             label={"Additional attribute"}
                             value={this.props.newAttributeName}
+                            variant={"outlined"}
                             onChange={this.props.attributeNameChangeCallback}
                             helperText={this.props.attributeNameError === true ? 'There is already attribute with that name in this category' : 'Attribute for all assets in this category'}
                         />
                     </div>
                     <div className={classes.attributeContent}>
                         <Select
-                            className={classes.select}
+                            className={classes.attributeTypeSelect}
                             value={this.props.newAttributeType}
+                            variant={"outlined"}
                             onChange={this.props.attributeTypeChangeCallback}
                         >
                             <MenuItem value={"text"}>Text</MenuItem>
@@ -207,8 +227,8 @@ class CategoryAttributes extends React.Component {
                         </Select>
                     </div>
                     <div className={classes.attributeContent}>
-                        <FormControlLabel
-                            control={<Checkbox
+                        <FormControlLabel className={classes.checkbox}
+                             control={<Checkbox
                                 id={"new"}
                                 checked={this.props.newAttributeRequired}
                                 onChange={this.props.attributeRequiredChangeCallback}
@@ -219,17 +239,18 @@ class CategoryAttributes extends React.Component {
                         />
                     </div>
                     <div className={classes.attributeContent}>
-                        <Button variant="outlined"
+                        <Button style={{marginTop: 7.625}}
+                                variant="contained"
                                 color="primary"
-                                className={classes.button}
+                                size={"large"}
                                 onClick={this.props.saveAttributeCallback}
                                 disabled={this.props.attributeNameError || this.props.newAttributeName === ''}
                         >
-                            Save attribute
+                            Add attribute
                         </Button>
                     </div>
                 </div>
-                <Paper className={classes.attributesListBox} elevation={4} style={{clear: "both"}}>
+                <Paper className={classes.attributesListBox} elevation={4}>
                     <List component={"ul"}>
                         {attributesList}
                     </List>

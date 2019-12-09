@@ -10,20 +10,53 @@ import {sleep} from "../Overview/Overview";
 import SuccessSnackBar from "../SuccessSnackBar";
 
 const styles = ({
-    root: {},
+    root: {
+        height: "calc(100vh - 154px)",
+    },
     content: {
+        height: "100%",
         marginTop: 10,
         marginBottom: 10,
         marginLeft: 10,
         marginRight: 10,
+        display: 'grid',
+        gridTemplateRows: 'max-content fit-content(100%) max-content',
+        gridTemplateAreas: `'form'
+                            'attributes'
+                            'button'`
+    },
+    form: {
+        gridArea: 'form',
+        marginRight: 10,
+        marginTop: 10,
+        marginBottom: 10,
+        marginLeft: 10
+    },
+    attributes: {
+        gridArea: 'attributes',
+        overflow: 'auto',
+        marginTop: 10,
+        marginBottom: 10,
+        marginLeft: 10,
+        marginRight: 10
+    },
+    button: {
+        gridArea: 'button',
+        marginTop: 10,
+        marginBottom: 10,
+        marginLeft: 10,
+        marginRight: 10
     },
     textField: {
-        width: 400,
+        width: 400
     },
     select: {
         textAlign: 'left',
         paddingLeft: 10,
-        width: 400,
+        width: 400
+    },
+    addButton: {
+        width: 400
     }
 });
 
@@ -294,7 +327,7 @@ class AddCategory extends React.Component {
                 />
                 {!this.isLoading() ? (
                     <form className={classes.content} noValidate>
-                        <div className={classes.content}>
+                        <div className={classes.form}>
                             <FormControl>
                                 <InputLabel id="super-category-select-label">Supercategory</InputLabel>
                                 <Select className={classes.select}
@@ -312,20 +345,19 @@ class AddCategory extends React.Component {
                                     )}
                                 </Select>
                             </FormControl>
+                            <div>
+                                <TextField
+                                    error={this.state.categoryNameError}
+                                    className={classes.textField}
+                                    label={"Category name"}
+                                    value={this.state.categoryName}
+                                    onChange={this.handleCategoryNameChange}
+                                    helperText={this.state.categoryNameError === true ? 'Category with that name already exists' : ''}
+                                />
+                            </div>
                         </div>
-                        <div className={classes.content}>
-                            <TextField
-                                error={this.state.categoryNameError}
-                                className={classes.textField}
-                                label={"Category name"}
-                                value={this.state.categoryName}
-                                onChange={this.handleCategoryNameChange}
-                                helperText={this.state.categoryNameError === true ? 'Category with that name already exists' : ''}
-                            />
-                        </div>
-                        <div className={classes.content} style={{clear: "both"}}>
+                        <div className={classes.attributes} style={{clear: "both"}}>
                             <CategoryAttributes
-                                classes={classes}
                                 attributes={this.state.attributes}
                                 superCategoryAttributes={this.state.superCategoryAttributes}
                                 newAttributeName={this.state.newAttributeName}
@@ -349,10 +381,11 @@ class AddCategory extends React.Component {
                                 cancelAttributeEditCallback={this.handleCancelAttributeEdition}
                             />
                         </div>
-                        <div className={classes.content}>
+                        <div className={classes.button}>
                             <Button variant="contained"
                                     color="primary"
-                                    className={classes.button}
+                                    size={"large"}
+                                    className={classes.addButton}
                                     onClick={this.handleAddCategoryButton}
                                     disabled={this.state.categoryNameError || this.state.categoryName === ''}
                             >
