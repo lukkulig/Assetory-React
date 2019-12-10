@@ -12,7 +12,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Input from "@material-ui/core/Input";
 import Chip from "@material-ui/core/Chip";
 import ListItem from "@material-ui/core/ListItem";
-import Grid from "@material-ui/core/Grid";
 import List from "@material-ui/core/List";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -514,7 +513,7 @@ class AddAsset extends React.Component {
                         </div>
                         <div className={classes.content}>
                             {this.state.selectedCategory.id !== "" &&
-                            <TextField
+                            <TextField inputProps={{maxLength: 68}}
                                 error={this.state.assetNameError || this.state.assetNameEmpty}
                                 required={true}
                                 className={classes.textField}
@@ -610,24 +609,22 @@ class AddAsset extends React.Component {
                                         }
                                     </div>
                                     {this.state.relatedAssets.length !== 0 &&
-                                    <Grid item xs={12} md={10}>
-                                        <div className={classes.content}>
-                                            <List dense={true}>
-                                                {this.state.relatedAssets.map(value => (
-                                                    <ListItem key={value.id}>
-                                                        <ListItemText
-                                                            primary={value.name}
-                                                        />
-                                                        <ListItemSecondaryAction>
-                                                            <IconButton edge="end" aria-label="delete"
-                                                                        onClick={() => this.handleDeleteRelatedAssets(value.name)}>
-                                                                <DeleteIcon/>
-                                                            </IconButton>
-                                                        </ListItemSecondaryAction>
-                                                    </ListItem>))}
-                                            </List>
-                                        </div>
-                                    </Grid>
+                                    <div className={classes.content}>
+                                        <List dense={true}>
+                                            {this.state.relatedAssets.map(value => (
+                                                <ListItem key={value.id}>
+                                                    <ListItemText
+                                                        primary={value.name}
+                                                    />
+                                                    <ListItemSecondaryAction>
+                                                        <IconButton edge="end" aria-label="delete"
+                                                                    onClick={() => this.handleDeleteRelatedAssets(value.name)}>
+                                                            <DeleteIcon/>
+                                                        </IconButton>
+                                                    </ListItemSecondaryAction>
+                                                </ListItem>))}
+                                        </List>
+                                    </div>
                                     }
                                 </CardContent>
                             </Collapse>

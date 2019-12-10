@@ -25,7 +25,8 @@ import {DeleteForever} from "@material-ui/icons";
 
 const styles = ({
     root: {
-        height: "calc(100vh - 154px)"
+        height: "calc(100vh - 154px)",
+        minHeight: '390px'
     },
     content: {
         height: "100%",
@@ -51,11 +52,14 @@ const styles = ({
 },
     attributes: {
         gridArea: 'attributes',
-        overflow: 'auto',
+        overflow: 'hidden',
         marginTop: 10,
         marginBottom: 10,
         marginLeft: 10,
-        marginRight: 10
+        marginRight: 10,
+        paddingLeft: 10,
+        paddingRight: 10,
+        paddingBottom: 10,
     },
     button: {
         gridArea: 'button',

@@ -57,12 +57,12 @@ const styles = ({
         flexWrap: 'wrap',
     },
     inlineEdit: {
-        width: '200px',
+        width: '250px',
         marginRight: '15px',
         paddingBottom: 10,
     },
     field: {
-        width: '200px'
+        width: '250px'
     },
     readViewContainer: {
         display: 'flex',
@@ -248,14 +248,16 @@ class AssetView extends React.Component {
 
         return (
             <ExpansionPanel defaultExpanded={open}>
-                <ExpansionPanelSummary
+                <ExpansionPanelSummary style={{width: '100%'}}
                     expandIcon={<ExpandMore/>}
                     aria-controls="panel2a-content"
                     id="panel2a-header"
                 >
-                    <Typography className={classes.title} variant="h6">
+                    <div style={{wordWrap: 'break-word'}}>
+                    <Typography className={classes.title} variant="h6" style={{wordWrap: 'break-word'}}>
                         {asset.name}
                     </Typography>
+                    </div>
                     <Typography className={classes.titleTag} variant="overline" color="textSecondary">
                         {asset.category}
                     </Typography>

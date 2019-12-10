@@ -12,6 +12,7 @@ import SuccessSnackBar from "../SuccessSnackBar";
 const styles = ({
     root: {
         height: "calc(100vh - 154px)",
+        minHeight: '435px'
     },
     content: {
         height: "100%",
@@ -34,11 +35,14 @@ const styles = ({
     },
     attributes: {
         gridArea: 'attributes',
-        overflow: 'auto',
+        overflow: 'hidden',
         marginTop: 10,
         marginBottom: 10,
         marginLeft: 10,
-        marginRight: 10
+        marginRight: 10,
+        paddingLeft: 10,
+        paddingRight: 10,
+        paddingBottom: 10,
     },
     button: {
         gridArea: 'button',
@@ -356,7 +360,7 @@ class AddCategory extends React.Component {
                                 />
                             </div>
                         </div>
-                        <div className={classes.attributes} style={{clear: "both"}}>
+                        <div className={classes.attributes}>
                             <CategoryAttributes
                                 attributes={this.state.attributes}
                                 superCategoryAttributes={this.state.superCategoryAttributes}

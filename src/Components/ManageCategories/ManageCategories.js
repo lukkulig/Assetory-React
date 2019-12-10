@@ -11,7 +11,7 @@ const styles = theme => ({
         height: 'calc(100vh - 64px)',
         display: 'flex',
         justifyContent: 'center',
-        minWidth: '900px',
+        minWidth: '910px',
         scrollPaddingBottom: 10
     },
     content: {
@@ -33,7 +33,7 @@ class ManageCategories extends React.Component {
     render() {
         const {classes} = this.props;
         return (
-            <div className={classes.root}>
+            <div className={classes.root} style={{minHeight: this.state.value === 0 ? '520px' : '470px'}}>
                 <div className={classes.content}>
                     <Tabs value={this.state.value} onSelect={this.handleChange} defaultActiveKey="addCategory" id="categoryActions" >
                         <Tab eventKey="addCategory" title="Add Category">
