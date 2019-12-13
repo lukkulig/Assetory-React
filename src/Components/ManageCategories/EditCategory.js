@@ -21,19 +21,68 @@ import InputLabel from "@material-ui/core/InputLabel";
 import {BeatLoader} from "react-spinners";
 import {sleep} from "../Overview/Overview";
 import SuccessSnackBar from "../SuccessSnackBar";
+import {DeleteForever} from "@material-ui/icons";
 
 const styles = ({
-    root: {},
+    root: {
+        height: "calc(100vh - 154px)",
+        minHeight: '390px'
+    },
     content: {
+        height: "100%",
         marginTop: 10,
         marginBottom: 10,
         marginLeft: 10,
         marginRight: 10,
+        display: 'grid',
+        gridTemplateRows: 'max-content fit-content(100%) max-content',
+        gridTemplateAreas: `'form'
+                            'attributes'
+                            'button'`
+    },
+    form: {
+        gridArea: 'form',
+        marginRight: 10,
+        marginTop: 10,
+        marginBottom: 10,
+        marginLeft: 10,
+        display: 'flex',
+        justifyContent: 'center',
+        position: 'relative'
+},
+    attributes: {
+        gridArea: 'attributes',
+        overflow: 'hidden',
+        marginTop: 10,
+        marginBottom: 10,
+        marginLeft: 10,
+        marginRight: 10,
+        paddingLeft: 10,
+        paddingRight: 10,
+        paddingBottom: 10,
+    },
+    button: {
+        gridArea: 'button',
+        marginTop: 10,
+        marginBottom: 10,
+        marginLeft: 10,
+        marginRight: 10
     },
     select: {
         textAlign: 'left',
         paddingLeft: 10,
-        width: 400,
+        width: 400
+    },
+    selectFormControl: {
+        width: 400
+    },
+    editButton: {
+        width: 400
+    },
+    deleteButton: {
+        marginTop: 5,
+        position: 'absolute',
+        right: 0
     }
 });
 
@@ -377,6 +426,12 @@ class EditCategory extends React.Component {
 
     render() {
         const {classes} = this.props;
+
+        let selectPadding = 0;
+        if (!this.isLoading() && this.state.category !== this.state.categories[0]) {
+            selectPadding = -15;
+        }
+
         return (
             <div className={classes.root}>
                 <SuccessSnackBar
@@ -386,10 +441,11 @@ class EditCategory extends React.Component {
                 />
                 {!this.isLoading() ? (
                     <form className={classes.content} noValidate>
-                        <div className={classes.content}>
-                            <FormControl>
+                        <div className={classes.form}>
+                            <FormControl className={classes.selectFormControl}>
                                 <InputLabel id="category-select-label">Category</InputLabel>
                                 <Select className={classes.select}
+                                        style={{marginRight: selectPadding}}
                                         id="category-select"
                                         labelId="category-select-label"
                                         value={this.state.category.id}
@@ -406,14 +462,15 @@ class EditCategory extends React.Component {
                             </FormControl>
                             {this.state.category !== this.state.categories[0] &&
                             <React.Fragment>
-                                <Button style={{float: "left"}}
-                                        className={classes.button}
+                                <Button className={classes.deleteButton}
                                         variant="contained"
                                         color="secondary"
+                                        size={"large"}
                                         onClick={this.handleDeleteCategoryButton}
                                         disabled={this.state.category === undefined}
                                 >
                                     Delete
+                                    <DeleteForever fontSize='small' className={classes.icon}/>
                                 </Button>
                                 <Dialog
                                     open={this.state.deleteDialogOpen}
@@ -449,9 +506,8 @@ class EditCategory extends React.Component {
                             </React.Fragment>
                             }
                         </div>
-                        <div className={classes.content} style={{clear: "both"}}>
+                        <div className={classes.attributes}>
                             <CategoryAttributes
-                                classes={classes}
                                 attributes={this.state.attributes}
                                 superCategoryAttributes={this.state.superCategoryAttributes}
                                 newAttributeName={this.state.newAttributeName}
@@ -475,10 +531,11 @@ class EditCategory extends React.Component {
                                 cancelAttributeEditCallback={this.handleCancelAttributeEdition}
                             />
                         </div>
-                        <div className={classes.content}>
+                        <div className={classes.button}>
                             <Button variant="contained"
                                     color="primary"
-                                    className={classes.button}
+                                    size={"large"}
+                                    className={classes.editButton}
                                     onClick={this.handleSaveCategoryButton}
                             >
                                 Save category
