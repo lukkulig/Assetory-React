@@ -12,7 +12,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Input from "@material-ui/core/Input";
 import Chip from "@material-ui/core/Chip";
 import ListItem from "@material-ui/core/ListItem";
-import Grid from "@material-ui/core/Grid";
 import List from "@material-ui/core/List";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -47,7 +46,6 @@ const styles = ({
         textAlign: 'left',
         paddingLeft: 10,
         width: 580,
-        fontWeight: 1000
     },
     selectAssets: {
         textAlign: 'left',
@@ -353,7 +351,7 @@ class AddAsset extends React.Component {
     };
 
     handleSnackbarOpen = (name) => {
-        this.setState({snackOpen: true, snackMsg: "Asset " + name + " was created!"})
+        this.setState({snackOpen: true, snackMsg: "Asset " + name + " successfully created!"})
     };
 
     isValid() {
@@ -514,15 +512,15 @@ class AddAsset extends React.Component {
                         </div>
                         <div className={classes.content}>
                             {this.state.selectedCategory.id !== "" &&
-                            <TextField
-                                error={this.state.assetNameError || this.state.assetNameEmpty}
+                            <TextField inputProps={{maxLength: 68}}
+                                error={this.state.assetNameError}
                                 required={true}
                                 className={classes.textField}
                                 label={"Asset name"}
                                 value={this.state.assetName}
                                 onChange={this.handleAssetNameChange}
                                 variant='outlined'
-                                helperText={this.state.assetNameError === true ? 'Asset with that name already exists' : this.state.assetNameEmpty === true ? 'Asset name is required' : ''}
+                                helperText={this.state.assetNameError === true ? 'Asset with that name already exists' : ''}
                             />
                             }
                         </div>
@@ -610,24 +608,22 @@ class AddAsset extends React.Component {
                                         }
                                     </div>
                                     {this.state.relatedAssets.length !== 0 &&
-                                    <Grid item xs={12} md={10}>
-                                        <div className={classes.content}>
-                                            <List dense={true}>
-                                                {this.state.relatedAssets.map(value => (
-                                                    <ListItem key={value.id}>
-                                                        <ListItemText
-                                                            primary={value.name}
-                                                        />
-                                                        <ListItemSecondaryAction>
-                                                            <IconButton edge="end" aria-label="delete"
-                                                                        onClick={() => this.handleDeleteRelatedAssets(value.name)}>
-                                                                <DeleteIcon/>
-                                                            </IconButton>
-                                                        </ListItemSecondaryAction>
-                                                    </ListItem>))}
-                                            </List>
-                                        </div>
-                                    </Grid>
+                                    <div className={classes.content}>
+                                        <List dense={true}>
+                                            {this.state.relatedAssets.map(value => (
+                                                <ListItem key={value.id}>
+                                                    <ListItemText
+                                                        primary={value.name}
+                                                    />
+                                                    <ListItemSecondaryAction>
+                                                        <IconButton edge="end" aria-label="delete"
+                                                                    onClick={() => this.handleDeleteRelatedAssets(value.name)}>
+                                                            <DeleteIcon/>
+                                                        </IconButton>
+                                                    </ListItemSecondaryAction>
+                                                </ListItem>))}
+                                        </List>
+                                    </div>
                                     }
                                 </CardContent>
                             </Collapse>

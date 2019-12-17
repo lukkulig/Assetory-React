@@ -16,25 +16,93 @@ import {
     TextField,
     withStyles
 } from "@material-ui/core";
+import Fab from "@material-ui/core/Fab";
+import {Cancel, CheckCircle, Delete, Edit} from '@material-ui/icons';
+import ListSubheader from "@material-ui/core/ListSubheader";
 
 const styles = ({
-    root: {},
-    content: {},
-    select: {},
-    attributesListBox: {
-        maxHeight: 280,
-        overflow: 'auto',
+    root: {
+        height: "100%",
+        minHeight: '210px',
+        display: 'grid',
+        gridTemplateRows: 'min-content auto',
+        gridTemplateAreas: `'form'
+                             'attributes'`
     },
-    textField: {
-        width: 400,
+    form: {
+        minHeight: '110px',
+        gridArea: 'form',
+        float: 'left'
+    },
+    attributeTypeSelect: {
+        width: 150,
+        textAlign: 'left',
+    },
+    attributesListBox: {
+        minHeight: '90px',
+        gridArea: 'attributes',
+        overflow: 'auto',
+        scrollPaddingRight: 10
+    },
+    attributeNameTextField: {
+        width: 300
     },
     attributeContent: {
         float: 'left',
         marginTop: 10,
         marginBottom: 10,
         marginLeft: 10,
-        marginRight: 10,
+        marginRight: 10
     },
+    checkbox: {
+        marginTop: 7.5,
+        marginLeft: 0,
+        marginRight: 0,
+    },
+    listItem: {
+        display: 'grid',
+        gridTemplateColumns: '400px 90px 90px 100px',
+        gridTemplateAreas: `'name type required buttons'`,
+    },
+    name: {
+        gridArea: 'name',
+        wordWrap: "break-word",
+        marginRight: 10
+    },
+    type: {
+        gridArea: 'type',
+        marginRight: 10
+    },
+    required: {
+        gridArea: 'required',
+        textAlign: 'center',
+        marginRight: 10
+    },
+    buttons: {
+        gridArea: 'buttons'
+    },
+    button: {
+        marginLeft: '5px',
+        marginRight: '5px'
+    },
+    smallButton: {
+        height: 36,
+        width: 36,
+    },
+    list: {
+        paddingTop: 0,
+        paddingBottom: 0
+    },
+    listSubheaderText: {
+        verticalAlign: 'top',
+        paddingTop: 0,
+        paddingBottom: 0,
+        height: 30,
+        textAlign: 'left',
+        paddingLeft: 10,
+        fontSize: 12,
+        color: "#6B778C"
+    }
 });
 
 const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCallback, type, typeChangeCallback, required, requiredChangeCallback, saveAttributeCallback, cancelEditCallback) => {
@@ -46,9 +114,9 @@ const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCal
                 <DialogTitle id="edit-attribute">Edit attribute</DialogTitle>
                 <DialogContent>
                     <div className={classes.attributeContent}>
-                        <TextField
+                        <TextField inputProps={{maxLength: 18}}
                             error={nameError}
-                            className={classes.textField}
+                            className={classes.attributeNameTextField}
                             label={"Attribute name"}
                             value={name}
                             onChange={nameChangeCallback}
@@ -58,7 +126,7 @@ const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCal
                     </div>
                     <div className={classes.attributeContent}>
                         <Select
-                            className={classes.select}
+                            className={classes.attributeTypeSelect}
                             value={type}
                             onChange={typeChangeCallback}
                         >
@@ -87,7 +155,6 @@ const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCal
                     </Button>
                     <Button
                         color="primary"
-                        className={classes.button}
                         onClick={saveAttributeCallback}
                         disabled={nameError || name === ''}
                     >
@@ -99,28 +166,35 @@ const EditAttributeDialog = (classes, dialogOpen, nameError, name, nameChangeCal
     )
 };
 
-const AttributeListItem = (name, type, required, handleChange, fromSupercategory, id, editAttributeCallback, editAttributeDialogProps) => {
+const AttributeListItem = (i, classes, name, type, required, handleChange, fromSupercategory, id, editAttributeCallback, editAttributeDialogProps, deleteAttributeCallback) => {
     return (
-        <ListItem component={"li"} style={{float: "left"}}>
-            {name + " (" + type + ")"}
-            <FormControlLabel
-                control={<Checkbox
-                    id={id}
-                    disabled={true}
-                    checked={required}
-                    onChange={handleChange}
-                    value="required"
-                    color="primary"/>}
-                label="Required"
-                labelPlacement="start"
-            />
-            <Button variant="contained"
-                    disabled={fromSupercategory}
-                    onClick={() => editAttributeCallback(name)}
-            >
-                Edit
-            </Button>
-            {EditAttributeDialog(editAttributeDialogProps.classes,
+        <ListItem key={i} component={"li"} className={classes.listItem}>
+            <div className={classes.name}>{name}</div>
+            <div className={classes.type}>{type.charAt(0).toUpperCase() + type.slice(1)}</div>
+            <div className={classes.required}>
+                {required ?
+                    <CheckCircle color={"primary"}/>
+                    :
+                    <Cancel color={"disabled"}/>
+                }
+            </div>
+            <div className={classes.buttons}>
+                {!fromSupercategory &&
+                <Fab className={classes.button} classes={{sizeSmall: classes.smallButton}}
+                     size="small" color="primary"
+                     onClick={() => editAttributeCallback(name)}>
+                    <Edit/>
+                </Fab>
+                }
+                {!fromSupercategory &&
+                <Fab className={classes.button} classes={{sizeSmall: classes.smallButton}}
+                     size="small" color="secondary"
+                     onClick={() => deleteAttributeCallback(name)}>
+                    <Delete/>
+                </Fab>
+                }
+            </div>
+            {EditAttributeDialog(classes,
                 editAttributeDialogProps.dialogOpen,
                 editAttributeDialogProps.nameError,
                 editAttributeDialogProps.name,
@@ -139,7 +213,6 @@ class CategoryAttributes extends React.Component {
     render() {
         const {classes} = this.props;
         let editAttributeDialogProps = {
-            classes: this.props.classes,
             dialogOpen: this.props.editAttributeDialogOpen,
             required: this.props.editedAttributeRequired,
             requiredChangeCallback: this.props.editedAttributeRequiredChangeCallback,
@@ -152,53 +225,42 @@ class CategoryAttributes extends React.Component {
             cancelEditCallback: this.props.cancelAttributeEditCallback,
         };
         let i = 0;
+        const inheritedAttributesList = [];
         const attributesList = [];
         if (this.props.superCategoryAttributes !== undefined) {
             this.props.superCategoryAttributes.forEach((attribute) => {
-                attributesList.push(
-                    <div key={i}>
-                        {AttributeListItem(attribute.name, attribute.type, attribute.required, this.props.attributeRequiredChangeCallback, true, i.toString(), this.props.editAttributeCallback, editAttributeDialogProps)}
-                        <br/>
-                    </div>
+                inheritedAttributesList.push(
+                    AttributeListItem(i, this.props.classes, attribute.name, attribute.type, attribute.required, this.props.attributeRequiredChangeCallback, true, i.toString(), this.props.editAttributeCallback, editAttributeDialogProps)
                 );
                 i++;
             });
         }
         this.props.attributes.forEach((attribute) => {
             attributesList.push(
-                <div key={i}>
-                    {AttributeListItem(attribute.name, attribute.type, attribute.required, this.props.attributeRequiredChangeCallback, false, i.toString(), this.props.editAttributeCallback, editAttributeDialogProps)}
-                    <Button style={{float: "left"}}
-                            className={classes.button}
-                            variant="contained"
-                            color="secondary"
-                            onClick={() => this.props.deleteAttributeCallback(attribute.name)}
-                    >
-                        Delete
-                    </Button>
-                    <br/>
-                </div>
+                AttributeListItem(i, this.props.classes, attribute.name, attribute.type, attribute.required, this.props.attributeRequiredChangeCallback, false, i.toString(), this.props.editAttributeCallback, editAttributeDialogProps, this.props.deleteAttributeCallback)
             );
             i++;
         });
 
         return (
-            <div>
-                <div style={{float: 'left'}}>
+            <div className={classes.root}>
+                <div className={classes.form}>
                     <div className={classes.attributeContent}>
-                        <TextField
+                        <TextField inputProps={{maxLength: 18}}
                             error={this.props.attributeNameError}
-                            className={classes.textField}
-                            label={"Additional attribute"}
+                            className={classes.attributeNameTextField}
+                            label={"New attribute name"}
                             value={this.props.newAttributeName}
+                            variant={"outlined"}
                             onChange={this.props.attributeNameChangeCallback}
-                            helperText={this.props.attributeNameError === true ? 'There is already attribute with that name in this category' : 'Attribute for all assets in this category'}
+                            helperText={this.props.attributeNameError === true ? 'There is already attribute with that name in this category' : 'New attribute for all assets in this category'}
                         />
                     </div>
                     <div className={classes.attributeContent}>
                         <Select
-                            className={classes.select}
+                            className={classes.attributeTypeSelect}
                             value={this.props.newAttributeType}
+                            variant={"outlined"}
                             onChange={this.props.attributeTypeChangeCallback}
                         >
                             <MenuItem value={"text"}>Text</MenuItem>
@@ -207,32 +269,60 @@ class CategoryAttributes extends React.Component {
                         </Select>
                     </div>
                     <div className={classes.attributeContent}>
-                        <FormControlLabel
-                            control={<Checkbox
-                                id={"new"}
-                                checked={this.props.newAttributeRequired}
-                                onChange={this.props.attributeRequiredChangeCallback}
-                                value="required"
-                                color="primary"/>}
-                            label="Required"
-                            labelPlacement="start"
+                        <FormControlLabel classes={{labelPlacementStart: classes.checkbox}}
+                                          control={<Checkbox
+                                              id={"new"}
+                                              checked={this.props.newAttributeRequired}
+                                              onChange={this.props.attributeRequiredChangeCallback}
+                                              value="required"
+                                              color="primary"/>}
+                                          label="Required"
+                                          labelPlacement="start"
                         />
                     </div>
                     <div className={classes.attributeContent}>
-                        <Button variant="outlined"
+                        <Button style={{marginTop: 7.625}}
+                                variant="contained"
                                 color="primary"
-                                className={classes.button}
+                                size={"large"}
                                 onClick={this.props.saveAttributeCallback}
                                 disabled={this.props.attributeNameError || this.props.newAttributeName === ''}
                         >
-                            Save attribute
+                            Add attribute
                         </Button>
                     </div>
                 </div>
-                <Paper className={classes.attributesListBox} elevation={4} style={{clear: "both"}}>
-                    <List component={"ul"}>
+                <Paper className={classes.attributesListBox} elevation={4}>
+                    <List disablePadding={true}>
+                        <ListItem component={"li"} className={classes.listItem} divider={true}>
+                            <div className={classes.name} style={{fontWeight: 1000, color: "darkgray"}}>Name</div>
+                            <div className={classes.type} style={{fontWeight: 1000, color: "darkgray"}}>Type</div>
+                            <div className={classes.required} style={{fontWeight: 1000, color: "darkgray"}}>Required
+                            </div>
+                        </ListItem>
+                    </List>
+                    {inheritedAttributesList.length !== 0 &&
+                    <List disablePadding={true}
+                          subheader={
+                              <ListSubheader component='div' classes={{root: classes.listSubheaderText}}
+                                             disableSticky={true}>
+                                  Attributes inherited from supercategories
+                              </ListSubheader>
+                          }>
+                        {inheritedAttributesList}
+                    </List>
+                    }
+                    {attributesList.length !== 0 &&
+                    <List disablePadding={true}
+                          subheader={
+                              <ListSubheader component='div' classes={{root: classes.listSubheaderText}}
+                                             disableSticky={true}>
+                                  Specific attributes
+                              </ListSubheader>
+                          }>
                         {attributesList}
                     </List>
+                    }
                 </Paper>
             </div>
         )
