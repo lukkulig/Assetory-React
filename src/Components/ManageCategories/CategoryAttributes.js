@@ -249,7 +249,7 @@ class CategoryAttributes extends React.Component {
                         <TextField inputProps={{maxLength: 18}}
                             error={this.props.attributeNameError}
                             className={classes.attributeNameTextField}
-                            label={"New attribute nam"}
+                            label={"New attribute name"}
                             value={this.props.newAttributeName}
                             variant={"outlined"}
                             onChange={this.props.attributeNameChangeCallback}

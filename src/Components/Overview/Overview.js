@@ -217,7 +217,7 @@ class Overview extends React.Component {
     };
 
     handleSnackbarOpenAfterAssetDelete = (name) => {
-        this.setState({snackOpen: true, snackMsg: "Asset " + name + " was deleted!"});
+        this.setState({snackOpen: true, snackMsg: "Asset " + name + " successfully deleted!"});
     };
 
     render() {

@@ -46,7 +46,6 @@ const styles = ({
         textAlign: 'left',
         paddingLeft: 10,
         width: 580,
-        fontWeight: 1000
     },
     selectAssets: {
         textAlign: 'left',
@@ -352,7 +351,7 @@ class AddAsset extends React.Component {
     };
 
     handleSnackbarOpen = (name) => {
-        this.setState({snackOpen: true, snackMsg: "Asset " + name + " was created!"})
+        this.setState({snackOpen: true, snackMsg: "Asset " + name + " successfully created!"})
     };
 
     isValid() {
@@ -514,14 +513,14 @@ class AddAsset extends React.Component {
                         <div className={classes.content}>
                             {this.state.selectedCategory.id !== "" &&
                             <TextField inputProps={{maxLength: 68}}
-                                error={this.state.assetNameError || this.state.assetNameEmpty}
+                                error={this.state.assetNameError}
                                 required={true}
                                 className={classes.textField}
                                 label={"Asset name"}
                                 value={this.state.assetName}
                                 onChange={this.handleAssetNameChange}
                                 variant='outlined'
-                                helperText={this.state.assetNameError === true ? 'Asset with that name already exists' : this.state.assetNameEmpty === true ? 'Asset name is required' : ''}
+                                helperText={this.state.assetNameError === true ? 'Asset with that name already exists' : ''}
                             />
                             }
                         </div>

@@ -317,7 +317,7 @@ class AddCategory extends React.Component {
     };
 
     handleSnackbarOpen = (name) => {
-        this.setState({snackOpen: true, snackMsg: "Category " + name + " was created!"})
+        this.setState({snackOpen: true, snackMsg: "Category " + name + " successfully created!"})
     };
 
     render() {

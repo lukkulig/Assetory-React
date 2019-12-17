@@ -417,11 +417,11 @@ class EditCategory extends React.Component {
     };
 
     handleSnackbarOpenAfterEdit = (name) => {
-        this.setState({snackOpen: true, snackMsg: "Category " + name + " was edited!"})
+        this.setState({snackOpen: true, snackMsg: "Category " + name + " successfully edited!"})
     };
 
     handleSnackbarOpenAfterDelete = (name) => {
-        this.setState({snackOpen: true, snackMsg: "Category " + name + " was deleted!"})
+        this.setState({snackOpen: true, snackMsg: "Category " + name + " successfully deleted!"})
     };
 
     render() {
